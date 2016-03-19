@@ -4,146 +4,1136 @@
  * @version 1.0
  */
 /*
-Plugin Name: CodistoConnect
+Plugin Name: Codisto Connect
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
-Description: List on ebay
-Author: Luke Amery
-Version: 1.0
+Description: List on eBay
+Author: Codisto
+Version: 1.1.87
 Author URI: https://codisto.com/
+License: GPLv2
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */
-
-define('CODISTOCONNECT_VERSION', '1.0');
-
-$merchantid = get_option('codisto_merchantid');
-
-if(!$merchantid)
-{
-	// register merchant
-	update_option('codisto_merchantid', '12822');
-	update_option('codisto_key', 'x');
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
 }
 
-function codisto_query_vars($vars)
-{
-	$vars[] = 'codisto';
-	$vars[] = 'codisto-proxy-route';
-	$vars[] = 'codisto-sync-route';
-	return $vars;
-}
+define('CODISTOCONNECT_VERSION', '1.1.87');
+define('CODISTOCONNECT_RESELLERKEY', '');
 
-function codisto_sync()
-{
-	global $wp;
-	global $wpdb;
 
-	if(strtolower($_SERVER['REQUEST_METHOD']) == 'get')
+if( ! class_exists('CodistoConnect') ) :
+
+
+final class CodistoConnect {
+
+	private $ping = null;
+
+	protected static $_instance = null;
+
+	public function query_vars($vars)
 	{
+		$vars[] = 'codisto';
+		$vars[] = 'codisto-proxy-route';
+		$vars[] = 'codisto-sync-route';
+		return $vars;
+	}
+
+	public function check_hash()
+	{
+		if(!isset($_SERVER['HTTP_X_NONCE']) ||
+			!isset($_SERVER['HTTP_X_HASH']))
+		{
+			status_header('400 Security Error');
+			header('Content-Type: application/json');
+			header('Cache-Control: no-cache, no-store');
+			header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+			header('Pragma: no-cache');
+			echo wp_json_encode(array( 'ack' => 'error', 'message' => 'Security Error - Missing Headers' ));
+			return false;
+		}
+
+		$r = get_option('codisto_key') . $_SERVER['HTTP_X_NONCE'];
+		$base = hash('sha256', $r, true);
+		$checkHash = base64_encode($base);
+		if(!hash_equals($_SERVER['HTTP_X_HASH'], $checkHash))
+		{
+			status_header('400 Security Error');
+			header('Content-Type: application/json');
+			header('Cache-Control: no-cache, no-store');
+			header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+			header('Pragma: no-cache');
+			echo wp_json_encode(array( 'ack' => 'error', 'message' => 'Security Error' ));
+			return false;
+		}
+
+		return true;
+	}
+
+	public function order_set_date($order_data)
+	{
+		return $order_data;
+	}
+
+	public function sync()
+	{
+		global $wp;
+		global $wpdb;
+
+		set_time_limit(0);
+
+		@ini_set('zlib.output_compression', 'Off');
+		@ini_set('output_buffering', 'Off');
+		@ini_set('output_handler', '');
+
+		if( !in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) )))
+		{
+			status_header('500 Config Error');
+			header('Content-Type: application/json');
+			header('Cache-Control: no-cache, no-store');
+			header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+			header('Pragma: no-cache');
+			echo wp_json_encode(array( 'ack' => 'failed', 'message' => 'WooCommerce Deactivated' ));
+			exit();
+		}
+
 		$type = $wp->query_vars['codisto-sync-route'];
 
-		if($type == 'tax')
+		if(strtolower($_SERVER['REQUEST_METHOD']) == 'get')
 		{
-			$rates = $wpdb->get_results("SELECT * FROM `{$wpdb->prefix}woocommerce_tax_rates` WHERE tax_rate_class = '' ORDER BY tax_rate_order");
-
-			status_header('200 OK');
-			header('Content-Type: application/json');
-			header('Cache-Control: no-cache, no-store');
-			header('Expires: on, 01 Jan 1970 00:00:00 GMT');
-			header('Pragma: no-cache');
-			echo wp_json_encode($rates);
-		}
-		else if($type == 'products')
-		{
-			$page = isset($_GET['page']) ? (int)$_GET['page'] : 0;
-			$count = isset($_GET['count']) ? (int)$_GET['count'] : 0;
-
-			$products = $wpdb->get_results( $wpdb->prepare(
-				"SELECT ID, (SELECT meta_value FROM `{$wpdb->prefix}postmeta` WHERE post_id = P.ID AND meta_key = '_sku') AS Code, post_title AS Name, CAST(COALESCE((SELECT meta_value FROM `{$wpdb->prefix}postmeta` WHERE post_id = P.ID AND meta_key = '_regular_price'), 0) AS DECIMAL) AS Price FROM `{$wpdb->prefix}posts` AS P WHERE post_type = 'product' AND post_status NOT IN ('auto-draft') ORDER BY ID LIMIT %d, %d",
-				$page * $count,
-				$count
-			));
-
-			foreach($products as $product)
+			if($type == 'test')
 			{
-				$wc_product = wc_get_product($product->ID);
-
-				$product->image = wp_get_attachment_image_src($wc_product->get_image_id())[0];
-			}
-
-			status_header('200 OK');
-			header('Content-Type: application/json');
-			header('Cache-Control: no-cache, no-store');
-			header('Expires: on, 01 Jan 1970 00:00:00 GMT');
-			header('Pragma: no-cache');
-			echo wp_json_encode(array( 'products' => $products, 'total_count' => 1));
-		}
-	}
-	else
-	{
-
-	}
-}
-
-function codisto_proxy()
-{
-	global $wp;
-
-	if(isset($_GET['productid']))
-	{
-		wp_redirect(admin_url('post.php?post='.$_GET['productid'].'&action=edit#codisto_product_data'));
-		exit;
-	}
-
-	$HostKey = get_option('codisto_key');
-
-	if (!function_exists('getallheaders'))
-	{
-		 function getallheaders()
-		 {
-			$headers = '';
-			foreach ($_SERVER as $name => $value)
-			{
-				if (substr($name, 0, 5) == 'HTTP_')
+				if(!$this->check_hash())
 				{
-					$headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+					exit();
+				}
+
+				if(preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+				{
+					@ini_set('zlib.output_compression_level', 9);
+					@ob_start("ob_gzhandler");
+				}
+				status_header('200 OK');
+				header('Content-Type: application/json');
+				header('Cache-Control: no-cache, no-store');
+				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+				header('Pragma: no-cache');
+				echo wp_json_encode(array( 'ack' => 'ok' ));
+			}
+			else if($type === 'settings')
+			{
+				if(!$this->check_hash())
+				{
+					exit();
+				}
+
+				$logo_url = get_header_image();
+
+				if(function_exists('site_logo'))
+				{
+					$logo = site_logo()->logo;
+					$logo_id = get_theme_mod( 'custom_logo' );
+					$logo_id = $logo_id ? $logo_id : $logo['id'];
+
+					if($logo_id)
+					{
+						$logo_url = wp_get_attachment_image_src($logo_id);
+						$logo_url = $logo_url[0];
+					}
+				}
+
+				$currency = get_option('woocommerce_currency');
+
+				$dimension_unit = get_option('woocommerce_dimension_unit');
+
+				$weight_unit = get_option('woocommerce_weight_unit');
+
+				$default_location = explode(':', get_option('woocommerce_default_country'));
+
+				$country_code = isset($default_location[0]) ? $default_location[0] : '';
+				$state_code = isset($default_location[1]) ? $default_location[1] : '';
+
+				$response = array( 'ack' => 'ok',
+					'logo' => $logo_url,
+					'currency' => $currency,
+					'dimension_unit' => $dimension_unit,
+					'weight_unit' => $weight_unit,
+				 	'country_code' => $country_code,
+				 	'state_code' => $state_code );
+
+				if(preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+				{
+					@ini_set('zlib.output_compression_level', 9);
+					@ob_start("ob_gzhandler");
+				}
+				status_header('200 OK');
+				header('Content-Type: application/json');
+				header('Cache-Control: no-cache, no-store');
+				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+				header('Pragma: no-cache');
+				echo wp_json_encode($response);
+			}
+			else if($type === 'tax')
+			{
+				if(!$this->check_hash())
+				{
+					exit();
+				}
+
+				$rates = $wpdb->get_results("SELECT tax_rate_country AS country, tax_rate_state AS state, tax_rate AS rate, tax_rate_name AS name, tax_rate_class AS class, tax_rate_order AS sequence, tax_rate_priority AS priority FROM `{$wpdb->prefix}woocommerce_tax_rates` ORDER BY tax_rate_order");
+
+				$response = array( 'ack' => 'ok', 'tax_rates' => $rates );
+
+				if(preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+				{
+					@ini_set('zlib.output_compression_level', 9);
+					@ob_start("ob_gzhandler");
+				}
+				status_header('200 OK');
+				header('Content-Type: application/json');
+				header('Cache-Control: no-cache, no-store');
+				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+				header('Pragma: no-cache');
+				echo wp_json_encode($response);
+			}
+			else if($type === 'products')
+			{
+				if(!$this->check_hash())
+				{
+					exit();
+				}
+
+				$page = isset($_GET['page']) ? (int)$_GET['page'] : 0;
+				$count = isset($_GET['count']) ? (int)$_GET['count'] : 0;
+
+				$product_ids = isset($_GET['product_ids']) ? json_decode($_GET['product_ids']) : null;
+
+				if(!is_null($product_ids))
+				{
+					if(!is_array($product_ids))
+						$product_ids = array($product_ids);
+
+					$product_ids = array_filter($product_ids, create_function('$v', 'return is_numeric($v);'));
+
+					if(!isset($_GET['count']))
+					{
+						$count = count($product_ids);
+					}
+				}
+
+				$products = $wpdb->get_results( $wpdb->prepare(
+						"SELECT id AS id ".
+						"FROM `{$wpdb->prefix}posts` AS P ".
+						"WHERE post_type = 'product' ".
+						"		AND post_status IN ('publish', 'future', 'pending', 'private') ".
+						"	".(is_array($product_ids) ? 'AND id IN ('.implode(',', $product_ids).')' : '')."".
+						"ORDER BY ID LIMIT %d, %d",
+					$page * $count,
+					$count
+				));
+
+				if(!is_array($product_ids) &&
+						$page === 0)
+				{
+					$total_count = $wpdb->get_var("SELECT COUNT(*) FROM `{$wpdb->prefix}posts` WHERE post_type = 'product' AND post_status IN ('publish', 'future', 'pending', 'private')");
+				}
+
+				foreach($products as $product)
+				{
+					$wc_product = wc_get_product($product->id);
+
+					$categoryproduct = $wc_product->get_categories();
+
+					$product->sku = $wc_product->get_sku();
+					$product->name = html_entity_decode(apply_filters( 'woocommerce_product_title', $wc_product->post->post_title, $wc_product ), ENT_COMPAT | ENT_HTML401, 'UTF-8');
+					$product->enabled = $wc_product->is_purchasable() && ($wc_product->managing_stock() || $wc_product->is_in_stock());
+					$product->price = $wc_product->get_price_excluding_tax();
+					$product->listprice = floatval($wc_product->get_regular_price());
+					$product->is_taxable = $wc_product->is_taxable();
+					$product->tax_class = $wc_product->get_tax_class();
+					$product->stock_control = $wc_product->managing_stock();
+					$product->stock_level = $wc_product->get_stock_quantity();
+					$product->type = $wc_product->get_type();
+					$product->description = apply_filters('the_content', $wc_product->post->post_content);
+					$product->short_description = apply_filters('the_content', $wc_product->post->post_excerpt);
+					$product->width = $wc_product->get_width();
+					if(!is_numeric($product->width))
+						unset($product->width);
+					$product->height = $wc_product->get_height();
+					if(!is_numeric($product->height))
+						unset($product->height);
+					$product->length = $wc_product->get_length();
+					if(!is_numeric($product->length))
+						unset($product->length);
+					$product->weight = $wc_product->get_weight();
+					if(!is_numeric($product->weight))
+						unset($product->weight);
+
+					if($product->is_taxable && 'yes' === get_option( 'woocommerce_prices_include_tax' ))
+					{
+						$tax_rates = WC_Tax::get_base_tax_rates( $product->tax_class );
+						$taxes = WC_Tax::calc_tax( $product->listprice , $tax_rates, true );
+						$product->listprice = $product->listprice - array_sum( $taxes );
+					}
+
+					if($product->type == 'variable')
+					{
+						$product->skus = array();
+
+						foreach($wc_product->get_children() as $child_id)
+						{
+							$child_product = $wc_product->get_child($child_id);
+
+							$img = wp_get_attachment_image_src($child_product->get_image_id());
+							$img = $img[0];
+
+							$child_product_data = array(
+												'id' => $child_id,
+												'sku' => $child_product->get_sku(),
+												'enabled' => $wc_product->is_purchasable() && ($wc_product->managing_stock() || $wc_product->is_in_stock()),
+												'price' => $child_product->get_price_excluding_tax(),
+												'listprice' => $child_product->get_regular_price(),
+												'is_taxable' => $child_product->is_taxable(),
+												'tax_class' => $child_product->get_tax_class(),
+												'stock_control' => $child_product->managing_stock(),
+												'stock_level' => $child_product->get_stock_quantity(),
+												'images' => array(array( 'source' => $img, 'sequence' => 0))
+											);
+
+							$attributes = array();
+
+							foreach($child_product->get_variation_attributes() as $name => $value)
+							{
+								$name = preg_replace('/^attribute_pa_/', '', $name);
+
+								$attributes[] = array( 'name' => $name, 'value' => $value );
+							}
+
+							$child_product_data['attributes'] = $attributes;
+
+							$product->skus[] = $child_product_data;
+						}
+					}
+					else if($product->type == 'grouped')
+					{
+						$product->skus = array();
+
+						foreach($wc_product->get_children() as $child_id)
+						{
+							$child_product = $wc_product->get_child($child_id);
+
+							$child_product_data = array(
+												'id' => $child_id,
+												'price' => $child_product->get_price_excluding_tax(),
+												'sku' => $child_product->get_sku(),
+												'name' => $child_product->get_title()
+											);
+
+							$product->skus[] = $child_product_data;
+						}
+					}
+
+					$product->categories = array();
+
+					$product_categories = get_the_terms($product->id, 'product_cat');
+
+					if(is_array($product_categories))
+					{
+						$sequence = 0;
+						foreach($product_categories as $category)
+						{
+							$product->categories[] = array( 'category_id' => $category->term_id, 'sequence' => $sequence );
+
+							$sequence++;
+						}
+					}
+
+					$product->images = array();
+
+					$imagesUsed = array();
+
+					$primaryimage_path = wp_get_attachment_image_src($wc_product->get_image_id());
+					$primaryimage_path = $primaryimage_path[0];
+
+					if($primaryimage_path)
+					{
+						$product->images[] = array( 'source' => $primaryimage_path, 'sequence' => 0 );
+
+						$imagesUsed[$primaryimage_path] = true;
+
+						$sequence = 1;
+						foreach($wc_product->get_gallery_attachment_ids() as $image_id)
+						{
+							$image_path = wp_get_attachment_image_src($image_id);
+							$image_path = $image_path[0];
+
+							if(!array_key_exists($image_path, $imagesUsed))
+							{
+								$product->images[] = array( 'source' => $image_path, 'sequence' => $sequence );
+
+								$imagesUsed[$image_path] = true;
+
+								$sequence++;
+							}
+						}
+					}
+
+					$product->attributes = array();
+
+					$attributesUsed = array();
+
+					foreach($wc_product->get_attributes() as $attribute)
+					{
+						if(!$attribute['is_variation'] && !$attribute['is_taxonomy'])
+						{
+							if(!array_key_exists($attribute['name'], $attributesUsed))
+							{
+								$attributesUsed[$attribute['name']] = true;
+
+								$product->attributes[] = array( 'name' => $attribute['name'], 'value' => $attribute['value'] );
+							}
+						}
+					}
+
+					foreach(get_post_custom_keys($product->id) as $attribute)
+					{
+						if(!(substr($attribute, 0, 1) === '_' ||
+							substr($attribute, 0, 3) === 'pa_'))
+						{
+							if(!array_key_exists($attribute, $attributesUsed))
+							{
+								$attributesUsed[$attribute] = true;
+
+								$value = get_post_meta($product->id, $attribute, false);
+								if(is_array($value))
+								{
+									if(count($value) === 1)
+										$value = $value[0];
+									else
+										$value = implode(',', $value);
+								}
+
+								$product->attributes[] = array( 'name' => $attribute, 'value' => $value );
+							}
+						}
+					}
+
+
+				}
+
+				$response = array( 'ack' => 'ok', 'products' => $products );
+				if(isset($total_count))
+					$response['total_count'] = $total_count;
+
+				if(preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+				{
+					@ini_set('zlib.output_compression_level', 9);
+					@ob_start("ob_gzhandler");
+				}
+				status_header('200 OK');
+				header('Content-Type: application/json');
+				header('Cache-Control: no-cache, no-store');
+				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+				header('Pragma: no-cache');
+				echo wp_json_encode($response);
+			}
+			else if($type === 'categories')
+			{
+				if(!$this->check_hash())
+				{
+					exit();
+				}
+
+				$categories = get_categories(array( 'taxonomy' => 'product_cat', 'orderby' => 'term_order', 'hide_empty' => 0 ));
+
+				$result = array();
+
+				foreach($categories as $category)
+				{
+					$result[] = array(
+								'category_id' => $category->term_id,
+								'name' => $category->name,
+								'parent_id' => $category->parent
+							);
+				}
+
+				$response = array( 'ack' => 'ok', 'categories' => $result, 'total_count' => count($categories));
+
+				if(preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+				{
+					@ini_set('zlib.output_compression_level', 9);
+					@ob_start("ob_gzhandler");
+				}
+				status_header('200 OK');
+				header('Content-Type: application/json');
+				header('Cache-Control: no-cache, no-store');
+				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+				header('Pragma: no-cache');
+				echo wp_json_encode($response);
+			}
+			else if($type === 'orders')
+			{
+				if(!$this->check_hash())
+				{
+					exit();
+				}
+
+				$page = isset($_GET['page']) ? (int)$_GET['page'] : 0;
+				$count = isset($_GET['count']) ? (int)$_GET['count'] : 0;
+
+				$orders = $wpdb->get_results( $wpdb->prepare(
+					"SELECT (SELECT meta_value FROM `{$wpdb->prefix}postmeta` WHERE post_id = P.id AND meta_key = '_codisto_orderid') AS id, ID AS post_id, post_status AS status FROM `{$wpdb->prefix}posts` AS P WHERE post_type = 'shop_order' AND ID IN (SELECT post_id FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_orderid') ORDER BY ID LIMIT %d, %d",
+					$page * $count,
+					$count
+				));
+
+				if($page == 0)
+				{
+					$total_count = $wpdb->get_var("SELECT COUNT(*) FROM `{$wpdb->prefix}posts` AS P WHERE post_type = 'shop_order' AND ID IN (SELECT post_id FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_orderid')");
+				}
+
+				$order_data = array();
+
+				foreach($orders as $order)
+				{
+					$ship_date = get_post_meta( $order->post_id, '_date_shipped', true );
+					if($ship_date)
+					{
+						if(is_numeric($ship_date))
+						{
+							$ship_date = date('Y-m-d H:i:s', $ship_date);
+						}
+
+						$order->ship_date = $ship_date;
+					}
+
+					$carrier = get_post_meta( $order->post_id, '_tracking_provider', true);
+					if($carrier)
+					{
+						if($carrier === 'custom')
+						{
+							$carrier = get_post_meta( $order->post_id, '_custom_tracking_provider', true);
+						}
+
+						if($carrier)
+						{
+							$order->carrier = $carrier;
+						}
+					}
+
+					$tracking_number = get_post_meta( $order->post_id, '_tracking_number', true);
+					if($tracking_number)
+					{
+						$order->track_number = $tracking_number;
+					}
+
+					unset($order->post_id);
+
+					$order_data[] = $order;
+				}
+
+				$response = array( 'ack' => 'ok', 'orders' => $order_data );
+				if(isset($total_count))
+					$response['total_count'] = $total_count;
+
+				if(preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+				{
+					@ini_set('zlib.output_compression_level', 9);
+					@ob_start("ob_gzhandler");
+				}
+				status_header('200 OK');
+				header('Content-Type: application/json');
+				header('Cache-Control: no-cache, no-store');
+				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+				header('Pragma: no-cache');
+				echo wp_json_encode($response);
+			}
+		}
+		else
+		{
+			if($type === 'createorder')
+			{
+				if(!$this->check_hash())
+				{
+					exit();
+				}
+
+				try
+				{
+					if(preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+					{
+						@ini_set('zlib.output_compression_level', 9);
+						@ob_start("ob_gzhandler");
+					}
+
+					$xml = simplexml_load_string(file_get_contents('php://input'));
+
+					$ordercontent = $xml->entry->content->children('http://api.codisto.com/schemas/2009/');
+
+					$wpdb->query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+					$wpdb->query('START TRANSACTION');
+
+					$billing_address = $ordercontent->orderaddresses->orderaddress[0];
+					$shipping_address = $ordercontent->orderaddresses->orderaddress[1];
+
+					$billing_first_name = $billing_last_name = '';
+					if(strpos($billing_address->name, ' ') !== false) {
+						$billing_name = explode(' ', $billing_address->name, 2);
+						$billing_first_name = $billing_name[0];
+						$billing_last_name = $billing_name[1];
+					} else {
+						$billing_first_name = (string)$billing_address->name;
+					}
+
+					$billing_country_code = (string)$billing_address->countrycode;
+					$billing_division = (string)$billing_address->division;
+
+					$billing_states = WC()->countries->get_states( $billing_country_code );
+
+					if($billing_states)
+					{
+						$billing_division_match = preg_replace('/\s+/', '', strtolower($billing_division));
+
+						foreach($billing_states as $state_code => $state_name)
+						{
+							if( preg_replace('/\s+/', '', strtolower($state_name)) == $billing_division_match )
+							{
+								$billing_division = $state_code;
+								break;
+							}
+						}
+					}
+
+					$shipping_first_name = $shipping_last_name = '';
+					if(strpos($shipping_address->name, ' ') !== false) {
+						$shipping_name = explode(' ', $shipping_address->name, 2);
+						$shipping_first_name = $shipping_name[0];
+						$shipping_last_name = $shipping_name[1];
+					} else {
+						$shipping_first_name = (string)$shipping_address->name;
+					}
+
+					$shipping_country_code = (string)$shipping_address->countrycode;
+					$shipping_division = (string)$shipping_address->division;
+
+					if($billing_country_code === $shipping_country_code)
+					{
+						$shipping_states = $billing_states;
+					}
+					else
+					{
+						$shipping_states = WC()->countries->get_states( $shipping_country_code );
+					}
+
+					if($shipping_states)
+					{
+						$shipping_division_match = preg_replace('/\s+/', '', strtolower($shipping_division));
+
+						foreach($shipping_states as $state_code => $state_name)
+						{
+							if(preg_replace('/\s+/', '', strtolower($state_name)) == $shipping_division_match )
+							{
+								$shipping_division = $state_code;
+								break;
+							}
+						}
+					}
+
+					$address_data = array(
+								'billing_first_name'	=> $billing_first_name,
+								'billing_last_name'		=> $billing_last_name,
+								'billing_company'		=> (string)$billing_address->companyname,
+								'billing_address_1'		=> (string)$billing_address->address1,
+								'billing_address_2'		=> (string)$billing_address->address2,
+								'billing_city'			=> (string)$billing_address->place,
+								'billing_postcode'		=> (string)$billing_address->postalcode,
+								'billing_state'			=> $billing_division,
+								'billing_country'		=> $billing_country_code,
+								'billing_email'			=> (string)$billing_address->email,
+								'billing_phone'			=> (string)$billing_address->phone,
+								'shipping_first_name'	=> $shipping_first_name,
+								'shipping_last_name'	=> $shipping_last_name,
+								'shipping_company'		=> (string)$shipping_address->companyname,
+								'shipping_address_1'	=> (string)$shipping_address->address1,
+								'shipping_address_2'	=> (string)$shipping_address->address2,
+								'shipping_city'			=> (string)$shipping_address->place,
+								'shipping_postcode'		=> (string)$shipping_address->postalcode,
+								'shipping_state'		=> $shipping_division,
+								'shipping_country'		=> $shipping_country_code,
+								'shipping_email'		=> (string)$shipping_address->email,
+								'shipping_phone'		=> (string)$shipping_address->phone,
+							);
+
+					$email = (string)$billing_address->email;
+					if(!$email)
+						$email = (string)$shipping_address->email;
+
+					if($email)
+					{
+						$user = get_user_by('email', $email);
+						if(!$user)
+						{
+							$username = (string)$ordercontent->ebayusername;
+							if(!$username)
+							{
+								$username = current( explode( '@', $email ) );
+							}
+
+							if($username)
+								$username = sanitize_user($username);
+
+							if(username_exists($username))
+							{
+								$counter = 1;
+								$newusername = $username.$counter;
+
+								while(username_exists($newusername))
+								{
+									$counter++;
+									$newusername = $username.$counter;
+								}
+
+								$username = $newusername;
+							}
+
+							$password = wp_generate_password();
+
+							$customer_data = apply_filters( 'woocommerce_new_customer_data',
+													array(
+													'user_login' => $username,
+													'user_pass'  => $password,
+													'user_email' => $email,
+													'role'       => 'customer'));
+
+							$customer_id = wp_insert_user( $customer_data );
+
+							foreach($address_data as $key => $value)
+							{
+								update_user_meta($customer_id, $key, $value);
+							}
+
+							do_action( 'woocommerce_created_customer', $customer_id, $customer_data, true );
+						}
+						else
+						{
+							$customer_id = $user->ID;
+						}
+					}
+					else
+					{
+						$customer_id = 0;
+					}
+
+					$customer_note = @count($ordercontent->instructions) ? strval($ordercontent->instructions) : '';
+
+					$order_id = $wpdb->get_var($wpdb->prepare("SELECT ID FROM `{$wpdb->prefix}posts` AS P WHERE ID IN (SELECT post_id FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_orderid' AND meta_value = %d)", (int)$ordercontent->orderid));
+
+					$shipping = 0;
+					$shipping_tax = 0;
+					$cart_discount = 0;
+					$cart_discount_tax = 0;
+					$total = (float)$ordercontent->ordertotal;
+					$tax = 0;
+
+					if(!$order_id)
+					{
+						$new_order_data_callback = array( $this, 'order_set_date' );
+
+						add_filter( 'woocommerce_new_order_data', $new_order_data_callback, 1, 1 );
+
+						$order = wc_create_order( array( 'customer_id' => $customer_id, 'customer_note' => $customer_note, 'created_via' => 'eBay' ) );
+
+						remove_filter( 'woocommerce_new_order_data', $new_order_data_callback );
+
+						$order_id = $order->id;
+
+						update_post_meta( $order_id, '_codisto_orderid', (int)$ordercontent->orderid);
+						update_post_meta( $order_id, '_codisto_ebayuser', (string)$ordercontent->ebayusername);
+						update_post_meta( $order_id, '_order_currency', (string)$ordercontent->transactcurrency);
+						update_post_meta( $order_id, '_customer_ip_address', '-' );
+						delete_post_meta( $order_id, '_prices_include_tax' );
+
+						do_action( 'woocommerce_new_order', $order_id );
+
+						foreach($ordercontent->orderlines->orderline as $orderline)
+						{
+							if($orderline->productcode[0] != 'FREIGHT')
+							{
+								$productcode = (string)$orderline->productcode;
+								if($productcode == null)
+									$productcode = '';
+								$productname = (string)$orderline->productname;
+								if($productname == null)
+									$productname = '';
+
+								$product_id = $orderline->externalreference[0];
+								if($product_id != null)
+								{
+									$product_id = intval($product_id);
+								}
+
+								$variation_id = 0;
+
+								if( get_post_type( $product_id ) === 'product_variation' )
+								{
+									$variation_id = $product_id;
+									$product_id = wp_get_post_parent_id( $variant_id );
+
+									if(!is_numeric($product_id) || $product_id === 0)
+									{
+										$product_id = 0;
+										$variation_id = 0;
+									}
+								}
+
+								$qty = (int)$orderline->quantity[0];
+
+								$item_id = wc_add_order_item( $order_id, array(
+
+									'order_item_name' => $productname,
+									'order_item_type' => 'line_item'
+
+								) );
+
+								wc_add_order_item_meta( $item_id, '_qty', $qty );
+
+								if(!is_null($product_id) && $product_id !== 0)
+								{
+									wc_add_order_item_meta( $item_id, '_product_id', $product_id );
+									wc_add_order_item_meta( $item_id, '_variation_id', $variation_id );
+									wc_add_order_item_meta( $item_id, '_tax_class', '' );
+								}
+								else
+								{
+									wc_add_order_item_meta( $item_id, '_product_id', 0 );
+									wc_add_order_item_meta( $item_id, '_variation_id', 0);
+									wc_add_order_item_meta( $item_id, '_tax_class', '' );
+								}
+
+								$line_total = wc_format_decimal( (float)$orderline->linetotalinctax );
+								$line_total_tax = wc_format_decimal( (float)$orderline->linetotalinctax - (float)$orderline->linetotal );
+
+								wc_add_order_item_meta( $item_id, '_line_subtotal',     $line_total );
+								wc_add_order_item_meta( $item_id, '_line_total',        $line_total );
+								wc_add_order_item_meta( $item_id, '_line_subtotal_tax', $line_total_tax );
+								wc_add_order_item_meta( $item_id, '_line_tax',          $line_total_tax );
+								wc_add_order_item_meta( $item_id, '_line_tax_data',		array( 'total' => array( 1 => $line_total_tax ), 'subtotal' => array( 1 => $line_total_tax ) ) );
+
+								//do_action( 'woocommerce_order_add_product', $order_id, $item_id, $product, $qty, $args );
+
+								$tax += $line_total_tax;
+							}
+							else
+							{
+								$item_id = wc_add_order_item( $order_id, array(
+											'order_item_name' 		=> (string)$orderline->productname,
+											'order_item_type' 		=> 'shipping'
+										) );
+
+								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->linetotalinctax) );
+
+								$shipping += (real)$orderline->linetotal;
+								$shipping_tax += (real)$orderline->linetotalinctax - (real)$orderline->linetotal;
+							}
+						}
+
+						if($ordercontent->paymentstatus == 'complete')
+						{
+							$transaction_id = (string)$ordercontent->orderpayments[0]->orderpayment->transactionid;
+
+							if($transaction_id)
+							{
+								update_post_meta( $order_id, '_payment_method', 'paypal' );
+								update_post_meta( $order_id, '_payment_method_title', __( 'PayPal', 'woocommerce' ) );
+							}
+							else
+							{
+								update_post_meta( $order_id, '_payment_method', 'bacs' );
+								update_post_meta( $order_id, '_payment_method_title', __( 'BACS', 'woocommerce' ) );
+							}
+
+							$order->payment_complete($transaction_id);
+						}
+					}
+					else
+					{
+						$order = wc_get_order( $order_id );
+
+						foreach($ordercontent->orderlines->orderline as $orderline)
+						{
+							if($orderline->productcode[0] != 'FREIGHT')
+							{
+								$line_total = wc_format_decimal( (float)$orderline->linetotalinctax );
+								$line_total_tax = wc_format_decimal( (float)$orderline->linetotalinctax - (float)$orderline->linetotal );
+
+								$tax += $line_total_tax;
+							}
+							else
+							{
+								$order->remove_order_items( 'shipping' );
+
+								$item_id = wc_add_order_item( $order_id, array(
+											'order_item_name' 		=> (string)$orderline->productname,
+											'order_item_type' 		=> 'shipping'
+										) );
+
+								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->linetotalinctax) );
+
+								$shipping += (real)$orderline->linetotal;
+								$shipping_tax += (real)$orderline->linetotalinctax - (real)$orderline->linetotal;
+							}
+						}
+					}
+
+					foreach($address_data as $key => $value)
+					{
+						update_post_meta($order_id, '_'.$key, $value);
+					}
+
+					$order->remove_order_items( 'tax' );
+					$order->add_tax( 1, $tax, $shipping_tax );
+
+					$order->set_total( $shipping, 'shipping' );
+					$order->set_total( $shipping_tax, 'shipping_tax' );
+					$order->set_total( $cart_discount, 'cart_discount' );
+					$order->set_total( $cart_discount_tax, 'cart_discount_tax' );
+					$order->set_total( $tax, 'tax' );
+					$order->set_total( $total, 'total');
+
+					if($ordercontent->orderstate == 'cancelled')
+					{
+						if(!$order->has_status('cancelled'))
+							$order->cancel_order();
+					}
+					else if($ordercontent->orderstate == 'inprogress' || $ordercontent->orderstate == 'processing')
+					{
+						if($ordercontent->paymentstatus == 'complete')
+						{
+							if(!$order->has_status('processing'))
+								$order->update_status('processing');
+						}
+						else
+						{
+							if(!$order->has_status('pending'))
+								$order->update_status('pending');
+						}
+					}
+					else if($ordercontent->orderstate == 'complete')
+					{
+						if(!$order->has_status('completed'))
+							$order->update_status('completed');
+					}
+
+					$wpdb->query('COMMIT');
+
+					$response = array( 'ack' => 'ok', 'orderid' => $order_id );
+
+					status_header('200 OK');
+					header('Content-Type: application/json');
+					header('Cache-Control: no-cache, no-store');
+					header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+					header('Pragma: no-cache');
+					echo wp_json_encode($response);
+				}
+				catch(Exception $e)
+				{
+					$wpdb->query('ROLLBACK');
+
+					$response = array( 'ack' => 'failed', 'message' => $e->getMessage() .'  '.$e->getFile().' '.$e->getLine()  );
+
+					status_header('200 OK');
+					header('Content-Type: application/json');
+					header('Cache-Control: no-cache, no-store');
+					header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+					header('Pragma: no-cache');
+					echo wp_json_encode($response);
 				}
 			}
-			return $headers;
-		 }
+		}
 	}
 
-	$querystring = preg_replace('/q=[^&]*&?/', '', $_SERVER['QUERY_STRING']);
-	$path = $wp->query_vars['codisto-proxy-route'] . (preg_match('/\/(?:\\?|$)/', $_SERVER['REQUEST_URI']) ? '/' : '');
-
-	$remoteUrl = 'https://ui.codisto.com/' . get_option('codisto_merchantid') . '/'. $path . ($querystring ? '?'.$querystring : '');
-
-	$adminUrl = admin_url('codisto/ebaytab/');
-
-	$requestHeaders = array('X-Codisto-Version' => CODISTOCONNECT_VERSION, 'X-HostKey' => $HostKey, 'X-Admin-Base-Url' => $adminUrl);
-
-	$incomingHeaders = getallheaders();
-
-	foreach($incomingHeaders as $name => $value)
+	public function order_is_editable($editable, $order)
 	{
-		if(!in_array(trim(strtolower($name)), array('host', 'connection')))
-			$requestHeaders[$name] = $value;
+		$codisto_order_id = get_post_meta( $order->id, '_codisto_orderid', true);
+		if(is_numeric($codisto_order_id) && $codisto_order_id !== 0)
+		{
+			return false;
+		}
+
+		return $editable;
 	}
 
-	$httpOptions = array('method' => $_SERVER['REQUEST_METHOD'], 'headers' => $requestHeaders, 'sslverify' => 0, 'timeout' => 10, 'httpversion' => '1.0', 'compress' => true, 'decompress' => false, 'redirection' => 0 );
-
-	if(strtolower($httpOptions['method']) == 'post')
+	public function order_buttons($order)
 	{
-		$httpOptions['body'] = file_get_contents("php://input");
+		$codisto_order_id = get_post_meta( $order->id, '_codisto_orderid', true);
+		if(is_numeric($codisto_order_id) && $codisto_order_id !== 0)
+		{
+			$ebay_user = get_post_meta($order->id, '_codisto_ebayuser', true);
+
+			?>
+			<p class="form-field form-field-wide codisto-order-buttons">
+			<a href="<?php echo htmlspecialchars(admin_url('codisto/ebaysale?orderid='.$codisto_order_id)) ?>" target="codisto!sale" class="button">eBay Order &rarr;</a>
+			<a href="<?php echo htmlspecialchars(admin_url('codisto/ebayuser?orderid='.$codisto_order_id)) ?>" target="codisto!user" class="button">eBay User<?php echo $ebay_user ? ' : '.htmlspecialchars($ebay_user) : ''; ?> &rarr;</a>
+			</p>
+			<?php
+		}
 	}
 
-
-	$response = wp_remote_request($remoteUrl, $httpOptions);
-
-	if(is_wp_error($response))
+	public function proxy()
 	{
-		echo 'error: '.htmlspecialchars($response->get_error_message());
-	}
-	else
-	{
+		global $wp;
+
+		set_time_limit(0);
+
+		@ini_set('zlib.output_compression', 'Off');
+		@ini_set('output_buffering', 'Off');
+		@ini_set('output_handler', '');
+
+		if(isset($_GET['productid']))
+		{
+			wp_redirect(admin_url('post.php?post='.$_GET['productid'].'&action=edit#codisto_product_data'));
+			exit;
+		}
+
+		$HostKey = get_option('codisto_key');
+
+		if (!function_exists('getallheaders'))
+		{
+			 function getallheaders()
+			 {
+				$headers = '';
+				foreach ($_SERVER as $name => $value)
+				{
+					if (substr($name, 0, 5) == 'HTTP_')
+					{
+						$headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+					}
+				}
+				return $headers;
+			 }
+		}
+
+		$querystring = preg_replace('/q=[^&]*&/', '', $_SERVER['QUERY_STRING']);
+		$path = $wp->query_vars['codisto-proxy-route'] . (preg_match('/\/(?:\\?|$)/', $_SERVER['REQUEST_URI']) ? '/' : '');
+
+
+		$storeId = '0';
+		$merchantid = get_option('codisto_merchantid');
+
+		if(isset($_GET['merchantid']))
+		{
+			$merchantid = (int)$_GET['merchantid'];
+		}
+		else
+		{
+			$storematch = array();
+
+			if(preg_match('/^ebaytab\/(\d+)\/(\d+)(?:\/|$)/', $path, $storematch))
+			{
+				$storeId = (int)$storematch[1];
+				$merchantid = (int)$storematch[2];
+
+				$path = preg_replace('/(^ebaytab\/)(\d+\/?)(\d+\/?)/', '$1', $path);
+			}
+			if(preg_match('/^ebaytab\/(\d+)(?:\/|$)/', $path, $storematch))
+			{
+				if(isset($storematch[2]))
+					$merchantid = (int)$storematch[2];
+
+				$path = preg_replace('/(^ebaytab\/)(\d+\/?)/', '$1', $path);
+			}
+		}
+
+		if(!$merchantid)
+		{
+			status_header('404 Not Found');
+			header('Content-Type: text/html');
+			header('Cache-Control: no-cache, no-store');
+			header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+			header('Pragma: no-cache');
+			?>
+			<h1>Resource Not Found</h1>
+			<?php
+			return;
+		}
+
+		$remoteUrl = 'https://ui.codisto.com/' . $merchantid . '/'. $path . ($querystring ? '?'.$querystring : '');
+
+		$adminUrl = admin_url('codisto/ebaytab/'.$storeId.'/'.$merchantid.'/');
+
+		$requestHeaders = array('X-Codisto-Cart' => 'woocommerce', 'X-Codisto-Version' => CODISTOCONNECT_VERSION, 'X-HostKey' => $HostKey, 'X-Admin-Base-Url' => $adminUrl);
+
+		$incomingHeaders = getallheaders();
+
+		foreach($incomingHeaders as $name => $value)
+		{
+			if(!in_array(trim(strtolower($name)), array('host', 'connection')))
+				$requestHeaders[$name] = $value;
+		}
+
+		$httpOptions = array(
+						'method' => $_SERVER['REQUEST_METHOD'],
+						'headers' => $requestHeaders,
+						'timeout' => 60,
+						'httpversion' => '1.0',
+						'compress' => true,
+						'redirection' => 0
+					);
+
+		$acceptEncoding = $_SERVER['HTTP_ACCEPT_ENCODING'];
+		$zlibEnabled = strtoupper(ini_get('zlib.output_compression'));
+		if(!$acceptEncoding || ($zlibEnabled == 1 || $zlibEnabled == 'ON'))
+		{
+			$httpOptions['decompress'] = true;
+		}
+		else
+		{
+			$httpOptions['decompress'] = false;
+		}
+
+		$upload_dir = wp_upload_dir();
+		$certPath = $upload_dir['basedir'].'/codisto.crt';
+		if(file_exists($certPath))
+		{
+			$httpOptions['sslcertificates'] = $certPath;
+		}
+
+		if(strtolower($httpOptions['method']) == 'post')
+		{
+			$httpOptions['body'] = file_get_contents("php://input");
+		}
+
+		for($retry = 0; ; $retry++)
+		{
+			$response = wp_remote_request($remoteUrl, $httpOptions);
+
+			if(is_wp_error($response))
+			{
+				if($retry >= 3)
+				{
+					status_header(500);
+					echo '<h1>Error processing request</h1> <p>'.htmlspecialchars($response->get_error_message()).'</p>';
+					return;
+				}
+
+				if($response->get_error_code() == 'http_request_failed')
+				{
+					$certResponse = wp_remote_get('http://ui.codisto.com/codisto.crt');
+
+					if(!is_wp_error($certResponse))
+					{
+						@file_put_contents($certPath, $certResponse['body']);
+						$httpOptions['sslcertificates'] = $certPath;
+						continue;
+					}
+				}
+
+				sleep(2);
+				continue;
+			}
+
+			break;
+		}
+
 		status_header(wp_remote_retrieve_response_code($response));
 
 		$filterHeaders = array('server', 'content-length', 'transfer-encoding', 'date', 'connection', 'x-storeviewmap');
@@ -158,7 +1148,7 @@ function codisto_proxy()
 
 					for($i = 1; $i < count($value); $i++)
 					{
-						header($header.': '.$value[$i]);
+						header($header.': '.$value[$i], false);
 					}
 				}
 				else
@@ -168,238 +1158,489 @@ function codisto_proxy()
 			}
 		}
 
-		echo wp_remote_retrieve_body($response);
+		file_put_contents('php://output', wp_remote_retrieve_body( $response ));
+		exit();
 	}
-}
 
-function codisto_parse()
-{
-	global $wp;
-
-	if(! empty( $wp->query_vars['codisto'] ) &&
-		in_array($wp->query_vars['codisto'], array('proxy','sync'), true))
+	public function parse()
 	{
-		$codistoMode = $wp->query_vars['codisto'];
+		global $wp;
 
-		if($codistoMode == 'sync')
+		if(! empty( $wp->query_vars['codisto'] ) &&
+			in_array($wp->query_vars['codisto'], array('proxy','sync'), true))
 		{
-			codisto_sync();
+			$codistoMode = $wp->query_vars['codisto'];
+
+			if($codistoMode == 'sync')
+			{
+				$this->sync();
+			}
+
+			else if($codistoMode == 'proxy')
+			{
+				$this->proxy();
+			}
+
+			exit;
+		}
+	}
+
+	private function reseller_key()
+	{
+		return CODISTOCONNECT_RESELLERKEY;
+	}
+
+	public function create_account()
+	{
+		if($_SERVER['REQUEST_METHOD'] === 'POST')
+		{
+			if($_POST['method'] == 'email')
+			{
+				$httpOptions = array(
+								'method' => 'POST',
+								'headers' => array( 'Content-Type' => 'application/json' ),
+								'timeout' => 60,
+								'httpversion' => '1.0',
+								'redirection' => 0,
+								'body' => wp_json_encode( array (
+
+									'type' => 'woocommerce',
+									'version' => get_bloginfo( 'version' ),
+									'url' => get_site_url(),
+									'email' => $_POST['email'],
+									'storename' => get_option('blogdescription') ,
+									'resellerkey' => $this->reseller_key(),
+									'codistoversion' => CODISTOCONNECT_VERSION
+
+								) )
+							);
+
+				$response = wp_remote_request('https://ui.codisto.com/create', $httpOptions);
+
+				$result = json_decode( wp_remote_retrieve_body( $response ), true );
+
+				update_option( 'codisto_merchantid' , 	$result['merchantid'] );
+				update_option( 'codisto_key',			$result['hostkey'] );
+
+				wp_redirect('admin.php?page=codisto');
+			}
+			else
+			{
+				wp_redirect('https://ui.codisto.com/register?finalurl='.
+						urlencode(admin_url('admin-post.php?action=codisto_create')).
+						'&type=woocommerce'.
+						'&version='.urlencode(get_bloginfo( 'version' )).
+						'&url='.urlencode(get_site_url()).
+						'&storename='.urlencode(get_option('blogdescription')).
+						'&storecurrency='.urlencode(get_option('woocommerce_currency')).
+						'&resellerkey='.urlencode($this->reseller_key()).
+						'&codistoversion='.urlencode(CODISTOCONNECT_VERSION));
+			}
+		}
+		else
+		{
+			$httpOptions = array(
+		                    'method' => 'POST',
+		                    'headers' => array( 'Content-Type' => 'application/json' ),
+		                    'timeout' => 60,
+		                    'httpversion' => '1.0',
+		                    'redirection' => 0,
+		                    'body' => wp_json_encode( array (
+
+		                        'regtoken' => $_GET['regtoken']
+
+		                    ) )
+		                );
+
+		    $response = wp_remote_request('https://ui.codisto.com/create', $httpOptions);
+
+		    $result = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		    update_option( 'codisto_merchantid' , 	$result['merchantid'] );
+		    update_option( 'codisto_key',			$result['hostkey'] );
+
+		    wp_redirect('admin.php?page=codisto');
+		}
+		exit();
+	}
+
+	private function admin_tab($url, $tabclass)
+	{
+		$merchantid = get_option('codisto_merchantid');
+
+		if(!is_numeric($merchantid))
+		{
+			$email = get_option( 'admin_email' );
+
+			$paypal_settings = get_option('woocommerce_paypal_settings');
+			if(is_array($paypal_settings))
+			{
+				$email = $paypal_settings['email'];
+			}
+
+			?>
+			<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:500,900,700,400">
+			<style>
+
+			</style>
+
+				<iframe id="dummy-data" frameborder="0" src="https://codisto.com/xpressgriddemo/"></iframe>
+				<div id="dummy-data-overlay"></div>
+				<div id="create-account-modal">
+				<h1>Codisto Connect - Account Creation</h1>
+				<form action="<?php echo htmlspecialchars(admin_url('admin-post.php')); ?>" method="post">
+					<input type="hidden" name="action" value="codisto_create"/>
+
+					<div class="option active">
+						<label>
+							<input type="radio" name="method" checked="checked" value="ebay">
+							<div style="display: inline-block;">
+								<img style="height: 20px;" src="https://d31wxntiwn0x96.cloudfront.net/connect/29137/ebaytab/images/ebay.png" scale="0">
+								<div style="padding-top: 6px;">Link your eBay account to create an account automatically</div>
+							</div>
+						</label>
+					</div>
+
+					<div class="or">
+					<strong>OR</strong>
+					</div>
+
+					<div class="option">
+						<label>
+							<input type="radio" name="method" value="email">
+							<div style="display: inline-block;">
+								<input type="text" name="email" value="<?php echo htmlspecialchars( $email ) ?>" size="40">
+								<div style="padding-top: 10px;">Use your email address (you can link eBay later)</div>
+							</div>
+						</label>
+					</div>
+
+					<div class="next">
+						<button class="button button-primary">Next</button>
+					</div>
+
+				</form>
+				<div class="footer">
+						Once you create an account we will begin synchronizing your catalog data.<br>
+				  		Sit tight, this may take several minutes depending on the size of your catalog.<br>
+						When completed, you'll have the world's best eBay integration at your fingertips.<br><br/>
+						You'll be able to:
+						 	<ul>
+								<li>Sync in real-time between WooCommerce &amp; eBay</li>
+								<li>have Codisto auto-categorize your products into eBay categories</li>
+								<li>Access our sophisticated template engine for amazing listings</li>
+								<li>and lots more…</li>
+							</ul>
+				</div>
+				</div>
+				<script>
+				jQuery(function($) {
+
+					$("#create-account-modal").on("click", ".option", function(e) {
+
+						$("#create-account-modal .option").removeClass("active");
+						$(this).addClass("active").find("INPUT[type=radio]").attr("checked", "checked");
+
+					});
+
+				});
+				</script>
+
+
+			<?php
+		}
+		else
+		{
+			?>
+			<div id="codisto-container">
+				<iframe class="<?php echo $tabclass ?>" src="<?php echo htmlspecialchars($url)?>" frameborder="0"></iframe>
+			</div>
+			<?php
+		}
+	}
+
+	public function ebay_tab()
+	{
+		$adminUrl = admin_url('codisto/ebaytab/0/'.get_option('codisto_merchantid').'/');
+
+		$this->admin_tab($adminUrl, 'codisto-bulk-editor');
+	}
+
+	public function orders()
+	{
+		$adminUrl = admin_url('codisto/ebaytab/0/'.get_option('codisto_merchantid').'/orders/');
+
+		$this->admin_tab($adminUrl, 'codisto-bulk-editor');
+	}
+
+	public function categories()
+	{
+		$adminUrl = admin_url('codisto/ebaytab/0/'.get_option('codisto_merchantid').'/categories/');
+
+		$this->admin_tab($adminUrl, 'codisto-bulk-editor');
+	}
+
+	public function attributes()
+	{
+		$adminUrl = admin_url('codisto/ebaytab/0/'.get_option('codisto_merchantid').'/attributemapping/');
+
+		$this->admin_tab($adminUrl, 'codisto-attributemapping');
+	}
+
+	public function import()
+	{
+		$adminUrl = admin_url('codisto/ebaytab/0/'.get_option('codisto_merchantid').'/importlistings/');
+
+		$this->admin_tab($adminUrl, 'codisto-bulk-editor');
+	}
+
+	public function templates()
+	{
+		include 'templates.php';
+	}
+
+	public function settings()
+	{
+		$adminUrl = admin_url('codisto/settings/');
+
+		$this->admin_tab($adminUrl, 'codisto-settings');
+	}
+
+	public function admin_menu()
+	{
+		add_menu_page( 'eBay | Codisto', 'eBay | Codisto', 'edit_posts', 'codisto', array( $this, 'ebay_tab' ), 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgDQogICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiDQoJIHZpZXdCb3g9IjAgMCAyMCAyMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8cGF0aCBzdHlsZT0iZmlsbDojOTk5OTk5OyIgZD0iTTE3LDBIM0MxLjMsMCwwLDEuMywwLDN2MTRjMCwxLjYsMS4zLDMsMywzaDE0YzEuNywwLDMtMS40LDMtM1YzQzIwLDEuMywxOC43LDAsMTcsMHogTTkuMywxNC4xDQoJYzAuNCwwLjUsMC45LDAuNywxLjYsMC43YzAuNywwLDEuMy0wLjMsMS45LTAuOWwyLjcsMi43Yy0xLjIsMS4yLTIuOCwxLjktNC42LDEuOWMtMS45LDAtMy40LTAuNi00LjctMS45Yy0wLjgtMC44LTEuMy0xLjgtMS41LTMNCgljLTAuMS0wLjctMC4yLTEuOS0wLjItMy42czAuMS0yLjksMC4yLTMuNmMwLjItMS4yLDAuNy0yLjMsMS41LTNDNy41LDIuMSw5LDEuNSwxMC45LDEuNWMxLjksMCwzLjQsMC42LDQuNiwxLjlsLTIuNywyLjcNCgljLTAuNi0wLjYtMS4yLTAuOS0xLjktMC45Yy0wLjcsMC0xLjIsMC4yLTEuNiwwLjdDOC44LDYuNCw4LjYsNy44LDguNiwxMEM4LjYsMTIuMiw4LjgsMTMuNiw5LjMsMTQuMXoiLz4NCjwvc3ZnPg0K', '55.51' );
+
+		$pages = array();
+
+		$pages[] = add_submenu_page('codisto', 'Listings', 'Listings', 'edit_posts', 'codisto', array( $this, 'ebay_tab' ) );
+		$pages[] = add_submenu_page('codisto', 'Orders', 'Orders', 'edit_posts', 'codisto-orders', array( $this, 'orders' ) );
+		$pages[] = add_submenu_page('codisto', 'Categories', 'Categories', 'edit_posts', 'codisto-categories', array( $this, 'categories' ) );
+		$pages[] = add_submenu_page('codisto', 'Attributes', 'Attributes', 'edit_posts', 'codisto-attributes', array( $this, 'attributes' ) );
+		$pages[] = add_submenu_page('codisto', 'Import Listings', 'Import Listings', 'edit_posts', 'codisto-import', array( $this, 'import' ) );
+		$pages[] = add_submenu_page('codisto', 'Templates', 'Templates', 'edit_posts', 'codisto-templates', array( $this, 'templates' ) );
+		$pages[] = add_submenu_page('codisto', 'Settings', 'Settings', 'edit_posts', 'codisto-settings', array( $this, 'settings' ) );
+
+		foreach($pages as $page)
+		{
+			add_action( "admin_print_styles-{$page}", array( $this, 'admin_styles' ) );
+		}
+	}
+
+	public function admin_styles()
+	{
+		wp_enqueue_style( 'codisto-style' );
+	}
+
+	public function bulk_edit_save($product)
+	{
+		if(!$this->ping)
+		{
+			$this->ping = array();
 		}
 
-		else if($codistoMode == 'proxy')
+		if(!isset($this->ping['products']))
 		{
-			codisto_proxy();
+			$this->ping['products'] = array();
 		}
 
-		exit;
+		$pingProducts = $this->ping['products'];
+
+		if(!in_array( $product->id, $pingProducts ) )
+		{
+			$pingProducts[] = $product->id;
+		}
+
+		$this->ping['products'] = $pingProducts;
 	}
-}
 
-function codisto_ebay_tab()
-{
-	$adminUrl = admin_url('codisto/ebaytab/');
-
-	echo "<style>";
-	echo "#wpbody { position: absolute !important; left: 160px !important; right: 0px; bottom: 0px; top: 0px; }\n";
-	echo ".folded #wpbody { left: 36px !important; }\n";
-	echo "#wpbody-content { padding: 0px; height: 100%; }\n";
-	echo "#wpfooter { display: none !important; }\n";
-	echo "</style>";
-	echo '<div style="width: 100%; height: 100%;"><iframe src="'.$adminUrl.'" frameborder="0" style="width: 100%; height: 100%; border-bottom: 1px solid #000;"></iframe></div>';
-
-}
-
-function codisto_orders()
-{
-	$adminUrl = admin_url('codisto/ebaytab/orders/');
-
-	echo "<style>";
-	echo "#wpbody { position: absolute !important; left: 160px !important; right: 0px; bottom: 0px; top: 0px; }\n";
-	echo ".folded #wpbody { left: 36px !important; }\n";
-	echo "#wpbody-content { padding: 0px; height: 100%; }\n";
-	echo "#wpfooter { display: none !important; }\n";
-	echo "</style>";
-	echo '<div style="width: 100%; height: 100%;"><iframe src="'.$adminUrl.'" frameborder="0" style="width: 100%; height: 100%; border-bottom: 1px solid #000;"></iframe></div>';
-
-}
-
-function codisto_categories()
-{
-	$adminUrl = admin_url('codisto/ebaytab/categories/');
-
-	echo "<style>";
-	echo "#wpbody { position: absolute !important; left: 160px !important; right: 0px; bottom: 0px; top: 0px; }\n";
-	echo ".folded #wpbody { left: 36px !important; }\n";
-	echo "#wpbody-content { padding: 0px; height: 100%; }\n";
-	echo "#wpfooter { display: none !important; }\n";
-	echo "</style>";
-	echo '<div style="width: 100%; height: 100%;"><iframe src="'.$adminUrl.'" frameborder="0" style="width: 100%; height: 100%; border-bottom: 1px solid #000;"></iframe></div>';
-
-}
-
-function codisto_attributes()
-{
-	$adminUrl = admin_url('codisto/ebaytab/attributemapping/');
-
-	echo "<style>";
-	echo "#wpbody { position: absolute !important; left: 160px !important; right: 0px; bottom: 0px; top: 0px; }\n";
-	echo ".folded #wpbody { left: 36px !important; }\n";
-	echo "#wpbody-content { padding: 0px; height: 100%; }\n";
-	echo "#wpfooter { display: none !important; }\n";
-	echo "</style>";
-	echo '<div style="width: 100%; height: 100%;"><iframe src="'.$adminUrl.'" frameborder="0" style="width: 100%; height: 100%; border-bottom: 1px solid #000;"></iframe></div>';
-
-}
-
-function codisto_import()
-{
-	$adminUrl = admin_url('codisto/ebaytab/importlistings/');
-
-	echo "<style>";
-	echo "#wpbody { position: absolute !important; left: 160px !important; right: 0px; bottom: 45px; top: 0px; }\n";
-	echo ".folded #wpbody { left: 36px !important; }\n";
-	echo "#wpbody-content { padding: 0px; height: 100%; }\n";
-	echo "#wpfooter { display: none !important; }\n";
-	echo "</style>";
-	echo '<div style="width: 100%; height: 100%;"><iframe class="codisto-settings" src="'.$adminUrl.'" frameborder="0" style="width: 100%; height: 100%; border-bottom: 1px solid #000;"></iframe></div>';
-}
-
-function codisto_settings()
-{
-	$adminUrl = admin_url('codisto/settings/');
-
-	echo "<style>";
-	echo "#wpbody { position: absolute !important; left: 160px !important; right: 0px; bottom: 45px; top: 0px; }\n";
-	echo ".folded #wpbody { left: 36px !important; }\n";
-	echo "#wpbody-content { padding: 0px; height: 100%; }\n";
-	echo "#wpfooter { display: none !important; }\n";
-	echo "</style>";
-	echo '<div style="width: 100%; height: 100%;"><iframe class="codisto-settings" src="'.$adminUrl.'" frameborder="0" style="width: 100%; height: 100%; border-bottom: 1px solid #000;"></iframe></div>';
-}
-
-function codisto_bulk_edit()
-{
-	echo print_r(func_get_args(), true);
-}
-
-function codisto_admin_menu()
-{
-	add_menu_page( 'eBay | Codisto', 'eBay | Codisto', 'edit_posts', 'codisto', 'codisto_ebay_tab', 'dashicons-cart', '55.51' );
-
-	add_submenu_page('codisto', 'Listings', 'Listings', 'edit_posts', 'codisto', 'codisto_ebay_tab');
-	add_submenu_page('codisto', 'Orders', 'Orders', 'edit_posts', 'codisto-orders', 'codisto_orders');
-	add_submenu_page('codisto', 'Categories', 'Categories', 'edit_posts', 'codisto-categories', 'codisto_categories');
-	add_submenu_page('codisto', 'Attributes', 'Attributes', 'edit_posts', 'codisto-attributes', 'codisto_attributes');
-	add_submenu_page('codisto', 'Import Listings', 'Import Listings', 'edit_posts', 'codisto-import', 'codisto_import');
-
-	add_submenu_page('codisto', 'Settings', 'Settings', 'edit_posts', 'codisto-settings', 'codisto_settings');
-}
-
-$pingProducts = null;
-
-
-function codisto_bulk_edit_save($product)
-{
-	global $pingProducts;
-
-	if(!$pingProducts)
-		$pingProducts[] = $product->id;
-
-//	echo print_r(func_get_args(), true);
-//	die();
-}
-
-function codisto_save($id)
-{
-	global $pingProducts;
-
-	// TODO: check that post isn't a draft
-
-	if(!$pingProducts)
-		$pingProducts[] = $id;
-}
-
-function codisto_signal_edits()
-{
-	global $pingProducts;
-
-
-	if($pingProducts)
+	public function option_save($value)
 	{
-		$response = wp_remote_post('https://api.codisto.com/12822', array(
-			  'method'		=> 'POST',
-			  'timeout'		=> 5,
-			  'redirection' => 0,
-			  'httpversion' => '1.0',
-			  'blocking'	=> true,
-			  'headers'		=> array('X-HostKey' => get_option('codisto_key') , 'Content-Type' => 'application/x-www-form-urlencoded' ),
-			  'body'		=> 'action=sync&productid=['.implode(',', $pingProducts).']'
-			  )
+		if(!$this->ping)
+		{
+			$this->ping = array();
+		}
+
+		return $value;
+	}
+
+	public function post_save($id, $post)
+	{
+		if($post->post_type == 'product')
+		{
+			if(!$this->ping)
+			{
+				$this->ping = array();
+			}
+
+			if(!isset($this->ping['products']))
+			{
+				$this->ping['products'] = array();
+			}
+
+			$pingProducts = $this->ping['products'];
+
+			if(!in_array( $id, $pingProducts ) )
+			{
+				$pingProducts[] = $id;
+			}
+
+			$this->ping['products'] = $pingProducts;
+		}
+	}
+
+	public function order_reduce_stock($order)
+	{
+		$product_ids = array();
+
+		foreach ( $order->get_items() as $item )
+		{
+			if ( $item['product_id'] > 0 )
+			{
+				if(is_string( get_post_status( $item['product_id'] ) ) )
+				{
+					$product_ids[] = $item['product_id'];
+				}
+			}
+		}
+
+		if(count($product_ids) > 0)
+		{
+			if(!$this->ping)
+			{
+				$this->ping = array();
+			}
+
+			if(!isset($this->ping['products']))
+			{
+				$this->ping['products'] = array();
+			}
+
+			$pingProducts = $this->ping['products'];
+
+			foreach($product_ids as $id)
+			{
+				if(!in_array($id, $pingProducts))
+				{
+					$pingProducts[] = $id;
+				}
+			}
+
+			$this->ping['products'] = $pingProducts;
+		}
+	}
+
+	public function signal_edits()
+	{
+		if(is_array($this->ping) &&
+			isset($this->ping['products']))
+		{
+			$response = wp_remote_post('https://api.codisto.com/'.get_option('codisto_merchantid'), array(
+				  'method'		=> 'POST',
+				  'timeout'		=> 5,
+				  'redirection' => 0,
+				  'httpversion' => '1.0',
+				  'blocking'	=> true,
+				  'headers'		=> array('X-HostKey' => get_option('codisto_key') , 'Content-Type' => 'application/x-www-form-urlencoded' ),
+				  'body'		=> 'action=sync&productid=['.implode(',', $this->ping['products']).']'
+				  )
+			);
+		}
+
+		else if(is_array($this->ping))
+		{
+			$response = wp_remote_post('https://api.codisto.com/'.get_option('codisto_merchantid'), array(
+				  'method'		=> 'POST',
+				  'timeout'		=> 5,
+				  'redirection' => 0,
+				  'httpversion' => '1.0',
+				  'blocking'	=> true,
+				  'headers'		=> array('X-HostKey' => get_option('codisto_key') , 'Content-Type' => 'application/x-www-form-urlencoded' ),
+				  'body'		=> 'action=sync'
+				  )
+			);
+		}
+	}
+
+	public function add_ebay_product_tab($tabs)
+	{
+		$tabs['codisto'] = array(
+								'label'	=> 'eBay',
+								'target' => 'codisto_product_data',
+								'class'	=> '',
+							);
+
+		return $tabs;
+	}
+
+	public function ebay_product_tab_content()
+	{
+		global $post;
+
+		?>
+			<div id="codisto_product_data" class="panel woocommerce_options_panel" style="padding: 8px;">
+			<iframe id="codisto-control-panel" style="width: 100%;" src="<?php echo htmlspecialchars(admin_url('/codisto/ebaytab/product/'.$post->ID).'/') ?>" frameborder="0"></iframe>
+			</div>
+		<?php
+	}
+
+	public function plugin_links($links)
+	{
+		$action_links = array(
+			'listings' => '<a href="' . admin_url( 'admin.php?page=codisto-listings' ) . '" title="Manage Listings">Manage eBay Listings</a>',
+			'settings' => '<a href="' . admin_url( 'admin.php?page=codisto-settings' ) . '" title="Codisto Settings">Settings</a>'
 		);
+
+		return array_merge( $action_links, $links );
+	}
+
+	public function init_plugin()
+	{
+		$adminUrl = parse_url(admin_url(), PHP_URL_PATH);
+
+		// synchronisation end point
+		add_rewrite_rule(
+			'^codisto-sync\/(.*)?',
+			'index.php?codisto=sync&codisto-sync-route=$matches[1]',
+			'top' );
+
+		// proxy end point
+		add_rewrite_rule(
+			'^'.preg_quote(ltrim($adminUrl, '/'), '/').'codisto\/(.*)?',
+			'index.php?codisto=proxy&codisto-proxy-route=$matches[1]',
+			'top'
+		);
+
+		wp_register_style( 'codisto-style', plugins_url('styles.css', __FILE__) );
+
+		add_filter( 'query_vars', 							array( $this, 'query_vars' ) );
+		add_action( 'parse_request',						array( $this, 'parse' ), 0 );
+		add_action( 'admin_post_codisto_create',			array( $this, 'create_account' ) );
+		add_action( 'admin_menu',							array( $this, 'admin_menu' ) );
+		add_action(	'woocommerce_product_bulk_edit_save', 	array( $this, 'bulk_edit_save' ) );
+		add_action( 'save_post',							array( $this, 'post_save' ), 10, 2 );
+		add_filter( 'woocommerce_product_data_tabs',		array( $this, 'add_ebay_product_tab' ) );
+		add_action( 'woocommerce_product_data_panels',		array( $this, 'ebay_product_tab_content' ) );
+		add_filter( 'wc_order_is_editable',					array( $this, 'order_is_editable' ), 10, 2 );
+		add_action( 'woocommerce_reduce_order_stock',		array( $this, 'order_reduce_stock' ) );
+		add_action( 'woocommerce_admin_order_data_after_'.
+						'order_details', 					array( $this, 'order_buttons' ) );
+		add_action(	'woocommerce_admin_settings_sanitize_'.
+					'	option_woocommerce_currency',		array( $this, 'option_save') );
+		add_filter( 'plugin_action_links_'.
+						plugin_basename( __FILE__ ),		array( $this, 'plugin_links' ) );
+		add_action( 'shutdown',								array( $this, 'signal_edits' ) );
+	}
+
+	public static function init() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+
+			add_action('init', array( self::$_instance, 'init_plugin' ) );
+		}
+		return self::$_instance;
 	}
 }
 
-function codisto_add_ebay_product_tab($tabs)
-{
+endif;
 
-	$tabs['codisto'] = array(
-							'label'	=> 'eBay',
-							'target' => 'codisto_product_data',
-							'class'	=> '',
-						);
-
-	return $tabs;
-
-
-}
-
-function codisto_ebay_product_tab_content()
-{
-	global $post;
-
-	?>
-		<div id="codisto_product_data" class="panel woocommerce_options_panel" style="padding: 8px;">
-		<iframe id="codisto-control-panel" style="width: 100%;" src="<?php echo htmlspecialchars(admin_url('/codisto/ebaytab/product/'.$post->ID).'/') ?>" frameborder="0"></iframe>
-		</div>
-	<?php
-}
-
-function codisto_plugin_links($links)
-{
-	$action_links = array(
-		'listings' => '<a href="' .admin_url('admin.php?page=codisto-listings').'" title="Manage Listings">Manage eBay Listings</a>',
-		'settings' => '<a href="' . admin_url( 'admin.php?page=codisto-settings' ) . '" title="Codisto Settings">Settings</a>'
-	);
-
-	return array_merge( $action_links, $links );
-}
-
-function codisto_init()
-{
-	add_filter('query_vars', 'codisto_query_vars' );
-
-	add_rewrite_rule('^codisto-sync(.*)?', 'index.php?codisto=sync&codisto-sync-route=$matches[1]', 'top' );
-
-	$adminUrl = parse_url(admin_url(), PHP_URL_PATH);
-
-	add_rewrite_rule('^'.preg_quote($adminUrl, '/').'codisto\/(.*)?', 'index.php?codisto=proxy&codisto-proxy-route=$matches[1]', 'top' );
-
-	add_action( 'parse_request', 'codisto_parse', 0 );
-
-	add_action( 'admin_menu', 'codisto_admin_menu');
-
-
-	add_action('woocommerce_product_bulk_edit_save', 'codisto_bulk_edit_save');
-	add_action('save_post', 'codisto_save');
-
-	add_action('shutdown', 'codisto_signal_edits');
-
-	add_filter('woocommerce_product_data_tabs', 'codisto_add_ebay_product_tab');
-	add_action('woocommerce_product_data_panels', 'codisto_ebay_product_tab_content');
-
-
-	add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'codisto_plugin_links' );
-
-}
-
-add_action('init', 'codisto_init');
+CodistoConnect::init();
