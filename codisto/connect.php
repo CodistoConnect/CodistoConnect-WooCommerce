@@ -1567,6 +1567,8 @@ final class CodistoConnect {
 
 		$file = WP_CONTENT_DIR . '/ebay/' . $filename;
 
+		@mkdir( basename( $file ), 0755, true );
+
 		$updated = false;
 
 		$f = fopen( $file, 'w' );
