@@ -1,7 +1,24 @@
-#wpbody { position: absolute !important; left: 160px !important; right: 0px; bottom: 0px; top: 0px; }
-.folded #wpbody { left: 36px !important; }
-#wpbody-content { padding: 0px; height: 100%; }
-#wpfooter { display: none !important; }
+.codisto #wpbody
+{
+    position: absolute !important;
+    left: 160px !important;
+    right: 0px;
+    bottom: 0px;
+    top: 0px;
+}
+.codisto .folded #wpbody
+{
+    left: 36px !important;
+}
+.codisto #wpbody-content
+{
+    padding: 0px; height: 100%;
+}
+.codisto #wpfooter
+{
+    display: none !important;
+}
+
 
 #codisto-container
 {
@@ -119,4 +136,16 @@
 #dummy-data
 {
     position: absolute; z-index: 0; top: 0px; left: 0px; bottom: 0px; right: 0px; width:100%; height:100%
+}
+
+.codisto-templates UL.file-list LI:last-child
+{
+    border-top: 1px solid #ddd;
+    padding-top: 12px;
+}
+
+.codisto-templates .button .dashicons
+{
+    vertical-align: middle;
+    font-size: 125%;
 }
