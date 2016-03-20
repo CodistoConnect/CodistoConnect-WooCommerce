@@ -1286,6 +1286,14 @@ final class CodistoConnect {
 					{
 						$headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
 					}
+					else if( $name == 'CONTENT_TYPE' )
+					{
+						$headers['Content-Type'] = $value;
+					}
+					else if( $name == 'CONTENT_LENGTH' )
+					{
+						$headers['Content-Length'] = $value;
+					}
 				}
 				return $headers;
 			 }
