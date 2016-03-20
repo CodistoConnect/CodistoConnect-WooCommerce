@@ -601,6 +601,11 @@ final class CodistoConnect {
 			{
 				if($_SERVER['HTTP_X_ACTION'] === 'TEMPLATE')
 				{
+					if(!$this->check_hash())
+					{
+						exit();
+					}
+
 					$ebayDesignDir = WP_CONTENT_DIR . '/ebay/';
 
 					$merchantid = (int)$_GET['merchantid'];
@@ -1163,6 +1168,11 @@ final class CodistoConnect {
 			{
 				if($_SERVER['HTTP_X_ACTION'] === 'TEMPLATE')
 				{
+					if(!$this->check_hash())
+					{
+						exit();
+					}
+
 					$ebayDesignDir = WP_CONTENT_DIR . '/ebay/';
 
 					$tmpPath = wp_tempnam();
