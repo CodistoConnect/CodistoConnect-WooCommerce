@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Codisto_Connect
- * @version 1.0
+ * @version 1.1.92
  */
 /*
 Plugin Name: Codisto Connect
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: List on eBay
 Author: Codisto
-Version: 1.1.87
+Version: 1.1.92
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 
-define('CODISTOCONNECT_VERSION', '1.1.87');
+define('CODISTOCONNECT_VERSION', '1.1.92');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 
@@ -47,8 +47,8 @@ final class CodistoConnect {
 			$_GET['page'] !== 'codisto-templates')
 		{
 			$headers = array(
-				'Cache-Control' => 'private, max-age=300',
-				'Expires' => gmdate( "D, d M Y H:i:s", time() + 300 ) . " GMT"
+				'Cache-Control' => 'private, max-age=0',
+				'Expires' => gmdate( "D, d M Y H:i:s", time() - 300 ) . " GMT"
 			);
 		}
 
@@ -130,6 +130,8 @@ final class CodistoConnect {
 		global $wpdb;
 
 		set_time_limit(0);
+
+		@ini_set('display_errors', '1');
 
 		@ini_set('zlib.output_compression', 'Off');
 		@ini_set('output_buffering', 'Off');
@@ -302,18 +304,36 @@ final class CodistoConnect {
 					$product->tax_class = $wc_product->get_tax_class();
 					$product->stock_control = $wc_product->managing_stock();
 					$product->stock_level = $wc_product->get_stock_quantity();
-					$product->type = $wc_product->get_type();
+					if( method_exists( $wc_product, 'get_type' ) )
+					{
+						$product->type = $wc_product->get_type();
+					}
+					else
+					{
+						$product->type = $wc_product->product_type;
+					}
 					$product->description = apply_filters('the_content', $wc_product->post->post_content);
 					$product->short_description = apply_filters('the_content', $wc_product->post->post_excerpt);
-					$product->width = $wc_product->get_width();
-					if(!is_numeric($product->width))
-						unset($product->width);
-					$product->height = $wc_product->get_height();
-					if(!is_numeric($product->height))
-						unset($product->height);
-					$product->length = $wc_product->get_length();
-					if(!is_numeric($product->length))
-						unset($product->length);
+
+					if( method_exists( $wc_product, 'get_width' ) )
+					{
+						$product->width = $wc_product->get_width();
+						if(!is_numeric($product->width))
+							unset($product->width);
+						$product->height = $wc_product->get_height();
+						if(!is_numeric($product->height))
+							unset($product->height);
+						$product->length = $wc_product->get_length();
+						if(!is_numeric($product->length))
+							unset($product->length);
+					}
+					else
+					{
+						$product->length = $wc_product->length;
+						$product->width = $wc_product->width;
+						$product->height = $wc_product->height;
+					}
+
 					$product->weight = $wc_product->get_weight();
 					if(!is_numeric($product->weight))
 						unset($product->weight);
