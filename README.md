@@ -1,6 +1,5 @@
 [![GitHub release](https://img.shields.io/github/release/CodistoConnect/CodistoConnect-WooCommerce.svg?style=plastic)](https://github.com/CodistoConnect/CodistoConnect-WooCommerce/releases)
-
-[ ![License] [license-image] ] [license]
+[![License] [license-image] ] [license]
 
 ![MarketPlace Connect eBay better logo](https://raw.githubusercontent.com/CodistoConnect/CodistoConnect-WooCommerce/screenshots/MarketPlaceConnect.png)
 
