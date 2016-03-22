@@ -70,7 +70,7 @@ The latest release is available from https://github.com/CodistoConnect/CodistoCo
 The CodistoConnect-WooCommerce.zip file located here is ready to install in your WordPress environment.
 
 
-<h2>Contributing to the Codisto Connect code base</h2>
+<h2>Contributing to the MarketPlace Connect code base</h2>
 Contributions can take the form of new components or features, changes to existing features, tests, documentation (such as developer guides, user guides, examples, or specifications), bug fixes, optimizations, or just good suggestions.
 
 Please contact <a href="https://codisto.com/contact-us.html">support</a> with your ideas or submit a pull request and feel free to contribute.
