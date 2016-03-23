@@ -1,12 +1,12 @@
 <?php
 /**
- * @package Codisto_Connect
+ * @package MarketPlace Connect by Codisto
  * @version 1.1.92
  */
 /*
-Plugin Name: Codisto Connect
+Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
-Description: List on eBay
+Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 Author: Codisto
 Version: 1.1.92
 Author URI: https://codisto.com/

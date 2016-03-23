@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 if ( !current_user_can('edit_themes') )
 	wp_die('<p>'.__('You do not have sufficient permissions to edit templates for this site.').'</p>');
 
