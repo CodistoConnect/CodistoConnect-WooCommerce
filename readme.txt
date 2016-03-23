@@ -1,4 +1,4 @@
-=== CodistoConnect ===
+=== MarketPlace Connect by Codisto ===
 Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.1
@@ -7,7 +7,7 @@ Stable tag: 1.1.92
 License: GPLv2
 License URI: http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
 
-Codisto Connect - WooCommerce eBay Integration - Convert a WooCommerce store into a fully integration eBay store in minutes
+MarketPlace Connect by Codisto - WooCommerce eBay Integration - Convert a WooCommerce store into a fully integration eBay store in minutes
 
 == Description ==
 
