@@ -2019,6 +2019,13 @@ final class CodistoConnect {
 	}
 }
 
+function codisto_activate()
+{
+	flush_rewrite_rules();
+}
+
+register_activation_hook( __FILE__, 'codisto_activate' );
+
 endif;
 
 CodistoConnect::init();
