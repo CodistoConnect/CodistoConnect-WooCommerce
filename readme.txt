@@ -7,7 +7,7 @@ Stable tag: 1.1.92
 License: GPLv2
 License URI: http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
 
-MarketPlace Connect by Codisto - WooCommerce eBay Integration - Convert a WooCommerce store into a fully integration eBay store in minutes
+MarketPlace Connect by Codisto - WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 
 == Description ==
 
@@ -42,7 +42,8 @@ Visit <https://codisto.com/connect/> to read more about Marketplace Connect incl
 == Installation ==
 
 1. Install MarketPlace Connect by Codisto either via the WordPress.org plugin repository, or by uploading the files to your server
-2. 1.	Choose either “Connect your eBay account” or “Enter your email address” and follow the setup instructions.
+2. Choose either “Connect your eBay account” or “Enter your email address” and follow the setup instructions.
+3. Choose which items you wish to list from the Codisto > Listings screen and click publish
 
 == Frequently Asked Questions ==
 
