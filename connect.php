@@ -1,14 +1,14 @@
 <?php
 /**
  * @package MarketPlace Connect by Codisto
- * @version 1.1.95
+ * @version 1.1.96
  */
 /*
 Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 Author: Codisto
-Version: 1.1.95
+Version: 1.1.96
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 
-define('CODISTOCONNECT_VERSION', '1.1.95');
+define('CODISTOCONNECT_VERSION', '1.1.96');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 
@@ -188,7 +188,7 @@ final class CodistoConnect {
 
 					if($logo_id)
 					{
-						$logo_url = wp_get_attachment_image_src($logo_id);
+						$logo_url = wp_get_attachment_image_src($logo_id, 'full');
 						$logo_url = $logo_url[0];
 					}
 				}
@@ -353,7 +353,7 @@ final class CodistoConnect {
 						{
 							$child_product = $wc_product->get_child($child_id);
 
-							$img = wp_get_attachment_image_src($child_product->get_image_id());
+							$img = wp_get_attachment_image_src($child_product->get_image_id(), 'full');
 							$img = $img[0];
 
 							$child_product_data = array(
@@ -421,7 +421,7 @@ final class CodistoConnect {
 
 					$imagesUsed = array();
 
-					$primaryimage_path = wp_get_attachment_image_src($wc_product->get_image_id());
+					$primaryimage_path = wp_get_attachment_image_src($wc_product->get_image_id(), 'full');
 					$primaryimage_path = $primaryimage_path[0];
 
 					if($primaryimage_path)
@@ -433,7 +433,7 @@ final class CodistoConnect {
 						$sequence = 1;
 						foreach($wc_product->get_gallery_attachment_ids() as $image_id)
 						{
-							$image_path = wp_get_attachment_image_src($image_id);
+							$image_path = wp_get_attachment_image_src($image_id, 'full');
 							$image_path = $image_path[0];
 
 							if(!array_key_exists($image_path, $imagesUsed))

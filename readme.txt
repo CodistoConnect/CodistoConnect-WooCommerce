@@ -3,7 +3,7 @@ Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.1
 Tested up to: 4.4
-Stable tag: 1.1.95
+Stable tag: 1.1.96
 License: GPLv2
 License URI: http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
 
@@ -102,3 +102,6 @@ No, MarketPlace Connect currently only works with eBay
 
 * had trouble updating wordpress svn so bumped version number
 
+= 1.1.96 - 30/03/2016 =
+
+* shift to full size image download - wp_get_attachment_image_src takes a default 2nd arg of 'thumbnail' which is now overriden to 'full'
