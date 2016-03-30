@@ -1,14 +1,14 @@
 <?php
 /**
  * @package MarketPlace Connect by Codisto
- * @version 1.1.92
+ * @version 1.1.95
  */
 /*
 Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 Author: Codisto
-Version: 1.1.93
+Version: 1.1.95
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 
-define('CODISTOCONNECT_VERSION', '1.1.93');
+define('CODISTOCONNECT_VERSION', '1.1.95');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 
@@ -1970,13 +1970,21 @@ final class CodistoConnect {
 
 	public function init_plugin()
 	{
-		$adminUrl = parse_url(admin_url(), PHP_URL_PATH);
+		$homeUrl = home_url();
+		$siteUrl = site_url();
+		$adminUrl = admin_url();
+
+		$syncUrl = str_replace($homeUrl, '', $siteUrl);
+		$syncUrl .= (substr($syncUrl, -1) == '/' ? '' : '/');
 
 		// synchronisation end point
 		add_rewrite_rule(
-			'^codisto-sync\/(.*)?',
+			'^'.preg_quote(ltrim($syncUrl, '/'), '/').'codisto-sync\/(.*)?',
 			'index.php?codisto=sync&codisto-sync-route=$matches[1]',
 			'top' );
+
+		$adminUrl = str_replace($homeUrl, '', $adminUrl);
+		$adminUrl .= (substr($adminUrl, -1) == '/' ? '' : '/');
 
 		// proxy end point
 		add_rewrite_rule(
@@ -2021,6 +2029,29 @@ final class CodistoConnect {
 
 function codisto_activate()
 {
+	$homeUrl = home_url();
+	$siteUrl = site_url();
+	$adminUrl = admin_url();
+
+	$syncUrl = str_replace($homeUrl, '', $siteUrl);
+	$syncUrl .= (substr($syncUrl, -1) == '/' ? '' : '/');
+
+	// synchronisation end point
+	add_rewrite_rule(
+		'^'.preg_quote(ltrim($syncUrl, '/'), '/').'codisto-sync\/(.*)?',
+		'index.php?codisto=sync&codisto-sync-route=$matches[1]',
+		'top' );
+
+	$adminUrl = str_replace($homeUrl, '', $adminUrl);
+	$adminUrl .= (substr($adminUrl, -1) == '/' ? '' : '/');
+
+	// proxy end point
+	add_rewrite_rule(
+		'^'.preg_quote(ltrim($adminUrl, '/'), '/').'codisto\/(.*)?',
+		'index.php?codisto=proxy&codisto-proxy-route=$matches[1]',
+		'top'
+	);
+
 	flush_rewrite_rules();
 }
 
