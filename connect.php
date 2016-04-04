@@ -65,7 +65,7 @@ final class CodistoConnect {
 			header('Cache-Control: no-cache, no-store');
 			header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 			header('Pragma: no-cache');
-			echo wp_json_encode(array( 'ack' => 'error', 'message' => 'Security Error - Missing Headers' ));
+			echo $this->json_encode(array( 'ack' => 'error', 'message' => 'Security Error - Missing Headers' ));
 			return false;
 		}
 
@@ -79,7 +79,7 @@ final class CodistoConnect {
 			header('Cache-Control: no-cache, no-store');
 			header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 			header('Pragma: no-cache');
-			echo wp_json_encode(array( 'ack' => 'error', 'message' => 'Security Error' ));
+			echo $this->json_encode(array( 'ack' => 'error', 'message' => 'Security Error' ));
 			return false;
 		}
 
@@ -89,6 +89,22 @@ final class CodistoConnect {
 	public function order_set_date($order_data)
 	{
 		return $order_data;
+	}
+
+	private function json_encode($arg)
+	{
+		if(function_exists('wp_json_encode'))
+		{
+			return wp_json_encode($arg);
+		}
+		else if(function_exists('json_encode'))
+		{
+			return json_encode($arg);
+		}
+		else
+		{
+			throw new Exception('PHP missing json library - please upgrade php or wordpress');
+		}
 	}
 
 	private function files_in_dir($dir, $prefix = '')
@@ -144,7 +160,7 @@ final class CodistoConnect {
 			header('Cache-Control: no-cache, no-store');
 			header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 			header('Pragma: no-cache');
-			echo wp_json_encode(array( 'ack' => 'failed', 'message' => 'WooCommerce Deactivated' ));
+			echo $this->json_encode(array( 'ack' => 'failed', 'message' => 'WooCommerce Deactivated' ));
 			exit();
 		}
 
@@ -169,7 +185,7 @@ final class CodistoConnect {
 				header('Cache-Control: no-cache, no-store');
 				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 				header('Pragma: no-cache');
-				echo wp_json_encode(array( 'ack' => 'ok' ));
+				echo $this->json_encode(array( 'ack' => 'ok' ));
 			}
 			else if($type === 'settings')
 			{
@@ -222,7 +238,7 @@ final class CodistoConnect {
 				header('Cache-Control: no-cache, no-store');
 				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 				header('Pragma: no-cache');
-				echo wp_json_encode($response);
+				echo $this->json_encode($response);
 			}
 			else if($type === 'tax')
 			{
@@ -245,7 +261,7 @@ final class CodistoConnect {
 				header('Cache-Control: no-cache, no-store');
 				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 				header('Pragma: no-cache');
-				echo wp_json_encode($response);
+				echo $this->json_encode($response);
 			}
 			else if($type === 'products')
 			{
@@ -504,7 +520,7 @@ final class CodistoConnect {
 				header('Cache-Control: no-cache, no-store');
 				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 				header('Pragma: no-cache');
-				echo wp_json_encode($response);
+				echo $this->json_encode($response);
 			}
 			else if($type === 'categories')
 			{
@@ -538,7 +554,7 @@ final class CodistoConnect {
 				header('Cache-Control: no-cache, no-store');
 				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 				header('Pragma: no-cache');
-				echo wp_json_encode($response);
+				echo $this->json_encode($response);
 			}
 			else if($type === 'orders')
 			{
@@ -615,7 +631,7 @@ final class CodistoConnect {
 				header('Cache-Control: no-cache, no-store');
 				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 				header('Pragma: no-cache');
-				echo wp_json_encode($response);
+				echo $this->json_encode($response);
 			}
 			else if($type == 'sync')
 			{
@@ -677,7 +693,7 @@ final class CodistoConnect {
 						header('Expires', 'Thu, 01 Jan 1970 00:00:00 GMT', true);
 						header('Cache-Control', 'no-cache, must-revalidate', true);
 						header('Pragma', 'no-cache', true);
-						echo wp_json_encode(array( 'ack' => 'ok' ));
+						echo $this->json_encode(array( 'ack' => 'ok' ));
 						exit;
 					}
 					else
@@ -1168,7 +1184,7 @@ final class CodistoConnect {
 					header('Cache-Control: no-cache, no-store');
 					header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 					header('Pragma: no-cache');
-					echo wp_json_encode($response);
+					echo $this->json_encode($response);
 				}
 				catch(Exception $e)
 				{
@@ -1181,7 +1197,7 @@ final class CodistoConnect {
 					header('Cache-Control: no-cache, no-store');
 					header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 					header('Pragma: no-cache');
-					echo wp_json_encode($response);
+					echo $this->json_encode($response);
 				}
 			}
 			else if($type == 'sync')
@@ -1244,7 +1260,7 @@ final class CodistoConnect {
 					header('Cache-Control: no-cache, no-store');
 					header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 					header('Pragma: no-cache');
-					echo wp_json_encode( array( 'ack' => 'ok' ) );
+					echo $this->json_encode( array( 'ack' => 'ok' ) );
 				}
 			}
 		}
@@ -1521,7 +1537,7 @@ final class CodistoConnect {
 								'timeout' => 60,
 								'httpversion' => '1.0',
 								'redirection' => 0,
-								'body' => wp_json_encode( array (
+								'body' => $this->json_encode( array (
 
 									'type' => 'woocommerce',
 									'version' => get_bloginfo( 'version' ),
@@ -1564,7 +1580,7 @@ final class CodistoConnect {
 							'timeout' => 60,
 							'httpversion' => '1.0',
 							'redirection' => 0,
-							'body' => wp_json_encode( array (
+							'body' => $this->json_encode( array (
 
 								'regtoken' => wp_unslash( $_GET['regtoken'] )
 
