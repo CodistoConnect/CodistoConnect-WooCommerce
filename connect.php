@@ -1,14 +1,14 @@
 <?php
 /**
  * @package MarketPlace Connect by Codisto
- * @version 1.1.97
+ * @version 1.1.98
  */
 /*
 Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 Author: Codisto
-Version: 1.1.97
+Version: 1.1.98
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 
-define('CODISTOCONNECT_VERSION', '1.1.97');
+define('CODISTOCONNECT_VERSION', '1.1.98');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 
@@ -104,6 +104,22 @@ final class CodistoConnect {
 		else
 		{
 			throw new Exception('PHP missing json library - please upgrade php or wordpress');
+		}
+	}
+
+	private function get_product($id)
+	{
+		if(function_exists('wc_get_product'))
+		{
+			return wc_get_product($id);
+		}
+		else if(function_exists('get_product'))
+		{
+			return get_product($id);
+		}
+		else
+		{
+			throw new Exception('WooCommerce wc_get_product function is missing - please reinstall or activate WooCommerce');
 		}
 	}
 
@@ -307,7 +323,7 @@ final class CodistoConnect {
 
 				foreach($products as $product)
 				{
-					$wc_product = wc_get_product($product->id);
+					$wc_product = $this->get_product($product->id);
 
 					$categoryproduct = $wc_product->get_categories();
 
