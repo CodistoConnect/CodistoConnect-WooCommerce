@@ -1590,6 +1590,22 @@ final class CodistoConnect {
 		}
 		else
 		{
+			$regtoken = '';
+			if(isset($_GET['regtoken']))
+			{
+				$regtoken = wp_unslash( $_GET['regtoken'] );
+			}
+			else
+			{
+				$query = array();
+				parse_str( $_SERVER['QUERY_STRING'], $query );
+
+				if(isset($query['regtoken']))
+				{
+					$regtoken = $query['regtoken'];
+				}
+			}
+
 			$httpOptions = array(
 							'method' => 'POST',
 							'headers' => array( 'Content-Type' => 'application/json' ),
@@ -1598,7 +1614,7 @@ final class CodistoConnect {
 							'redirection' => 0,
 							'body' => $this->json_encode( array (
 
-								'regtoken' => wp_unslash( $_GET['regtoken'] )
+								'regtoken' => $regtoken
 
 							) )
 						);
