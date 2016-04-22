@@ -57,8 +57,8 @@ final class CodistoConnect {
 
 	public function check_hash()
 	{
-		if(!isset($_SERVER['HTTP_X_NONCE']) ||
-			!isset($_SERVER['HTTP_X_HASH']))
+		if(!isset($_SERVER['HTTP_X_CODISTONONCE']) ||
+			!isset($_SERVER['HTTP_X_CODISTOKEY']))
 		{
 			status_header('400 Security Error');
 			header('Content-Type: application/json');
@@ -69,10 +69,10 @@ final class CodistoConnect {
 			return false;
 		}
 
-		$r = get_option('codisto_key') . $_SERVER['HTTP_X_NONCE'];
+		$r = get_option('codisto_key') . $_SERVER['HTTP_X_CODISTONONCE'];
 		$base = hash('sha256', $r, true);
 		$checkHash = base64_encode($base);
-		if(!hash_equals($_SERVER['HTTP_X_HASH'], $checkHash))
+		if(!hash_equals($_SERVER['HTTP_X_CODISTOKEY'], $checkHash))
 		{
 			status_header('400 Security Error');
 			header('Content-Type: application/json');
