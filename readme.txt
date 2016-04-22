@@ -3,7 +3,7 @@ Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
 Tested up to: 4.5
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -90,34 +90,38 @@ No, MarketPlace Connect currently only works with eBay
 
 == Changelog ==
 
-= 1.1.87 - 21/03/2016 =
+= 1.2.1 - 22/04/2016 =
 
-* Initial public release
+* switched http headers over to be codisto specific to avoid collision with other extensions
 
-= 1.1.94 - 30/03/2016 =
+= 1.2.0 - 21/04/2016 =
 
-* fix rewrite rules to honour the difference between home and site url
-
-= 1.1.95 - 30/03/2016 =
-
-* had trouble updating wordpress svn so bumped version number
-
-= 1.1.96 - 30/03/2016 =
-
-* shift to full size image download - wp_get_attachment_image_src takes a default 2nd arg of 'thumbnail' which is now overriden to 'full'
-
-= 1.1.97 - 04/04/2016 =
-
-* handle older versions of wordpress by not assuming wp_json_encode
-
-= 1.1.98 - 04/04/2016 =
-
-* fallback to get_product defined in earlier versions of WooCommerce if wc_get_product is not defined
+* handle missing _GET variables during registrations
 
 = 1.1.99 - 21/04/2016 =
 
 * tested against wordpress 4.5
 
-= 1.2.0 - 21/04/2016 =
+= 1.1.98 - 04/04/2016 =
 
-* handle missing _GET variables during registrations
+* fallback to get_product defined in earlier versions of WooCommerce if wc_get_product is not defined
+
+= 1.1.97 - 04/04/2016 =
+
+* handle older versions of wordpress by not assuming wp_json_encode
+
+= 1.1.96 - 30/03/2016 =
+
+* shift to full size image download - wp_get_attachment_image_src takes a default 2nd arg of 'thumbnail' which is now overriden to 'full'
+
+= 1.1.95 - 30/03/2016 =
+
+* had trouble updating wordpress svn so bumped version number
+
+= 1.1.94 - 30/03/2016 =
+
+* fix rewrite rules to honour the difference between home and site url
+
+= 1.1.87 - 21/03/2016 =
+
+* Initial public release
