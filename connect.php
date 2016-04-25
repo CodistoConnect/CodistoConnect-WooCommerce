@@ -2070,6 +2070,11 @@ final class CodistoConnect {
 			self::$_instance = new self();
 
 			add_action('init', array( self::$_instance, 'init_plugin' ) );
+
+			if(preg_match('/\/codisto-sync\//', $_SERVER['REQUEST_URI']))
+			{
+				$_POST['aelia_cs_currency'] = get_option('woocommerce_currency');
+			}
 		}
 		return self::$_instance;
 	}
