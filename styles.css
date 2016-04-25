@@ -1,10 +1,10 @@
 .codisto #wpbody
 {
-	position: absolute !important;
+	position: fixed !important;
 	left: 160px !important;
 	right: 0px;
 	bottom: 0px;
-	top: 0px;
+	top: 32px;
 }
 .codisto .folded #wpbody
 {
