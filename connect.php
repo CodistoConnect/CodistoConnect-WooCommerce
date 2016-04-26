@@ -1,14 +1,14 @@
 <?php
 /**
  * @package MarketPlace Connect by Codisto
- * @version 1.2.2
+ * @version 1.2.21
  */
 /*
 Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 Author: Codisto
-Version: 1.2.2
+Version: 1.2.21
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 
-define('CODISTOCONNECT_VERSION', '1.2.2');
+define('CODISTOCONNECT_VERSION', '1.2.21');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 
@@ -1476,11 +1476,14 @@ final class CodistoConnect {
 		status_header(wp_remote_retrieve_response_code($response));
 
 		$filterHeaders = array('server', 'content-length', 'transfer-encoding', 'date', 'connection', 'x-storeviewmap');
+		if($httpOptions['decompress'] == true)
+			$filterHeaders[] = 'content-encoding';
 
 		@header_remove( 'Last-Modified' );
 		@header_remove( 'Pragma' );
 		@header_remove( 'Cache-Control' );
 		@header_remove( 'Expires' );
+		@header_remove( 'Content-Encoding' );
 
 		foreach(wp_remote_retrieve_headers($response) as $header => $value)
 		{
