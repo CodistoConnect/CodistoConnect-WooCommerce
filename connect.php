@@ -1476,11 +1476,14 @@ final class CodistoConnect {
 		status_header(wp_remote_retrieve_response_code($response));
 
 		$filterHeaders = array('server', 'content-length', 'transfer-encoding', 'date', 'connection', 'x-storeviewmap');
+		if($httpOptions['decompress'] == true)
+			$filterHeaders[] = 'content-encoding';
 
 		@header_remove( 'Last-Modified' );
 		@header_remove( 'Pragma' );
 		@header_remove( 'Cache-Control' );
 		@header_remove( 'Expires' );
+		@header_remove( 'Content-Encoding' );
 
 		foreach(wp_remote_retrieve_headers($response) as $header => $value)
 		{
