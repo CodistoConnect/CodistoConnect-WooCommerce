@@ -1,14 +1,14 @@
 <?php
 /**
  * @package MarketPlace Connect by Codisto
- * @version 1.2.21
+ * @version 1.2.22
  */
 /*
 Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 Author: Codisto
-Version: 1.2.21
+Version: 1.2.22
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -18,8 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
+include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-define('CODISTOCONNECT_VERSION', '1.2.21');
+define('CODISTOCONNECT_VERSION', '1.2.22');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 
@@ -321,6 +322,8 @@ final class CodistoConnect {
 					$total_count = $wpdb->get_var("SELECT COUNT(*) FROM `{$wpdb->prefix}posts` WHERE post_type = 'product' AND post_status IN ('publish', 'future', 'pending', 'private')");
 				}
 
+				$acf_installed = is_plugin_active('advanced-custom-fields/acf.php');
+
 				foreach($products as $product)
 				{
 					$wc_product = $this->get_product($product->id);
@@ -449,6 +452,7 @@ final class CodistoConnect {
 						}
 					}
 
+					$image_sequence = 1;
 					$product->images = array();
 
 					$imagesUsed = array();
@@ -462,7 +466,6 @@ final class CodistoConnect {
 
 						$imagesUsed[$primaryimage_path] = true;
 
-						$sequence = 1;
 						foreach($wc_product->get_gallery_attachment_ids() as $image_id)
 						{
 							$image_path = wp_get_attachment_image_src($image_id, 'full');
@@ -470,11 +473,11 @@ final class CodistoConnect {
 
 							if(!array_key_exists($image_path, $imagesUsed))
 							{
-								$product->images[] = array( 'source' => $image_path, 'sequence' => $sequence );
+								$product->images[] = array( 'source' => $image_path, 'sequence' => $image_sequence );
 
 								$imagesUsed[$image_path] = true;
 
-								$sequence++;
+								$image_sequence++;
 							}
 						}
 					}
@@ -519,7 +522,93 @@ final class CodistoConnect {
 						}
 					}
 
+					// acf
 
+					if($acf_installed)
+					{
+						if( function_exists( 'get_field_objects' ) )
+						{
+							$fields = get_field_objects( $product->id );
+							if( is_array( $fields ) )
+							{
+								foreach( $fields as $field )
+								{
+									if( $field['type'] == 'image' )
+									{
+										$image_path = $field['value']['url'];
+
+										if( !array_key_exists( $image_path, $imagesUsed ) )
+										{
+											$product->images[] = array( 'source' => $image_path, 'sequence' => $image_sequence );
+
+											$imagesUsed[$image_path] = true;
+
+											$image_sequence++;
+										}
+									}
+
+									else if( $field['type'] == 'gallery' )
+									{
+										$gallery = $field['value'];
+
+										if( is_array( $gallery ) )
+										{
+											foreach( $gallery as $image )
+											{
+												$image_path = $image['url'];
+
+												if( !array_key_exists( $image_path, $imagesUsed ) )
+												{
+													$product->images[] = array( 'source' => $image_path, 'sequence' => $image_sequence );
+
+													$imagesUsed[$image_path] = true;
+
+													$image_sequence++;
+												}
+											}
+										}
+									}
+
+									else if( in_array( $field['type'],
+												array(	'textarea',
+														'wysiwyg',
+														'text',
+														'number',
+														'select',
+														'radio',
+														'checkbox',
+														'true_false' ) ) )
+									{
+										if( !array_key_exists( $field['label'], $attributesUsed ) )
+										{
+											$attributesUsed[$field['label']] = true;
+
+											$value = $field['value'];
+											if( is_array( $value ) )
+											{
+												if( count( $value ) === 1)
+													$value = $value[0];
+												else
+													$value = implode(',', $value);
+											}
+
+											$product->attributes[] = array( 'name' => $field['name'], 'value' => $value );
+										}
+									}
+
+									if( !$product->description )
+									{
+										if( in_array( $field['type'], array( 'textarea', 'wysiwyg' ) ) &&
+												$field['name'] == 'description' )
+										{
+											$product->description = $field['value'];
+										}
+									}
+
+								}
+							}
+						}
+					}
 				}
 
 				$response = array( 'ack' => 'ok', 'products' => $products );
