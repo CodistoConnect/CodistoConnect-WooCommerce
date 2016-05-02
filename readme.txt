@@ -39,6 +39,8 @@ Powerful control via full real time inventory synchronization between your ecomm
 
 Visit <https://codisto.com/connect/> to read more about Marketplace Connect including documentation, installation instructions and pricing.
 
+Pricing starts at $49 USD per month.
+
 == Installation ==
 
 1. Install MarketPlace Connect by Codisto either via the WordPress.org plugin repository, or by uploading the files to your server
