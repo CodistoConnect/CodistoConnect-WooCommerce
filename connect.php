@@ -322,7 +322,7 @@ final class CodistoConnect {
 					$total_count = $wpdb->get_var("SELECT COUNT(*) FROM `{$wpdb->prefix}posts` WHERE post_type = 'product' AND post_status IN ('publish', 'future', 'pending', 'private')");
 				}
 
-				$acf_installed = is_plugin_active('advanced-custom-fields/acf.php');
+				$acf_installed = function_exists('acf');
 
 				foreach($products as $product)
 				{
