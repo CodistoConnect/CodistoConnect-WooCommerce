@@ -1665,6 +1665,8 @@ final class CodistoConnect {
 				update_option( 'codisto_merchantid' , 	$result['merchantid'] );
 				update_option( 'codisto_key',			$result['hostkey'] );
 
+				wp_cache_flush();
+
 				wp_redirect('admin.php?page=codisto');
 			}
 			else
@@ -1717,6 +1719,8 @@ final class CodistoConnect {
 
 			update_option( 'codisto_merchantid' , 	$result['merchantid'] );
 			update_option( 'codisto_key',			$result['hostkey'] );
+
+			wp_cache_flush();
 
 			wp_redirect('admin.php?page=codisto');
 		}
