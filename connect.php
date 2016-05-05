@@ -2114,9 +2114,9 @@ final class CodistoConnect {
 
 	public function init_plugin()
 	{
-		$homeUrl = preg_replace('/^https?:\/\//', '', home_url());
-		$siteUrl = preg_replace('/^https?:\/\//', '', site_url());
-		$adminUrl = preg_replace('/^https?:\/\//', '', admin_url());
+		$homeUrl = preg_replace('/^https?:\/\//', '', trim(home_url()));
+		$siteUrl = preg_replace('/^https?:\/\//', '', trim(site_url()));
+		$adminUrl = preg_replace('/^https?:\/\//', '', trim(admin_url()));
 
 		$syncUrl = str_replace($homeUrl, '', $siteUrl);
 		$syncUrl .= (substr($syncUrl, -1) == '/' ? '' : '/');
@@ -2178,9 +2178,9 @@ final class CodistoConnect {
 
 function codisto_activate()
 {
-	$homeUrl = preg_replace('/^https?:\/\//', '', home_url());
-	$siteUrl = preg_replace('/^https?:\/\//', '', site_url());
-	$adminUrl = preg_replace('/^https?:\/\//', '', admin_url());
+	$homeUrl = preg_replace('/^https?:\/\//', '', trim(home_url()));
+	$siteUrl = preg_replace('/^https?:\/\//', '', trim(site_url()));
+	$adminUrl = preg_replace('/^https?:\/\//', '', trim(admin_url()));
 
 	$syncUrl = str_replace($homeUrl, '', $siteUrl);
 	$syncUrl .= (substr($syncUrl, -1) == '/' ? '' : '/');
