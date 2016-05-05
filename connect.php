@@ -1,14 +1,14 @@
 <?php
 /**
  * @package MarketPlace Connect by Codisto
- * @version 1.2.25
+ * @version 1.2.26
  */
 /*
 Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 Author: Codisto
-Version: 1.2.25
+Version: 1.2.26
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-define('CODISTOCONNECT_VERSION', '1.2.25');
+define('CODISTOCONNECT_VERSION', '1.2.26');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 
@@ -1368,6 +1368,43 @@ final class CodistoConnect {
 					echo $this->json_encode( array( 'ack' => 'ok' ) );
 				}
 			}
+			else if($type == 'index/calc')
+			{
+				$product_ids = array();
+				$quantities = array();
+
+				for($i = 0; ; $i++)
+				{
+					if(!isset($_POST['PRODUCTCODE('.$i.')']))
+						break;
+
+					$productid = (int)$_POST['PRODUCTID('.$i.')'];
+					if(!$productid)
+					{
+						$productcode = $_POST['PRODUCTCODE('.$i.')'];
+						$productid = wc_get_product_id_by_sku( $productcode );
+					}
+
+					$productqty = $_POST['PRODUCTQUANTITY('.$i.')'];
+					if(!$productqty && $productqty != 0)
+						$productqty = 1;
+
+					WC()->cart->add_to_cart( $productid, $productqty );
+
+				}
+
+				WC()->customer->set_location($_POST['COUNTRYCODE'], $_POST['DIVISION'], $_POST['POSTALCODE'], $_POST['PLACE']);
+				WC()->customer->set_shipping_location($_POST['COUNTRYCODE'], $_POST['DIVISION'], $_POST['POSTALCODE'], $_POST['PLACE']);
+				WC()->cart->calculate_totals();
+				WC()->cart->calculate_shipping();
+
+				status_header('200 OK');
+				header('Content-Type: text/plain');
+				header('Cache-Control: no-cache, no-store');
+				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+				header('Pragma: no-cache');
+				echo 'FREIGHTNAME(0)=Shipping&FREIGHTCHARGEINCTAX(0)='.number_format((float)WC()->cart->shipping_total, 2, '.', '');
+			}
 		}
 	}
 
@@ -2114,9 +2151,9 @@ final class CodistoConnect {
 
 	public function init_plugin()
 	{
-		$homeUrl = home_url();
-		$siteUrl = site_url();
-		$adminUrl = admin_url();
+		$homeUrl = preg_replace('/^https?:\/\//', '', trim(home_url()));
+		$siteUrl = preg_replace('/^https?:\/\//', '', trim(site_url()));
+		$adminUrl = preg_replace('/^https?:\/\//', '', trim(admin_url()));
 
 		$syncUrl = str_replace($homeUrl, '', $siteUrl);
 		$syncUrl .= (substr($syncUrl, -1) == '/' ? '' : '/');
@@ -2178,9 +2215,9 @@ final class CodistoConnect {
 
 function codisto_activate()
 {
-	$homeUrl = home_url();
-	$siteUrl = site_url();
-	$adminUrl = admin_url();
+	$homeUrl = preg_replace('/^https?:\/\//', '', trim(home_url()));
+	$siteUrl = preg_replace('/^https?:\/\//', '', trim(site_url()));
+	$adminUrl = preg_replace('/^https?:\/\//', '', trim(admin_url()));
 
 	$syncUrl = str_replace($homeUrl, '', $siteUrl);
 	$syncUrl .= (substr($syncUrl, -1) == '/' ? '' : '/');
