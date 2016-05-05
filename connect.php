@@ -1368,6 +1368,43 @@ final class CodistoConnect {
 					echo $this->json_encode( array( 'ack' => 'ok' ) );
 				}
 			}
+			else if($type == 'index/calc')
+			{
+				$product_ids = array();
+				$quantities = array();
+
+				for($i = 0; ; $i++)
+				{
+					if(!isset($_POST['PRODUCTCODE('.$i.')']))
+						break;
+
+					$productid = (int)$_POST['PRODUCTID('.$i.')'];
+					if(!$productid)
+					{
+						$productcode = $_POST['PRODUCTCODE('.$i.')'];
+						$productid = wc_get_product_id_by_sku( $productcode );
+					}
+
+					$productqty = $_POST['PRODUCTQUANTITY('.$i.')'];
+					if(!$productqty && $productqty != 0)
+						$productqty = 1;
+
+					WC()->cart->add_to_cart( $productid, $productqty );
+
+				}
+
+				WC()->customer->set_location($_POST['COUNTRYCODE'], $_POST['DIVISION'], $_POST['POSTALCODE'], $_POST['PLACE']);
+				WC()->customer->set_shipping_location($_POST['COUNTRYCODE'], $_POST['DIVISION'], $_POST['POSTALCODE'], $_POST['PLACE']);
+				WC()->cart->calculate_totals();
+				WC()->cart->calculate_shipping();
+
+				status_header('200 OK');
+				header('Content-Type: text/plain');
+				header('Cache-Control: no-cache, no-store');
+				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+				header('Pragma: no-cache');
+				echo 'FREIGHTNAME(0)=Shipping&FREIGHTCHARGEINCTAX(0)='.number_format((float)WC()->cart->shipping_total, 2, '.', '');
+			}
 		}
 	}
 
