@@ -1398,12 +1398,42 @@ final class CodistoConnect {
 				WC()->cart->calculate_totals();
 				WC()->cart->calculate_shipping();
 
+				$response = '';
+
+				$idx = 0;
+				$methods = WC()->shipping()->get_shipping_methods();
+				foreach($methods as $method)
+				{
+					if(file_exists(plugin_dir_path( __FILE__ ).'shipping/'.$method->id))
+					{
+						include( plugin_dir_path( __FILE__ ).'shipping/'.$method->id );
+					}
+					else
+					{
+						foreach($method->rates as $method => $rate)
+						{
+							$method_name = $rate->get_label();
+							if(!$method_name)
+								$method_name = 'Shipping';
+
+							$method_cost = $rate->cost;
+							if(is_numeric($method_cost))
+							{
+								$response .= ($idx > 0 ? '&' : '').'FREIGHTNAME('.$idx.')='.rawurlencode($method_name).'&FREIGHTCHARGEINCTAX('.$idx.')='.number_format((float)$method_cost, 2, '.', '');
+
+								$idx++;
+							}
+						}
+					}
+				}
+
 				status_header('200 OK');
 				header('Content-Type: text/plain');
 				header('Cache-Control: no-cache, no-store');
 				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 				header('Pragma: no-cache');
-				echo 'FREIGHTNAME(0)=Shipping&FREIGHTCHARGEINCTAX(0)='.number_format((float)WC()->cart->shipping_total, 2, '.', '');
+				echo $response;
+				die();
 			}
 		}
 	}
