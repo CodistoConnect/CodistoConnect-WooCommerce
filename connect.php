@@ -1733,7 +1733,7 @@ final class CodistoConnect {
 
 				$result = json_decode( wp_remote_retrieve_body( $response ), true );
 
-				if(!$result || $response) {
+				if(!$result || !$response) {
 
 					$postdata = array (
 					    'type' => 'woocommerce',
