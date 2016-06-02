@@ -1559,9 +1559,23 @@ final class CodistoConnect {
 
 		$incomingHeaders = getallheaders();
 
+		$headerfilter = array('host', 'connection');
+
+		$acceptEncoding = $_SERVER['HTTP_ACCEPT_ENCODING'];
+		$zlibEnabled = strtoupper(ini_get('zlib.output_compression'));
+		if(!$acceptEncoding || ($zlibEnabled == 1 || $zlibEnabled == 'ON'))
+		{
+			$decompress = true;
+		}
+		else
+		{
+			$decompress = false;
+			$headerfilter[] = 'accept-encoding';
+		}
+
 		foreach($incomingHeaders as $name => $value)
 		{
-			if(!in_array(trim(strtolower($name)), array('host', 'connection')))
+			if(!in_array(trim(strtolower($name)), $headerfilter))
 				$requestHeaders[$name] = $value;
 		}
 
@@ -1570,20 +1584,10 @@ final class CodistoConnect {
 						'headers' => $requestHeaders,
 						'timeout' => 60,
 						'httpversion' => '1.0',
+						'decompress' => $decompress,
 						'compress' => true,
 						'redirection' => 0
 					);
-
-		$acceptEncoding = $_SERVER['HTTP_ACCEPT_ENCODING'];
-		$zlibEnabled = strtoupper(ini_get('zlib.output_compression'));
-		if(!$acceptEncoding || ($zlibEnabled == 1 || $zlibEnabled == 'ON'))
-		{
-			$httpOptions['decompress'] = true;
-		}
-		else
-		{
-			$httpOptions['decompress'] = false;
-		}
 
 		$upload_dir = wp_upload_dir();
 		$certPath = $upload_dir['basedir'].'/codisto.crt';
@@ -1728,6 +1732,37 @@ final class CodistoConnect {
 				$response = wp_remote_request('https://ui.codisto.com/create', $httpOptions);
 
 				$result = json_decode( wp_remote_retrieve_body( $response ), true );
+
+				if(!$result || $response) {
+
+					$postdata = array (
+					    'type' => 'woocommerce',
+					    'version' => get_bloginfo( 'version' ),
+					    'url' => get_site_url(),
+					    'email' => wp_unslash( $_POST['email'] ),
+					    'storename' => get_option('blogdescription') ,
+					    'resellerkey' => $this->reseller_key(),
+					    'codistoversion' => CODISTOCONNECT_VERSION
+					);
+					$str = json_encode( $postdata );
+
+					$curl = curl_init();
+					curl_setopt_array( $curl, array(
+					    CURLOPT_RETURNTRANSFER => 1,
+					    CURLOPT_URL => 'https://ui.codisto.com/create',
+					    CURLOPT_POST => 1,
+					    CURLOPT_POSTFIELDS => $str,
+					    CURLOPT_HTTPHEADER => array(
+					        'Content-Type: application/json',
+					        'Content-Length: ' . strlen($str)
+					    )
+					));
+					$response = curl_exec( $curl );
+					curl_close( $curl );
+
+					$result = json_decode( $response, true );
+
+				}
 
 				update_option( 'codisto_merchantid' , 	$result['merchantid'] );
 				update_option( 'codisto_key',			$result['hostkey'] );
