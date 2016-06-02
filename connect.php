@@ -1731,9 +1731,11 @@ final class CodistoConnect {
 
 				$response = wp_remote_request('https://ui.codisto.com/create', $httpOptions);
 
-				$result = json_decode( wp_remote_retrieve_body( $response ), true );
+				if($response) {
 
-				if(!$result || !$response) {
+					$result = json_decode( wp_remote_retrieve_body( $response ), true );
+
+				} else {
 
 					$postdata = array (
 					    'type' => 'woocommerce',
@@ -1744,7 +1746,7 @@ final class CodistoConnect {
 					    'resellerkey' => $this->reseller_key(),
 					    'codistoversion' => CODISTOCONNECT_VERSION
 					);
-					$str = json_encode( $postdata );
+					$str = $this->json_encode( $postdata );
 
 					$curl = curl_init();
 					curl_setopt_array( $curl, array(
