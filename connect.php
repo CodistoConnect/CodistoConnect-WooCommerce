@@ -1419,6 +1419,17 @@ final class CodistoConnect {
 							$method_cost = $rate->cost;
 							if(is_numeric($method_cost))
 							{
+								if(isset($rate->taxes) && is_array($rate->taxes))
+								{
+									foreach($rate->taxes as $tax)
+									{
+										if(is_numeric($tax))
+										{
+											$method_cost += $tax;
+										}
+									}
+								}
+
 								$response .= ($idx > 0 ? '&' : '').'FREIGHTNAME('.$idx.')='.rawurlencode($method_name).'&FREIGHTCHARGEINCTAX('.$idx.')='.number_format((float)$method_cost, 2, '.', '');
 
 								$idx++;
