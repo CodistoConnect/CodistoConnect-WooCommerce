@@ -1,14 +1,14 @@
 <?php
 /**
  * @package MarketPlace Connect by Codisto
- * @version 1.2.26
+ * @version 1.2.27
  */
 /*
 Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 Author: Codisto
-Version: 1.2.26
+Version: 1.2.27
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-define('CODISTOCONNECT_VERSION', '1.2.26');
+define('CODISTOCONNECT_VERSION', '1.2.27');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 
@@ -1398,12 +1398,53 @@ final class CodistoConnect {
 				WC()->cart->calculate_totals();
 				WC()->cart->calculate_shipping();
 
+				$response = '';
+
+				$idx = 0;
+				$methods = WC()->shipping()->get_shipping_methods();
+				foreach($methods as $method)
+				{
+					if(file_exists(plugin_dir_path( __FILE__ ).'shipping/'.$method->id))
+					{
+						include( plugin_dir_path( __FILE__ ).'shipping/'.$method->id );
+					}
+					else
+					{
+						foreach($method->rates as $method => $rate)
+						{
+							$method_name = $rate->get_label();
+							if(!$method_name)
+								$method_name = 'Shipping';
+
+							$method_cost = $rate->cost;
+							if(is_numeric($method_cost))
+							{
+								if(isset($rate->taxes) && is_array($rate->taxes))
+								{
+									foreach($rate->taxes as $tax)
+									{
+										if(is_numeric($tax))
+										{
+											$method_cost += $tax;
+										}
+									}
+								}
+
+								$response .= ($idx > 0 ? '&' : '').'FREIGHTNAME('.$idx.')='.rawurlencode($method_name).'&FREIGHTCHARGEINCTAX('.$idx.')='.number_format((float)$method_cost, 2, '.', '');
+
+								$idx++;
+							}
+						}
+					}
+				}
+
 				status_header('200 OK');
 				header('Content-Type: text/plain');
 				header('Cache-Control: no-cache, no-store');
 				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 				header('Pragma: no-cache');
-				echo 'FREIGHTNAME(0)=Shipping&FREIGHTCHARGEINCTAX(0)='.number_format((float)WC()->cart->shipping_total, 2, '.', '');
+				echo $response;
+				die();
 			}
 		}
 	}
@@ -1529,9 +1570,23 @@ final class CodistoConnect {
 
 		$incomingHeaders = getallheaders();
 
+		$headerfilter = array('host', 'connection');
+
+		$acceptEncoding = $_SERVER['HTTP_ACCEPT_ENCODING'];
+		$zlibEnabled = strtoupper(ini_get('zlib.output_compression'));
+		if(!$acceptEncoding || ($zlibEnabled == 1 || $zlibEnabled == 'ON'))
+		{
+			$decompress = true;
+		}
+		else
+		{
+			$decompress = false;
+			$headerfilter[] = 'accept-encoding';
+		}
+
 		foreach($incomingHeaders as $name => $value)
 		{
-			if(!in_array(trim(strtolower($name)), array('host', 'connection')))
+			if(!in_array(trim(strtolower($name)), $headerfilter))
 				$requestHeaders[$name] = $value;
 		}
 
@@ -1540,20 +1595,10 @@ final class CodistoConnect {
 						'headers' => $requestHeaders,
 						'timeout' => 60,
 						'httpversion' => '1.0',
+						'decompress' => $decompress,
 						'compress' => true,
 						'redirection' => 0
 					);
-
-		$acceptEncoding = $_SERVER['HTTP_ACCEPT_ENCODING'];
-		$zlibEnabled = strtoupper(ini_get('zlib.output_compression'));
-		if(!$acceptEncoding || ($zlibEnabled == 1 || $zlibEnabled == 'ON'))
-		{
-			$httpOptions['decompress'] = true;
-		}
-		else
-		{
-			$httpOptions['decompress'] = false;
-		}
 
 		$upload_dir = wp_upload_dir();
 		$certPath = $upload_dir['basedir'].'/codisto.crt';
@@ -1697,7 +1742,40 @@ final class CodistoConnect {
 
 				$response = wp_remote_request('https://ui.codisto.com/create', $httpOptions);
 
-				$result = json_decode( wp_remote_retrieve_body( $response ), true );
+				if($response) {
+
+					$result = json_decode( wp_remote_retrieve_body( $response ), true );
+
+				} else {
+
+					$postdata = array (
+					    'type' => 'woocommerce',
+					    'version' => get_bloginfo( 'version' ),
+					    'url' => get_site_url(),
+					    'email' => wp_unslash( $_POST['email'] ),
+					    'storename' => get_option('blogdescription') ,
+					    'resellerkey' => $this->reseller_key(),
+					    'codistoversion' => CODISTOCONNECT_VERSION
+					);
+					$str = $this->json_encode( $postdata );
+
+					$curl = curl_init();
+					curl_setopt_array( $curl, array(
+					    CURLOPT_RETURNTRANSFER => 1,
+					    CURLOPT_URL => 'https://ui.codisto.com/create',
+					    CURLOPT_POST => 1,
+					    CURLOPT_POSTFIELDS => $str,
+					    CURLOPT_HTTPHEADER => array(
+					        'Content-Type: application/json',
+					        'Content-Length: ' . strlen($str)
+					    )
+					));
+					$response = curl_exec( $curl );
+					curl_close( $curl );
+
+					$result = json_decode( $response, true );
+
+				}
 
 				update_option( 'codisto_merchantid' , 	$result['merchantid'] );
 				update_option( 'codisto_key',			$result['hostkey'] );
