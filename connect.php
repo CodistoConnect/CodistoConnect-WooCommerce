@@ -1650,11 +1650,22 @@ final class CodistoConnect {
 		if($httpOptions['decompress'] == true)
 			$filterHeaders[] = 'content-encoding';
 
-		@header_remove( 'Last-Modified' );
-		@header_remove( 'Pragma' );
-		@header_remove( 'Cache-Control' );
-		@header_remove( 'Expires' );
-		@header_remove( 'Content-Encoding' );
+		if(function_exists( 'header_remove' ))
+		{
+			@header_remove( 'Last-Modified' );
+			@header_remove( 'Pragma' );
+			@header_remove( 'Cache-Control' );
+			@header_remove( 'Expires' );
+			@header_remove( 'Content-Encoding' );
+		}
+		else
+		{
+			@header( 'Last-Modified:' );
+			@header( 'Pragma:' );
+			@header( 'Cache-Control:' );
+			@header( 'Expires:' );
+			@header( 'Content-Encoding:' );
+		}
 
 		foreach(wp_remote_retrieve_headers($response) as $header => $value)
 		{
