@@ -3,7 +3,7 @@ Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
 Tested up to: 4.5.2
-Stable tag: 1.2.27
+Stable tag: 1.2.28
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -91,6 +91,16 @@ No, MarketPlace Connect currently only works with eBay
 3. Order Management
 
 == Changelog ==
+
+= 1.2.28 - 08/06/2016 =
+
+* disable sending taxes if they are turned off in woocommerce settings
+* check for header_remove existence before using it (introduced in php 5.2)
+
+= 1.2.27 - 03/06/2016 =
+
+* support multiple shipping options in the shipping callback
+* properly add any applicable tax on shipping to the inc tax freight result
 
 = 1.2.26 - 05/05/2016 =
 

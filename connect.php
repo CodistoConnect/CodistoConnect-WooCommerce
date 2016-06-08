@@ -1,14 +1,14 @@
 <?php
 /**
  * @package MarketPlace Connect by Codisto
- * @version 1.2.27
+ * @version 1.2.28
  */
 /*
 Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 Author: Codisto
-Version: 1.2.27
+Version: 1.2.28
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-define('CODISTOCONNECT_VERSION', '1.2.27');
+define('CODISTOCONNECT_VERSION', '1.2.28');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 
@@ -264,7 +264,24 @@ final class CodistoConnect {
 					exit();
 				}
 
-				$rates = $wpdb->get_results("SELECT tax_rate_country AS country, tax_rate_state AS state, tax_rate AS rate, tax_rate_name AS name, tax_rate_class AS class, tax_rate_order AS sequence, tax_rate_priority AS priority FROM `{$wpdb->prefix}woocommerce_tax_rates` ORDER BY tax_rate_order");
+				$tax_enabled = true;
+				if(function_exists( 'wc_tax_enabled' ))
+				{
+					$tax_enabled = wc_tax_enabled();
+				}
+				else
+				{
+					$tax_enabled = get_option( 'woocommerce_calc_taxes' ) === 'yes';
+				}
+
+				if($tax_enabled)
+				{
+					$rates = $wpdb->get_results("SELECT tax_rate_country AS country, tax_rate_state AS state, tax_rate AS rate, tax_rate_name AS name, tax_rate_class AS class, tax_rate_order AS sequence, tax_rate_priority AS priority FROM `{$wpdb->prefix}woocommerce_tax_rates` ORDER BY tax_rate_order");
+				}
+				else
+				{
+					$rates = array();
+				}
 
 				$response = array( 'ack' => 'ok', 'tax_rates' => $rates );
 
