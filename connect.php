@@ -1,14 +1,14 @@
 <?php
 /**
  * @package MarketPlace Connect by Codisto
- * @version 1.2.28
+ * @version 1.2.29
  */
 /*
 Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 Author: Codisto
-Version: 1.2.28
+Version: 1.2.29
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-define('CODISTOCONNECT_VERSION', '1.2.28');
+define('CODISTOCONNECT_VERSION', '1.2.29');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 
@@ -256,6 +256,7 @@ final class CodistoConnect {
 				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 				header('Pragma: no-cache');
 				echo $this->json_encode($response);
+				exit();
 			}
 			else if($type === 'tax')
 			{
@@ -296,6 +297,7 @@ final class CodistoConnect {
 				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 				header('Pragma: no-cache');
 				echo $this->json_encode($response);
+				exit();
 			}
 			else if($type === 'products')
 			{
@@ -643,6 +645,7 @@ final class CodistoConnect {
 				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 				header('Pragma: no-cache');
 				echo $this->json_encode($response);
+				exit();
 			}
 			else if($type === 'categories')
 			{
@@ -677,6 +680,7 @@ final class CodistoConnect {
 				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 				header('Pragma: no-cache');
 				echo $this->json_encode($response);
+				exit();
 			}
 			else if($type === 'orders')
 			{
@@ -754,6 +758,7 @@ final class CodistoConnect {
 				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 				header('Pragma: no-cache');
 				echo $this->json_encode($response);
+				exit();
 			}
 			else if($type == 'sync')
 			{
@@ -816,7 +821,7 @@ final class CodistoConnect {
 						header('Cache-Control', 'no-cache, must-revalidate', true);
 						header('Pragma', 'no-cache', true);
 						echo $this->json_encode(array( 'ack' => 'ok' ));
-						exit;
+						exit();
 					}
 					else
 					{
@@ -1307,6 +1312,7 @@ final class CodistoConnect {
 					header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 					header('Pragma: no-cache');
 					echo $this->json_encode($response);
+					exit();
 				}
 				catch(Exception $e)
 				{
@@ -1320,6 +1326,7 @@ final class CodistoConnect {
 					header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 					header('Pragma: no-cache');
 					echo $this->json_encode($response);
+					exit();
 				}
 			}
 			else if($type == 'sync')
@@ -1383,6 +1390,7 @@ final class CodistoConnect {
 					header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 					header('Pragma: no-cache');
 					echo $this->json_encode( array( 'ack' => 'ok' ) );
+					exit();
 				}
 			}
 			else if($type == 'index/calc')
@@ -1461,7 +1469,7 @@ final class CodistoConnect {
 				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 				header('Pragma: no-cache');
 				echo $response;
-				die();
+				exit();
 			}
 		}
 	}
@@ -1576,7 +1584,7 @@ final class CodistoConnect {
 			?>
 			<h1>Resource Not Found</h1>
 			<?php
-			return;
+			exit();
 		}
 
 		$remoteUrl = 'https://ui.codisto.com/' . $merchantid . '/'. $path . ($querystring ? '?'.$querystring : '');
@@ -1639,7 +1647,7 @@ final class CodistoConnect {
 				{
 					status_header(500);
 					echo '<h1>Error processing request</h1> <p>'.htmlspecialchars($response->get_error_message()).'</p>';
-					return;
+					exit();
 				}
 
 				if($response->get_error_code() == 'http_request_failed')
