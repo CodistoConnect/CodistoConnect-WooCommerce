@@ -92,6 +92,10 @@ No, MarketPlace Connect currently only works with eBay
 
 == Changelog ==
 
+= 1.2.30 - 09/06/2016 =
+
+* work around wp super cache shutdown function that corrupts output
+
 = 1.2.29 - 09/06/2016 =
 
 * ensure exit() called on sync and proxy functions so that additional plugins do not foul the output
