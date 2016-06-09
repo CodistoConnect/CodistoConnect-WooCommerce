@@ -1683,14 +1683,6 @@ final class CodistoConnect {
 			@header_remove( 'Expires' );
 			@header_remove( 'Content-Encoding' );
 		}
-		else
-		{
-			@header( 'Last-Modified:' );
-			@header( 'Pragma:' );
-			@header( 'Cache-Control:' );
-			@header( 'Expires:' );
-			@header( 'Content-Encoding:' );
-		}
 
 		foreach(wp_remote_retrieve_headers($response) as $header => $value)
 		{
