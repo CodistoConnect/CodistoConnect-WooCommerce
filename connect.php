@@ -1236,7 +1236,7 @@ final class CodistoConnect {
 									wc_add_order_item_meta( $item_id, '_tax_class', '' );
 								}
 
-								$line_total = wc_format_decimal( (float)$orderline->linetotalinctax );
+								$line_total = wc_format_decimal( (float)$orderline->linetotal );
 								$line_total_tax = wc_format_decimal( (float)$orderline->linetotalinctax - (float)$orderline->linetotal );
 
 								wc_add_order_item_meta( $item_id, '_line_subtotal',	 $line_total );
@@ -1256,7 +1256,7 @@ final class CodistoConnect {
 											'order_item_type' 		=> 'shipping'
 										) );
 
-								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->linetotalinctax) );
+								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->linetotal) );
 
 								$shipping += (real)$orderline->linetotal;
 								$shipping_tax += (real)$orderline->linetotalinctax - (real)$orderline->linetotal;
@@ -1289,7 +1289,7 @@ final class CodistoConnect {
 						{
 							if($orderline->productcode[0] != 'FREIGHT')
 							{
-								$line_total = wc_format_decimal( (float)$orderline->linetotalinctax );
+								$line_total = wc_format_decimal( (float)$orderline->linetotal );
 								$line_total_tax = wc_format_decimal( (float)$orderline->linetotalinctax - (float)$orderline->linetotal );
 
 								$tax += $line_total_tax;
@@ -1303,7 +1303,7 @@ final class CodistoConnect {
 											'order_item_type' 		=> 'shipping'
 										) );
 
-								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->linetotalinctax) );
+								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->linetotal) );
 
 								$shipping += (real)$orderline->linetotal;
 								$shipping_tax += (real)$orderline->linetotalinctax - (real)$orderline->linetotal;
