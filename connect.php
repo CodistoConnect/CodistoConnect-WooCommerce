@@ -1236,7 +1236,7 @@ final class CodistoConnect {
 									wc_add_order_item_meta( $item_id, '_tax_class', '' );
 								}
 
-								$line_total = wc_format_decimal( (float)$orderline->linetotalinctax );
+								$line_total = wc_format_decimal( (float)$orderline->linetotal );
 								$line_total_tax = wc_format_decimal( (float)$orderline->linetotalinctax - (float)$orderline->linetotal );
 
 								wc_add_order_item_meta( $item_id, '_line_subtotal',	 $line_total );
@@ -1256,7 +1256,7 @@ final class CodistoConnect {
 											'order_item_type' 		=> 'shipping'
 										) );
 
-								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->linetotalinctax) );
+								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->linetotal) );
 
 								$shipping += (real)$orderline->linetotal;
 								$shipping_tax += (real)$orderline->linetotalinctax - (real)$orderline->linetotal;
@@ -1289,7 +1289,7 @@ final class CodistoConnect {
 						{
 							if($orderline->productcode[0] != 'FREIGHT')
 							{
-								$line_total = wc_format_decimal( (float)$orderline->linetotalinctax );
+								$line_total = wc_format_decimal( (float)$orderline->linetotal );
 								$line_total_tax = wc_format_decimal( (float)$orderline->linetotalinctax - (float)$orderline->linetotal );
 
 								$tax += $line_total_tax;
@@ -1303,7 +1303,7 @@ final class CodistoConnect {
 											'order_item_type' 		=> 'shipping'
 										) );
 
-								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->linetotalinctax) );
+								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->linetotal) );
 
 								$shipping += (real)$orderline->linetotal;
 								$shipping_tax += (real)$orderline->linetotalinctax - (real)$orderline->linetotal;
@@ -1922,7 +1922,36 @@ final class CodistoConnect {
 
 			$response = wp_remote_request('https://ui.codisto.com/create', $httpOptions);
 
-			$result = json_decode( wp_remote_retrieve_body( $response ), true );
+			if($response) {
+
+				$result = json_decode( wp_remote_retrieve_body( $response ), true );
+
+			} else {
+
+				$postdata =  array (
+					'regtoken' => $regtoken
+				);
+
+				$str = $this->json_encode( $postdata );
+
+				$curl = curl_init();
+				curl_setopt_array( $curl, array(
+					CURLOPT_RETURNTRANSFER => 1,
+					CURLOPT_URL => 'https://ui.codisto.com/create',
+					CURLOPT_POST => 1,
+					CURLOPT_POSTFIELDS => $str,
+					CURLOPT_HTTPHEADER => array(
+						'Content-Type: application/json',
+						'Content-Length: ' . strlen($str)
+					)
+				));
+
+				$response = curl_exec( $curl );
+				curl_close( $curl );
+
+				$result = json_decode( $response, true );
+
+			}
 
 			update_option( 'codisto_merchantid' , 	$result['merchantid'] );
 			update_option( 'codisto_key',			$result['hostkey'] );
