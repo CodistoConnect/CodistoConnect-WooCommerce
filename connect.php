@@ -1922,7 +1922,36 @@ final class CodistoConnect {
 
 			$response = wp_remote_request('https://ui.codisto.com/create', $httpOptions);
 
-			$result = json_decode( wp_remote_retrieve_body( $response ), true );
+			if($response) {
+
+				$result = json_decode( wp_remote_retrieve_body( $response ), true );
+
+			} else {
+
+				$postdata =  array (
+					'regtoken' => $regtoken
+				);
+
+				$str = $this->json_encode( $postdata );
+
+				$curl = curl_init();
+				curl_setopt_array( $curl, array(
+					CURLOPT_RETURNTRANSFER => 1,
+					CURLOPT_URL => 'https://ui.codisto.com/create',
+					CURLOPT_POST => 1,
+					CURLOPT_POSTFIELDS => $str,
+					CURLOPT_HTTPHEADER => array(
+						'Content-Type: application/json',
+						'Content-Length: ' . strlen($str)
+					)
+				));
+
+				$response = curl_exec( $curl );
+				curl_close( $curl );
+
+				$result = json_decode( $response, true );
+
+			}
 
 			update_option( 'codisto_merchantid' , 	$result['merchantid'] );
 			update_option( 'codisto_key',			$result['hostkey'] );
