@@ -1,14 +1,14 @@
 <?php
 /**
  * @package MarketPlace Connect by Codisto
- * @version 1.2.29
+ * @version 1.2.31
  */
 /*
 Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 Author: Codisto
-Version: 1.2.29
+Version: 1.2.31
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-define('CODISTOCONNECT_VERSION', '1.2.29');
+define('CODISTOCONNECT_VERSION', '1.2.31');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 
@@ -61,11 +61,13 @@ final class CodistoConnect {
 		if(!isset($_SERVER['HTTP_X_CODISTONONCE']) ||
 			!isset($_SERVER['HTTP_X_CODISTOKEY']))
 		{
-			status_header('400 Security Error');
-			header('Content-Type: application/json');
-			header('Cache-Control: no-cache, no-store');
-			header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
-			header('Pragma: no-cache');
+			$this->sendHttpHeaders('400 Security Error', array(
+				'Content-Type' => 'application/json',
+				'Cache-Control' => 'no-cache, no-store',
+				'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+				'Pragma' => 'no-cache'
+			));
+
 			echo $this->json_encode(array( 'ack' => 'error', 'message' => 'Security Error - Missing Headers' ));
 			return false;
 		}
@@ -75,11 +77,13 @@ final class CodistoConnect {
 		$checkHash = base64_encode($base);
 		if(!hash_equals($_SERVER['HTTP_X_CODISTOKEY'], $checkHash))
 		{
-			status_header('400 Security Error');
-			header('Content-Type: application/json');
-			header('Cache-Control: no-cache, no-store');
-			header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
-			header('Pragma: no-cache');
+			$this->sendHttpHeaders('400 Security Error', array(
+				'Content-Type' => 'application/json',
+				'Cache-Control' => 'no-cache, no-store',
+				'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+				'Pragma' => 'no-cache'
+			));
+
 			echo $this->json_encode(array( 'ack' => 'error', 'message' => 'Security Error' ));
 			return false;
 		}
@@ -90,6 +94,21 @@ final class CodistoConnect {
 	public function order_set_date($order_data)
 	{
 		return $order_data;
+	}
+
+	private function sendHttpHeaders($status, $headers)
+	{
+		if(defined( 'ADVANCEDCACHEPROBLEM' ) &&
+			false == strpos($_SERVER['REQUEST_URI'], 'wp-admin'))
+		{
+			$_SERVER['REQUEST_URI'] = '/wp-admin'.$_SERVER['REQUEST_URI'];
+		}
+
+		status_header($status);
+		foreach($headers as $header => $value)
+		{
+			header($header.': '.$value);
+		}
 	}
 
 	private function json_encode($arg)
@@ -172,11 +191,13 @@ final class CodistoConnect {
 
 		if( !in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) )))
 		{
-			status_header('500 Config Error');
-			header('Content-Type: application/json');
-			header('Cache-Control: no-cache, no-store');
-			header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
-			header('Pragma: no-cache');
+			$this->sendHttpHeaders('500 Config Error', array(
+				'Content-Type' => 'application/json',
+				'Cache-Control' => 'no-cache, no-store',
+				'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+				'Pragma' => 'no-cache'
+			));
+
 			echo $this->json_encode(array( 'ack' => 'failed', 'message' => 'WooCommerce Deactivated' ));
 			exit();
 		}
@@ -197,11 +218,14 @@ final class CodistoConnect {
 					@ini_set('zlib.output_compression_level', 9);
 					@ob_start("ob_gzhandler");
 				}
-				status_header('200 OK');
-				header('Content-Type: application/json');
-				header('Cache-Control: no-cache, no-store');
-				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
-				header('Pragma: no-cache');
+
+				$this->sendHttpHeaders('200 OK', array(
+					'Content-Type' => 'application/json',
+					'Cache-Control' => 'no-cache, no-store',
+					'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+					'Pragma' => 'no-cache'
+				));
+
 				echo $this->json_encode(array( 'ack' => 'ok' ));
 			}
 			else if($type === 'settings')
@@ -250,11 +274,14 @@ final class CodistoConnect {
 					@ini_set('zlib.output_compression_level', 9);
 					@ob_start("ob_gzhandler");
 				}
-				status_header('200 OK');
-				header('Content-Type: application/json');
-				header('Cache-Control: no-cache, no-store');
-				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
-				header('Pragma: no-cache');
+
+				$this->sendHttpHeaders('200 OK', array(
+					'Content-Type' => 'application/json',
+					'Cache-Control' => 'no-cache, no-store',
+					'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+					'Pragma' => 'no-cache'
+				));
+
 				echo $this->json_encode($response);
 				exit();
 			}
@@ -291,11 +318,14 @@ final class CodistoConnect {
 					@ini_set('zlib.output_compression_level', 9);
 					@ob_start("ob_gzhandler");
 				}
-				status_header('200 OK');
-				header('Content-Type: application/json');
-				header('Cache-Control: no-cache, no-store');
-				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
-				header('Pragma: no-cache');
+
+				$this->sendHttpHeaders('200 OK', array(
+					'Content-Type' => 'application/json',
+					'Cache-Control' => 'no-cache, no-store',
+					'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+					'Pragma' => 'no-cache'
+				));
+
 				echo $this->json_encode($response);
 				exit();
 			}
@@ -639,11 +669,14 @@ final class CodistoConnect {
 					@ini_set('zlib.output_compression_level', 9);
 					@ob_start("ob_gzhandler");
 				}
-				status_header('200 OK');
-				header('Content-Type: application/json');
-				header('Cache-Control: no-cache, no-store');
-				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
-				header('Pragma: no-cache');
+
+				$this->sendHttpHeaders('200 OK', array(
+					'Content-Type' => 'application/json',
+					'Cache-Control' => 'no-cache, no-store',
+					'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+					'Pragma' => 'no-cache'
+				));
+
 				echo $this->json_encode($response);
 				exit();
 			}
@@ -674,11 +707,14 @@ final class CodistoConnect {
 					@ini_set('zlib.output_compression_level', 9);
 					@ob_start("ob_gzhandler");
 				}
-				status_header('200 OK');
-				header('Content-Type: application/json');
-				header('Cache-Control: no-cache, no-store');
-				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
-				header('Pragma: no-cache');
+
+				$this->sendHttpHeaders('200 OK', array(
+					'Content-Type' => 'application/json',
+					'Cache-Control' => 'no-cache, no-store',
+					'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+					'Pragma' => 'no-cache'
+				));
+
 				echo $this->json_encode($response);
 				exit();
 			}
@@ -752,11 +788,14 @@ final class CodistoConnect {
 					@ini_set('zlib.output_compression_level', 9);
 					@ob_start("ob_gzhandler");
 				}
-				status_header('200 OK');
-				header('Content-Type: application/json');
-				header('Cache-Control: no-cache, no-store');
-				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
-				header('Pragma: no-cache');
+
+				$this->sendHttpHeaders('200 OK', array(
+					'Content-Type' => 'application/json',
+					'Cache-Control' => 'no-cache, no-store',
+					'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+					'Pragma' => 'no-cache'
+				));
+
 				echo $this->json_encode($response);
 				exit();
 			}
@@ -817,9 +856,13 @@ final class CodistoConnect {
 						$db->exec('COMMIT TRANSACTION');
 						$db = null;
 
-						header('Expires', 'Thu, 01 Jan 1970 00:00:00 GMT', true);
-						header('Cache-Control', 'no-cache, must-revalidate', true);
-						header('Pragma', 'no-cache', true);
+						$this->sendHttpHeaders('200 OK', array(
+							'Content-Type' => 'application/json',
+							'Cache-Control' => 'no-cache, must-revalidate',
+							'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+							'Pragma' => 'no-cache'
+						));
+
 						echo $this->json_encode(array( 'ack' => 'ok' ));
 						exit();
 					}
@@ -893,23 +936,28 @@ final class CodistoConnect {
 
 						if($fileCount == 0)
 						{
-							status_header(204, 'No Content');
-							header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
-							header('Cache-Control: no-cache, must-revalidate');
-							header('Pragma: no-cache');
+							$this->sendHttpHeaders('204 No Content', array(
+								'Cache-Control' => 'no-cache, must-revalidate',
+								'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+								'Pragma' => 'no-cache'
+							));
 						}
 						else
 						{
-							header('Cache-Control: no-cache, must-revalidate'); //HTTP 1.1
-							header('Pragma: no-cache'); //HTTP 1.0
-							header('Expires: Thu, 01 Jan 1970 00:00:00 GMT'); // Date in the past
-							header('Content-Type: application/octet-stream');
-							header('Content-Disposition: attachment; filename=' . basename($tmpDb));
+							$headers = array(
+								'Cache-Control' => 'no-cache, must-revalidate',
+								'Pragma' => 'no-cache',
+								'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+								'Content-Type' => 'application/octet-stream',
+								'Content-Disposition' => 'attachment; filename=' . basename($tmpDb)
+							);
 
 							if(strtolower(ini_get('zlib.output_compression')) == 'off')
 							{
-								header('Content-Length: ' . filesize($tmpDb));
+								$headers['Content-Length'] = filesize($tmpDb);
 							}
+
+							$this->sendHttpHeaders('200 OK', $headers);
 
 							while(ob_get_level() > 0)
 							{
@@ -1188,7 +1236,7 @@ final class CodistoConnect {
 									wc_add_order_item_meta( $item_id, '_tax_class', '' );
 								}
 
-								$line_total = wc_format_decimal( (float)$orderline->linetotalinctax );
+								$line_total = wc_format_decimal( (float)$orderline->linetotal );
 								$line_total_tax = wc_format_decimal( (float)$orderline->linetotalinctax - (float)$orderline->linetotal );
 
 								wc_add_order_item_meta( $item_id, '_line_subtotal',	 $line_total );
@@ -1208,7 +1256,7 @@ final class CodistoConnect {
 											'order_item_type' 		=> 'shipping'
 										) );
 
-								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->linetotalinctax) );
+								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->linetotal) );
 
 								$shipping += (real)$orderline->linetotal;
 								$shipping_tax += (real)$orderline->linetotalinctax - (real)$orderline->linetotal;
@@ -1241,7 +1289,7 @@ final class CodistoConnect {
 						{
 							if($orderline->productcode[0] != 'FREIGHT')
 							{
-								$line_total = wc_format_decimal( (float)$orderline->linetotalinctax );
+								$line_total = wc_format_decimal( (float)$orderline->linetotal );
 								$line_total_tax = wc_format_decimal( (float)$orderline->linetotalinctax - (float)$orderline->linetotal );
 
 								$tax += $line_total_tax;
@@ -1255,7 +1303,7 @@ final class CodistoConnect {
 											'order_item_type' 		=> 'shipping'
 										) );
 
-								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->linetotalinctax) );
+								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->linetotal) );
 
 								$shipping += (real)$orderline->linetotal;
 								$shipping_tax += (real)$orderline->linetotalinctax - (real)$orderline->linetotal;
@@ -1306,11 +1354,12 @@ final class CodistoConnect {
 
 					$response = array( 'ack' => 'ok', 'orderid' => $order_id );
 
-					status_header('200 OK');
-					header('Content-Type: application/json');
-					header('Cache-Control: no-cache, no-store');
-					header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
-					header('Pragma: no-cache');
+					$this->sendHttpHeaders('200 OK', array(
+						'Content-Type' => 'application/json',
+						'Cache-Control' => 'no-cache, no-store',
+						'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+						'Pragma' => 'no-cache'
+					));
 					echo $this->json_encode($response);
 					exit();
 				}
@@ -1320,11 +1369,12 @@ final class CodistoConnect {
 
 					$response = array( 'ack' => 'failed', 'message' => $e->getMessage() .'  '.$e->getFile().' '.$e->getLine()  );
 
-					status_header('200 OK');
-					header('Content-Type: application/json');
-					header('Cache-Control: no-cache, no-store');
-					header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
-					header('Pragma: no-cache');
+					$this->sendHttpHeaders('200 OK', array(
+						'Content-Type' => 'application/json',
+						'Cache-Control' => 'no-cache, no-store',
+						'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+						'Pragma' => 'no-cache'
+					));
 					echo $this->json_encode($response);
 					exit();
 				}
@@ -1384,11 +1434,12 @@ final class CodistoConnect {
 					$db = null;
 					unlink($tmpPath);
 
-					status_header('200 OK');
-					header('Content-Type: application/json');
-					header('Cache-Control: no-cache, no-store');
-					header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
-					header('Pragma: no-cache');
+					$this->sendHttpHeaders('200 OK', array(
+						'Content-Type' => 'application/json',
+						'Cache-Control' => 'no-cache, no-store',
+						'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+						'Pragma' => 'no-cache'
+					));
 					echo $this->json_encode( array( 'ack' => 'ok' ) );
 					exit();
 				}
@@ -1463,11 +1514,12 @@ final class CodistoConnect {
 					}
 				}
 
-				status_header('200 OK');
-				header('Content-Type: text/plain');
-				header('Cache-Control: no-cache, no-store');
-				header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
-				header('Pragma: no-cache');
+				$this->sendHttpHeaders('200 OK', array(
+					'Content-Type' => 'application/json',
+					'Cache-Control' => 'no-cache, no-store',
+					'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+					'Pragma' => 'no-cache'
+				));
 				echo $response;
 				exit();
 			}
@@ -1576,11 +1628,12 @@ final class CodistoConnect {
 
 		if(!$merchantid)
 		{
-			status_header('404 Not Found');
-			header('Content-Type: text/html');
-			header('Cache-Control: no-cache, no-store');
-			header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
-			header('Pragma: no-cache');
+			$this->sendHttpHeaders('404 Not Found', array(
+				'Content-Type' => 'text/html',
+				'Cache-Control' => 'no-cache, no-store',
+				'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+				'Pragma' => 'no-cache'
+			));
 			?>
 			<h1>Resource Not Found</h1>
 			<?php
@@ -1645,7 +1698,12 @@ final class CodistoConnect {
 			{
 				if($retry >= 3)
 				{
-					status_header(500);
+					$this->sendHttpHeaders('500 Server Error', array(
+						'Content-Type' => 'text/html',
+						'Cache-Control' => 'no-cache, no-store',
+						'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+						'Pragma' => 'no-cache'
+					));
 					echo '<h1>Error processing request</h1> <p>'.htmlspecialchars($response->get_error_message()).'</p>';
 					exit();
 				}
@@ -1669,6 +1727,12 @@ final class CodistoConnect {
 			break;
 		}
 
+		if(defined( 'ADVANCEDCACHEPROBLEM' ) &&
+			false == strpos($_SERVER['REQUEST_URI'], 'wp-admin'))
+		{
+			$_SERVER['REQUEST_URI'] = '/wp-admin'.$_SERVER['REQUEST_URI'];
+		}
+
 		status_header(wp_remote_retrieve_response_code($response));
 
 		$filterHeaders = array('server', 'content-length', 'transfer-encoding', 'date', 'connection', 'x-storeviewmap');
@@ -1682,14 +1746,6 @@ final class CodistoConnect {
 			@header_remove( 'Cache-Control' );
 			@header_remove( 'Expires' );
 			@header_remove( 'Content-Encoding' );
-		}
-		else
-		{
-			@header( 'Last-Modified:' );
-			@header( 'Pragma:' );
-			@header( 'Cache-Control:' );
-			@header( 'Expires:' );
-			@header( 'Content-Encoding:' );
 		}
 
 		foreach(wp_remote_retrieve_headers($response) as $header => $value)
@@ -1866,7 +1922,36 @@ final class CodistoConnect {
 
 			$response = wp_remote_request('https://ui.codisto.com/create', $httpOptions);
 
-			$result = json_decode( wp_remote_retrieve_body( $response ), true );
+			if($response) {
+
+				$result = json_decode( wp_remote_retrieve_body( $response ), true );
+
+			} else {
+
+				$postdata =  array (
+					'regtoken' => $regtoken
+				);
+
+				$str = $this->json_encode( $postdata );
+
+				$curl = curl_init();
+				curl_setopt_array( $curl, array(
+					CURLOPT_RETURNTRANSFER => 1,
+					CURLOPT_URL => 'https://ui.codisto.com/create',
+					CURLOPT_POST => 1,
+					CURLOPT_POSTFIELDS => $str,
+					CURLOPT_HTTPHEADER => array(
+						'Content-Type: application/json',
+						'Content-Length: ' . strlen($str)
+					)
+				));
+
+				$response = curl_exec( $curl );
+				curl_close( $curl );
+
+				$result = json_decode( $response, true );
+
+			}
 
 			update_option( 'codisto_merchantid' , 	$result['merchantid'] );
 			update_option( 'codisto_key',			$result['hostkey'] );
