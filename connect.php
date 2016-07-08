@@ -1,14 +1,14 @@
 <?php
 /**
  * @package MarketPlace Connect by Codisto
- * @version 1.2.31
+ * @version 1.2.32
  */
 /*
 Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 Author: Codisto
-Version: 1.2.31
+Version: 1.2.32
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-define('CODISTOCONNECT_VERSION', '1.2.31');
+define('CODISTOCONNECT_VERSION', '1.2.32');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 
@@ -213,7 +213,7 @@ final class CodistoConnect {
 					exit();
 				}
 
-				if(preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+				if(in_array('HTTP_ACCEPT_ENCODING', $_SERVER) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
 				{
 					@ini_set('zlib.output_compression_level', 9);
 					@ob_start("ob_gzhandler");
@@ -269,7 +269,7 @@ final class CodistoConnect {
 				 	'country_code' => $country_code,
 				 	'state_code' => $state_code );
 
-				if(preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+				if(in_array('HTTP_ACCEPT_ENCODING', $_SERVER) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
 				{
 					@ini_set('zlib.output_compression_level', 9);
 					@ob_start("ob_gzhandler");
@@ -313,7 +313,7 @@ final class CodistoConnect {
 
 				$response = array( 'ack' => 'ok', 'tax_rates' => $rates );
 
-				if(preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+				if(in_array('HTTP_ACCEPT_ENCODING', $_SERVER) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
 				{
 					@ini_set('zlib.output_compression_level', 9);
 					@ob_start("ob_gzhandler");
@@ -466,6 +466,7 @@ final class CodistoConnect {
 
 							$product->skus[] = $child_product_data;
 						}
+
 					}
 					else if($product->type == 'grouped')
 					{
@@ -486,8 +487,18 @@ final class CodistoConnect {
 						}
 					}
 
-					$product->categories = array();
+					$attrs = array();
 
+					foreach($wc_product->get_variation_attributes() as $name => $value)
+					{
+						$name = preg_replace('/^attribute_pa_/', '', $name);
+
+						$attrs[] = array( 'name' => $name, 'value' => $value );
+					}
+
+					$product->options = $attrs;
+
+					$product->categories = array();
 					$product_categories = get_the_terms($product->id, 'product_cat');
 
 					if(is_array($product_categories))
@@ -664,7 +675,7 @@ final class CodistoConnect {
 				if(isset($total_count))
 					$response['total_count'] = $total_count;
 
-				if(preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+				if(in_array('HTTP_ACCEPT_ENCODING', $_SERVER) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
 				{
 					@ini_set('zlib.output_compression_level', 9);
 					@ob_start("ob_gzhandler");
@@ -702,7 +713,7 @@ final class CodistoConnect {
 
 				$response = array( 'ack' => 'ok', 'categories' => $result, 'total_count' => count($categories));
 
-				if(preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+				if(in_array('HTTP_ACCEPT_ENCODING', $_SERVER) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
 				{
 					@ini_set('zlib.output_compression_level', 9);
 					@ob_start("ob_gzhandler");
@@ -783,7 +794,7 @@ final class CodistoConnect {
 				if(isset($total_count))
 					$response['total_count'] = $total_count;
 
-				if(preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+				if(in_array('HTTP_ACCEPT_ENCODING', $_SERVER) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
 				{
 					@ini_set('zlib.output_compression_level', 9);
 					@ob_start("ob_gzhandler");
@@ -986,7 +997,7 @@ final class CodistoConnect {
 
 				try
 				{
-					if(preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+					if(in_array('HTTP_ACCEPT_ENCODING', $_SERVER) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
 					{
 						@ini_set('zlib.output_compression_level', 9);
 						@ob_start("ob_gzhandler");
