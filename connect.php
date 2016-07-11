@@ -1256,8 +1256,6 @@ final class CodistoConnect {
 								wc_add_order_item_meta( $item_id, '_line_tax',		  $line_total_tax );
 								wc_add_order_item_meta( $item_id, '_line_tax_data',		array( 'total' => array( 1 => $line_total_tax ), 'subtotal' => array( 1 => $line_total_tax ) ) );
 
-								//do_action( 'woocommerce_order_add_product', $order_id, $item_id, $product, $qty, $args );
-
 								$tax += $line_total_tax;
 							}
 							else
@@ -1289,7 +1287,13 @@ final class CodistoConnect {
 								update_post_meta( $order_id, '_payment_method_title', __( 'BACS', 'woocommerce' ) );
 							}
 
-							$order->payment_complete($transaction_id);
+							// payment_complete
+							add_post_meta( $order_id, '_paid_date', current_time( 'mysql' ), true );
+							update_post_meta( $order_id, '_transaction_id', $transaction_id );
+							if(!get_post_meta( $order_id, '_order_stock_reduced', true))
+							{
+								$order->reduce_order_stock();
+							}
 						}
 					}
 					else
@@ -1320,6 +1324,30 @@ final class CodistoConnect {
 								$shipping_tax += (real)$orderline->linetotalinctax - (real)$orderline->linetotal;
 							}
 						}
+
+						if($ordercontent->paymentstatus == 'complete')
+						{
+							$transaction_id = (string)$ordercontent->orderpayments[0]->orderpayment->transactionid;
+
+							if($transaction_id)
+							{
+								update_post_meta( $order_id, '_payment_method', 'paypal' );
+								update_post_meta( $order_id, '_payment_method_title', __( 'PayPal', 'woocommerce' ) );
+							}
+							else
+							{
+								update_post_meta( $order_id, '_payment_method', 'bacs' );
+								update_post_meta( $order_id, '_payment_method_title', __( 'BACS', 'woocommerce' ) );
+							}
+
+							// payment_complete
+							add_post_meta( $order_id, '_paid_date', current_time( 'mysql' ), true );
+							update_post_meta( $order_id, '_transaction_id', $transaction_id );
+							if(!get_post_meta( $order_id, '_order_stock_reduced', true))
+							{
+								$order->reduce_order_stock();
+							}
+						}
 					}
 
 					foreach($address_data as $key => $value)
@@ -1340,25 +1368,65 @@ final class CodistoConnect {
 					if($ordercontent->orderstate == 'cancelled')
 					{
 						if(!$order->has_status('cancelled'))
-							$order->cancel_order();
+						{
+							// update_status
+							$order->post_status = 'wc-cancelled';
+							$update_post_data  = array(
+								'ID'         	=> $order_id,
+								'post_status'	=> 'wc-cancelled',
+								'post_date'		=> current_time( 'mysql', 0 ),
+								'post_date_gmt' => current_time( 'mysql', 1 )
+							);
+							wp_update_post( $update_post_data );
+						}
 					}
 					else if($ordercontent->orderstate == 'inprogress' || $ordercontent->orderstate == 'processing')
 					{
 						if($ordercontent->paymentstatus == 'complete')
 						{
 							if(!$order->has_status('processing'))
-								$order->update_status('processing');
+							{
+								// update_status
+								$order->post_status = 'wc-processing';
+								$update_post_data  = array(
+									'ID'         	=> $order_id,
+									'post_status'	=> 'wc-processing',
+									'post_date'		=> current_time( 'mysql', 0 ),
+									'post_date_gmt' => current_time( 'mysql', 1 )
+								);
+								wp_update_post( $update_post_data );
+							}
 						}
 						else
 						{
 							if(!$order->has_status('pending'))
-								$order->update_status('pending');
+							{
+								// update_status
+								$order->post_status = 'wc-pending';
+								$update_post_data  = array(
+									'ID'         	=> $order_id,
+									'post_status'	=> 'wc-pending',
+									'post_date'		=> current_time( 'mysql', 0 ),
+									'post_date_gmt' => current_time( 'mysql', 1 )
+								);
+								wp_update_post( $update_post_data );
+							}
 						}
 					}
 					else if($ordercontent->orderstate == 'complete')
 					{
 						if(!$order->has_status('completed'))
-							$order->update_status('completed');
+						{
+							// update_status
+							$order->post_status = 'wc-completed';
+							$update_post_data  = array(
+								'ID'         	=> $order_id,
+								'post_status'	=> 'wc-completed',
+								'post_date'		=> current_time( 'mysql', 0 ),
+								'post_date_gmt' => current_time( 'mysql', 1 )
+							);
+							wp_update_post( $update_post_data );
+						}
 					}
 
 					$wpdb->query('COMMIT');
