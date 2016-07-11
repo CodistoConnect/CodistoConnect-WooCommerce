@@ -1380,6 +1380,10 @@ final class CodistoConnect {
 								'post_date_gmt' => current_time( 'mysql', 1 )
 							);
 							wp_update_post( $update_post_data );
+
+							$order->decrease_coupon_usage_counts();
+
+							wc_delete_shop_order_transients( $order_id );
 						}
 					}
 					else if($ordercontent->orderstate == 'inprogress' || $ordercontent->orderstate == 'processing')
@@ -1428,6 +1432,14 @@ final class CodistoConnect {
 								'post_date_gmt' => current_time( 'mysql', 1 )
 							);
 							wp_update_post( $update_post_data );
+
+							$order->record_product_sales();
+
+							$order->increase_coupon_usage_counts();
+
+							update_post_meta( $order_id, '_completed_date', current_time('mysql') );
+
+							wc_delete_shop_order_transients( $order_id );
 						}
 					}
 
