@@ -713,7 +713,7 @@ final class CodistoConnect {
 
 				$response = array( 'ack' => 'ok', 'categories' => $result, 'total_count' => count($categories));
 
-				if(in_array('HTTP_ACCEPT_ENCODING', $_SERVER) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+				if(isset($_SERVER['HTTP_ACCEPT_ENCODING']) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
 				{
 					@ini_set('zlib.output_compression_level', 9);
 					@ob_start("ob_gzhandler");
@@ -794,7 +794,7 @@ final class CodistoConnect {
 				if(isset($total_count))
 					$response['total_count'] = $total_count;
 
-				if(in_array('HTTP_ACCEPT_ENCODING', $_SERVER) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+				if(isset($_SERVER['HTTP_ACCEPT_ENCODING']) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
 				{
 					@ini_set('zlib.output_compression_level', 9);
 					@ob_start("ob_gzhandler");
@@ -997,7 +997,7 @@ final class CodistoConnect {
 
 				try
 				{
-					if(in_array('HTTP_ACCEPT_ENCODING', $_SERVER) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+					if(isset($_SERVER['HTTP_ACCEPT_ENCODING']) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
 					{
 						@ini_set('zlib.output_compression_level', 9);
 						@ob_start("ob_gzhandler");
