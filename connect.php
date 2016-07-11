@@ -1280,6 +1280,8 @@ final class CodistoConnect {
 							{
 								update_post_meta( $order_id, '_payment_method', 'paypal' );
 								update_post_meta( $order_id, '_payment_method_title', __( 'PayPal', 'woocommerce' ) );
+
+								update_post_meta( $order_id, '_transaction_id', $transaction_id );
 							}
 							else
 							{
@@ -1289,7 +1291,6 @@ final class CodistoConnect {
 
 							// payment_complete
 							add_post_meta( $order_id, '_paid_date', current_time( 'mysql' ), true );
-							update_post_meta( $order_id, '_transaction_id', $transaction_id );
 							if(!get_post_meta( $order_id, '_order_stock_reduced', true))
 							{
 								$order->reduce_order_stock();
@@ -1333,6 +1334,8 @@ final class CodistoConnect {
 							{
 								update_post_meta( $order_id, '_payment_method', 'paypal' );
 								update_post_meta( $order_id, '_payment_method_title', __( 'PayPal', 'woocommerce' ) );
+
+								update_post_meta( $order_id, '_transaction_id', $transaction_id );
 							}
 							else
 							{
@@ -1342,7 +1345,6 @@ final class CodistoConnect {
 
 							// payment_complete
 							add_post_meta( $order_id, '_paid_date', current_time( 'mysql' ), true );
-							update_post_meta( $order_id, '_transaction_id', $transaction_id );
 							if(!get_post_meta( $order_id, '_order_stock_reduced', true))
 							{
 								$order->reduce_order_stock();
