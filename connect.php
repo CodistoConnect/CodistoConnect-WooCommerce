@@ -213,7 +213,7 @@ final class CodistoConnect {
 					exit();
 				}
 
-				if(in_array('HTTP_ACCEPT_ENCODING', $_SERVER) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+				if(isset($_SERVER['HTTP_ACCEPT_ENCODING']) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
 				{
 					@ini_set('zlib.output_compression_level', 9);
 					@ob_start("ob_gzhandler");
@@ -269,7 +269,7 @@ final class CodistoConnect {
 				 	'country_code' => $country_code,
 				 	'state_code' => $state_code );
 
-				if(in_array('HTTP_ACCEPT_ENCODING', $_SERVER) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+				if(isset($_SERVER['HTTP_ACCEPT_ENCODING']) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
 				{
 					@ini_set('zlib.output_compression_level', 9);
 					@ob_start("ob_gzhandler");
@@ -313,7 +313,7 @@ final class CodistoConnect {
 
 				$response = array( 'ack' => 'ok', 'tax_rates' => $rates );
 
-				if(in_array('HTTP_ACCEPT_ENCODING', $_SERVER) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
+				if(isset($_SERVER['HTTP_ACCEPT_ENCODING']) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
 				{
 					@ini_set('zlib.output_compression_level', 9);
 					@ob_start("ob_gzhandler");
