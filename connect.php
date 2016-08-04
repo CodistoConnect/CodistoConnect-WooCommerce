@@ -1214,7 +1214,7 @@ final class CodistoConnect {
 								if( get_post_type( $product_id ) === 'product_variation' )
 								{
 									$variation_id = $product_id;
-									$product_id = wp_get_post_parent_id( $variant_id );
+									$product_id = wp_get_post_parent_id( $variation_id );
 
 									if(!is_numeric($product_id) || $product_id === 0)
 									{
