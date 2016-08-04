@@ -1,4 +1,4 @@
-=== MarketPlace Connect by Codisto ===
+=== WooCommerce eBay Integration - MarketPlace Connect by Codisto ===
 Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
