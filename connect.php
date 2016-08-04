@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-define('CODISTOCONNECT_VERSION', '1.2.33');
+define('CODISTOCONNECT_VERSION', '1.2.34');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 
