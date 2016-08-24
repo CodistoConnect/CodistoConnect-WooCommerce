@@ -1,14 +1,14 @@
 <?php
 /**
  * @package MarketPlace Connect by Codisto
- * @version 1.2.34
+ * @version 1.2.35
  */
 /*
 Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 Author: Codisto
-Version: 1.2.34
+Version: 1.2.35
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-define('CODISTOCONNECT_VERSION', '1.2.34');
+define('CODISTOCONNECT_VERSION', '1.2.35');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 
@@ -213,12 +213,6 @@ final class CodistoConnect {
 					exit();
 				}
 
-				if(isset($_SERVER['HTTP_ACCEPT_ENCODING']) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
-				{
-					@ini_set('zlib.output_compression_level', 9);
-					@ob_start("ob_gzhandler");
-				}
-
 				$this->sendHttpHeaders('200 OK', array(
 					'Content-Type' => 'application/json',
 					'Cache-Control' => 'no-cache, no-store',
@@ -269,12 +263,6 @@ final class CodistoConnect {
 				 	'country_code' => $country_code,
 				 	'state_code' => $state_code );
 
-				if(isset($_SERVER['HTTP_ACCEPT_ENCODING']) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
-				{
-					@ini_set('zlib.output_compression_level', 9);
-					@ob_start("ob_gzhandler");
-				}
-
 				$this->sendHttpHeaders('200 OK', array(
 					'Content-Type' => 'application/json',
 					'Cache-Control' => 'no-cache, no-store',
@@ -312,12 +300,6 @@ final class CodistoConnect {
 				}
 
 				$response = array( 'ack' => 'ok', 'tax_rates' => $rates );
-
-				if(isset($_SERVER['HTTP_ACCEPT_ENCODING']) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
-				{
-					@ini_set('zlib.output_compression_level', 9);
-					@ob_start("ob_gzhandler");
-				}
 
 				$this->sendHttpHeaders('200 OK', array(
 					'Content-Type' => 'application/json',
@@ -675,12 +657,6 @@ final class CodistoConnect {
 				if(isset($total_count))
 					$response['total_count'] = $total_count;
 
-				if(isset($_SERVER['HTTP_ACCEPT_ENCODING']) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
-				{
-					@ini_set('zlib.output_compression_level', 9);
-					@ob_start("ob_gzhandler");
-				}
-
 				$this->sendHttpHeaders('200 OK', array(
 					'Content-Type' => 'application/json',
 					'Cache-Control' => 'no-cache, no-store',
@@ -712,12 +688,6 @@ final class CodistoConnect {
 				}
 
 				$response = array( 'ack' => 'ok', 'categories' => $result, 'total_count' => count($categories));
-
-				if(isset($_SERVER['HTTP_ACCEPT_ENCODING']) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
-				{
-					@ini_set('zlib.output_compression_level', 9);
-					@ob_start("ob_gzhandler");
-				}
 
 				$this->sendHttpHeaders('200 OK', array(
 					'Content-Type' => 'application/json',
@@ -793,12 +763,6 @@ final class CodistoConnect {
 				$response = array( 'ack' => 'ok', 'orders' => $order_data );
 				if(isset($total_count))
 					$response['total_count'] = $total_count;
-
-				if(isset($_SERVER['HTTP_ACCEPT_ENCODING']) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
-				{
-					@ini_set('zlib.output_compression_level', 9);
-					@ob_start("ob_gzhandler");
-				}
 
 				$this->sendHttpHeaders('200 OK', array(
 					'Content-Type' => 'application/json',
@@ -960,13 +924,10 @@ final class CodistoConnect {
 								'Pragma' => 'no-cache',
 								'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
 								'Content-Type' => 'application/octet-stream',
-								'Content-Disposition' => 'attachment; filename=' . basename($tmpDb)
+								'Content-Disposition' => 'attachment; filename=' . basename($tmpDb),
+								'Content-Length' => filesize($tmpDb)
 							);
 
-							if(strtolower(ini_get('zlib.output_compression')) == 'off')
-							{
-								$headers['Content-Length'] = filesize($tmpDb);
-							}
 
 							$this->sendHttpHeaders('200 OK', $headers);
 
@@ -997,11 +958,6 @@ final class CodistoConnect {
 
 				try
 				{
-					if(isset($_SERVER['HTTP_ACCEPT_ENCODING']) && preg_match('/(?:^|,|\s)gzip(?:$|,|\s)/', $_SERVER['HTTP_ACCEPT_ENCODING']))
-					{
-						@ini_set('zlib.output_compression_level', 9);
-						@ob_start("ob_gzhandler");
-					}
 
 					$xml = simplexml_load_string(file_get_contents('php://input'));
 
@@ -1741,20 +1697,11 @@ final class CodistoConnect {
 
 		$incomingHeaders = getallheaders();
 
-		$headerfilter = array('host', 'connection');
-
-		$acceptEncoding = $_SERVER['HTTP_ACCEPT_ENCODING'];
-		$zlibEnabled = strtoupper(ini_get('zlib.output_compression'));
-		if(!$acceptEncoding || ($zlibEnabled == 1 || $zlibEnabled == 'ON'))
-		{
-			$decompress = true;
-		}
-		else
-		{
-			$decompress = false;
-			$headerfilter[] = 'accept-encoding';
-		}
-
+		$headerfilter = array(
+			'host',
+			'connection',
+			'accept-encoding'
+		);
 		foreach($incomingHeaders as $name => $value)
 		{
 			if(!in_array(trim(strtolower($name)), $headerfilter))
@@ -1766,8 +1713,7 @@ final class CodistoConnect {
 						'headers' => $requestHeaders,
 						'timeout' => 60,
 						'httpversion' => '1.0',
-						'decompress' => $decompress,
-						'compress' => true,
+						'decompress' => false,
 						'redirection' => 0
 					);
 
@@ -1828,9 +1774,7 @@ final class CodistoConnect {
 
 		status_header(wp_remote_retrieve_response_code($response));
 
-		$filterHeaders = array('server', 'content-length', 'transfer-encoding', 'date', 'connection', 'x-storeviewmap');
-		if($httpOptions['decompress'] == true)
-			$filterHeaders[] = 'content-encoding';
+		$filterHeaders = array('server', 'content-length', 'transfer-encoding', 'date', 'connection', 'x-storeviewmap', 'content-encoding');
 
 		if(function_exists( 'header_remove' ))
 		{
