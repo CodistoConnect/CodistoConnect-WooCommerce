@@ -1,14 +1,14 @@
 <?php
 /**
  * @package MarketPlace Connect by Codisto
- * @version 1.2.36
+ * @version 1.2.37
  */
 /*
 Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 Author: Codisto
-Version: 1.2.36
+Version: 1.2.37
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-define('CODISTOCONNECT_VERSION', '1.2.36');
+define('CODISTOCONNECT_VERSION', '1.2.37');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 
@@ -439,7 +439,9 @@ final class CodistoConnect {
 
 							foreach($child_product->get_variation_attributes() as $name => $value)
 							{
-								$name = wc_attribute_label( $name, $child_product );
+								$name = preg_replace('/(pa_)?attribute_/', '', $name);
+
+								$name = wc_attribute_label($name, $child_product);
 
 								$attributes[] = array( 'name' => $name, 'value' => $value );
 							}
@@ -453,7 +455,9 @@ final class CodistoConnect {
 
 						foreach($wc_product->get_variation_attributes() as $name => $value)
 						{
-							$name = wc_attribute_label( $name, $child_product );
+							$name = preg_replace('/(pa_)?attribute_/', '', $name);
+
+							$name = wc_attribute_label($name, $wc_product);
 
 							$attrs[] = array( 'name' => $name, 'value' => $value );
 						}
