@@ -1,14 +1,14 @@
 <?php
 /**
  * @package MarketPlace Connect by Codisto
- * @version 1.2.37
+ * @version 1.2.38
  */
 /*
 Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 Author: Codisto
-Version: 1.2.37
+Version: 1.2.38
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-define('CODISTOCONNECT_VERSION', '1.2.37');
+define('CODISTOCONNECT_VERSION', '1.2.38');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 
@@ -1697,7 +1697,13 @@ final class CodistoConnect {
 
 		$adminUrl = admin_url('codisto/ebaytab/'.$storeId.'/'.$merchantid.'/');
 
-		$requestHeaders = array('X-Codisto-Cart' => 'woocommerce', 'X-Codisto-Version' => CODISTOCONNECT_VERSION, 'X-HostKey' => $HostKey, 'X-Admin-Base-Url' => $adminUrl);
+		$requestHeaders = array(
+							'X-Codisto-Cart' => 'woocommerce',
+							'X-Codisto-Version' => CODISTOCONNECT_VERSION,
+							'X-HostKey' => $HostKey,
+							'X-Admin-Base-Url' => $adminUrl,
+							'Accept-Encoding' => ''
+						);
 
 		$incomingHeaders = getallheaders();
 
