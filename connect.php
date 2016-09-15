@@ -437,13 +437,30 @@ final class CodistoConnect {
 
 							$attributes = array();
 
+							$termsmap = array();
+							$names = array();
+
 							foreach($child_product->get_variation_attributes() as $name => $value)
 							{
+
 								$name = preg_replace('/(pa_)?attribute_/', '', $name);
+
+								if(!isset($names[$name])) {
+									$names[$name] = true;
+									$terms = get_terms(array('taxonomy' => $name));
+									if($terms) {
+										foreach($terms as $term) {
+												$termsmap[$term->slug] = $term->name;
+										}
+									}
+								}
+
+								$newvalue = isset($termsmap[$value]) ? $termsmap[$value] : $value;
 
 								$name = wc_attribute_label($name, $child_product);
 
-								$attributes[] = array( 'name' => $name, 'value' => $value );
+								$attributes[] = array( 'name' => $name, 'value' => $newvalue, 'slug' => $value );
+
 							}
 
 							$child_product_data['attributes'] = $attributes;
@@ -457,9 +474,21 @@ final class CodistoConnect {
 						{
 							$name = preg_replace('/(pa_)?attribute_/', '', $name);
 
-							$name = wc_attribute_label($name, $wc_product);
+							if(!isset($names[$name])) {
+								$names[$name] = true;
+								$terms = get_terms(array('taxonomy' => $name));
+								if($terms) {
+									foreach($terms as $term) {
+											$termsmap[$term->slug] = $term->name;
+									}
+								}
+							}
 
-							$attrs[] = array( 'name' => $name, 'value' => $value );
+							$newvalue = isset($termsmap[$value]) ? $termsmap[$value] : $value;
+
+							$name = wc_attribute_label($name, $child_product);
+
+							$attrs[] = array( 'name' => $name, 'value' => $newvalue, 'slug' => $value );
 						}
 
 						$product->options = $attrs;
