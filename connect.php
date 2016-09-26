@@ -2214,6 +2214,13 @@ final class CodistoConnect {
 		$this->admin_tab($adminUrl, 'codisto-bulk-editor');
 	}
 
+	public function account()
+	{
+		$adminUrl = admin_url('codisto/ebaytab/0/'.get_option('codisto_merchantid').'/account/');
+
+		$this->admin_tab($adminUrl, 'codisto-account');
+	}
+
 	public function templates()
 	{
 		include 'templates.php';
@@ -2240,6 +2247,7 @@ final class CodistoConnect {
 			$pages[] = add_submenu_page('codisto', __('Attributes'), __('Attributes'), 'edit_posts', 'codisto-attributes', array( $this, 'attributes' ) );
 			$pages[] = add_submenu_page('codisto', __('Import Listings'), __('Import Listings'), 'edit_posts', 'codisto-import', array( $this, 'import' ) );
 			$pages[] = add_submenu_page('codisto', __('Templates'), __('Templates'), 'edit_posts', 'codisto-templates', array( $this, 'templates' ) );
+			$pages[] = add_submenu_page('codisto', __('Account'), __('Account'), 'edit_posts', 'codisto-account', array( $this, 'account' ) );
 			$pages[] = add_submenu_page('codisto', __('Settings'), __('Settings'), 'edit_posts', 'codisto-settings', array( $this, 'settings' ) );
 
 			foreach($pages as $page)
