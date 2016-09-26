@@ -450,12 +450,20 @@ final class CodistoConnect {
 									$terms = get_terms(array('taxonomy' => $name));
 									if($terms) {
 										foreach($terms as $term) {
-												$termsmap[$term->slug] = $term->name;
+											$termsmap[$term->slug] = $term->name;
 										}
 									}
 								}
 
-								$newvalue = isset($termsmap[$value]) ? $termsmap[$value] : $value;
+								if($value && (gettype($value) == 'string' || gettype($value) == 'integer')) {
+									if(array_key_exists($value, $termsmap)) {
+										$newvalue = $termsmap[$value];
+									} else {
+										$newvalue = $value;
+									}
+								} else {
+									$newvalue = '';
+								}
 
 								$name = wc_attribute_label($name, $child_product);
 
@@ -479,12 +487,20 @@ final class CodistoConnect {
 								$terms = get_terms(array('taxonomy' => $name));
 								if($terms) {
 									foreach($terms as $term) {
-											$termsmap[$term->slug] = $term->name;
+										$termsmap[$term->slug] = $term->name;
 									}
 								}
 							}
 
-							$newvalue = isset($termsmap[$value]) ? $termsmap[$value] : $value;
+							if($value && (gettype($value) == 'string' || gettype($value) == 'integer')) {
+								if(array_key_exists($value, $termsmap)) {
+									$newvalue = $termsmap[$value];
+								} else {
+									$newvalue = $value;
+								}
+							} else {
+								$newvalue = '';
+							}
 
 							$name = wc_attribute_label($name, $child_product);
 
