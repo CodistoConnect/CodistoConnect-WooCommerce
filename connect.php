@@ -471,6 +471,30 @@ final class CodistoConnect {
 
 							}
 
+							foreach(get_post_custom_keys($child_product->variation_id) as $attribute)
+							{
+								if(!(in_array( $attribute, array( '_sku',
+													'_weight', '_length', '_width', '_height', '_thumbnail_id', '_virtual', '_downloadable', '_regular_price',
+													'_sale_price', '_sale_price_dates_from', '_sale_price_dates_to', '_price',
+													'_download_limit', '_download_expiry', '_file_paths', '_manage_stock', '_stock_status',
+													'_downloadable_files', '_variation_description', '_tax_class', '_tax_status',
+													'_stock', '_default_attributes')) ||
+									substr($attribute, 0, 4) === '_wp_') ||
+									substr($attribute, 0, 13) === 'attribute_pa_'))
+								{
+									$value = get_post_meta($child_product->variation_id, $attribute, false);
+									if(is_array($value))
+									{
+										if(count($value) === 1)
+											$value = $value[0];
+										else
+											$value = implode(',', $value);
+									}
+
+									$attributes[] = array( 'name' => $attribute, 'value' => $value, 'custom' => true );
+								}
+							}
+
 							$child_product_data['attributes'] = $attributes;
 
 							$product->skus[] = $child_product_data;
@@ -579,13 +603,24 @@ final class CodistoConnect {
 
 					foreach($wc_product->get_attributes() as $attribute)
 					{
-						if(!$attribute['is_variation'] && !$attribute['is_taxonomy'])
+						if(!$attribute['is_variation'])
 						{
 							if(!array_key_exists($attribute['name'], $attributesUsed))
 							{
 								$attributesUsed[$attribute['name']] = true;
 
-								$product->attributes[] = array( 'name' => $attribute['name'], 'value' => $attribute['value'] );
+								$attributeName = wc_attribute_label($attribute['name']);
+
+								if(!$attribute['is_taxonomy'])
+								{
+									$product->attributes[] = array( 'name' => $attributeName, 'value' => $attribute['value'] );
+								}
+								else
+								{
+									$attributeValue = implode( ', ', wc_get_product_terms( $product->id, $attribute['name'], array( 'fields' => 'names' ) ) );
+
+									$product->attributes[] = array( 'name' => $attributeName, 'value' => $attributeValue );
+								}
 							}
 						}
 					}
