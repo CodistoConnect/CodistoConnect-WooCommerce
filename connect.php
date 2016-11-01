@@ -478,7 +478,7 @@ final class CodistoConnect {
 													'_sale_price', '_sale_price_dates_from', '_sale_price_dates_to', '_price',
 													'_download_limit', '_download_expiry', '_file_paths', '_manage_stock', '_stock_status',
 													'_downloadable_files', '_variation_description', '_tax_class', '_tax_status',
-													'_stock', '_default_attributes')) ||
+													'_stock', '_default_attributes', '_product_attributes', '_file_path', '_backorders')) ||
 									substr($attribute, 0, 4) === '_wp_') ||
 									substr($attribute, 0, 13) === 'attribute_pa_'))
 								{
