@@ -479,7 +479,7 @@ final class CodistoConnect {
 													'_download_limit', '_download_expiry', '_file_paths', '_manage_stock', '_stock_status',
 													'_downloadable_files', '_variation_description', '_tax_class', '_tax_status',
 													'_stock', '_default_attributes', '_product_attributes', '_file_path', '_backorders')) ||
-									substr($attribute, 0, 4) === '_wp_') ||
+									substr($attribute, 0, 4) === '_wp_' ||
 									substr($attribute, 0, 13) === 'attribute_pa_'))
 								{
 									$value = get_post_meta($child_product->variation_id, $attribute, false);
