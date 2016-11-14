@@ -189,6 +189,15 @@ final class CodistoConnect {
 		@ini_set('output_buffering', 'Off');
 		@ini_set('output_handler', '');
 
+		while(ob_get_level() > 1)
+		{
+			@ob_end_clean();
+		}
+		if(ob_get_level() > 0)
+		{
+			@ob_clean();
+		}
+
 		if( !in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) )))
 		{
 			$this->sendHttpHeaders('500 Config Error', array(
@@ -1695,6 +1704,15 @@ final class CodistoConnect {
 		@ini_set('zlib.output_compression', 'Off');
 		@ini_set('output_buffering', 'Off');
 		@ini_set('output_handler', '');
+
+		while(ob_get_level() > 1)
+		{
+			@ob_end_clean();
+		}
+		if(ob_get_level() > 0)
+		{
+			@ob_clean();
+		}
 
 		if(isset($_GET['productid']))
 		{
