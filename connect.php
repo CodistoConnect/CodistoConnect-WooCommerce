@@ -1,18 +1,21 @@
 <?php
 /**
  * @package MarketPlace Connect by Codisto
- * @version 1.2.42
+ * @version 1.2.44
  */
 /*
 Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 Author: Codisto
-Version: 1.2.42
+Version: 1.2.44
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */
+
+error_reporting(E_ERROR | E_PARSE);
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -20,12 +23,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-define('CODISTOCONNECT_VERSION', '1.2.42');
+define('CODISTOCONNECT_VERSION', '1.2.44');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
-
 if( ! class_exists('CodistoConnect') ) :
-
 
 final class CodistoConnect {
 
@@ -188,6 +189,15 @@ final class CodistoConnect {
 		@ini_set('zlib.output_compression', 'Off');
 		@ini_set('output_buffering', 'Off');
 		@ini_set('output_handler', '');
+
+		while(ob_get_level() > 1)
+		{
+			@ob_end_clean();
+		}
+		if(ob_get_level() > 0)
+		{
+			@ob_clean();
+		}
 
 		if( !in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) )))
 		{
@@ -406,7 +416,7 @@ final class CodistoConnect {
 
 					if($product->is_taxable && 'yes' === get_option( 'woocommerce_prices_include_tax' ))
 					{
-						$tax_rates = WC_Tax::get_base_tax_rates( $product->tax_class );
+						$tax_rates = WC_Tax::get_shop_base_rate( $product->tax_class );
 						$taxes = WC_Tax::calc_tax( $product->listprice , $tax_rates, true );
 						$product->listprice = $product->listprice - array_sum( $taxes );
 					}
@@ -1695,6 +1705,15 @@ final class CodistoConnect {
 		@ini_set('zlib.output_compression', 'Off');
 		@ini_set('output_buffering', 'Off');
 		@ini_set('output_handler', '');
+
+		while(ob_get_level() > 1)
+		{
+			@ob_end_clean();
+		}
+		if(ob_get_level() > 0)
+		{
+			@ob_clean();
+		}
 
 		if(isset($_GET['productid']))
 		{
