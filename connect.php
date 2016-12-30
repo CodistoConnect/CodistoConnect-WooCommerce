@@ -510,6 +510,32 @@ final class CodistoConnect {
 							$product->skus[] = $child_product_data;
 						}
 
+						$productvariant = array();
+						$variationattrs = get_post_meta( $product->id, '_product_attributes', true );
+						$attribute_keys  = array_keys( $variationattrs );
+						$attribute_total = sizeof( $attribute_keys );
+
+						for ( $i = 0; $i < $attribute_total; $i ++ ) {
+							$attribute = $variationattrs[ $attribute_keys[ $i ] ];
+
+							$name = wc_attribute_label($attribute['name']);
+							if($attribute['is_taxonomy']){
+								$valmap = array();
+								$terms = get_terms(array('taxonomy' => $attribute['name']));
+								foreach($terms as $term) {
+									$valmap[] = $term->name;
+								}
+								$value = implode("|", $valmap);
+							} else {
+								$value = $attribute['value'];
+							}
+							$sequence = $attribute['position'];
+
+							$productvariant[] = array( 'name' => $name, 'values' => $value, 'sequence' => $sequence );
+						}
+
+						$product->variantvalues = $productvariant;
+
 						$attrs = array();
 
 						foreach($wc_product->get_variation_attributes() as $name => $value)
@@ -2559,6 +2585,7 @@ final class CodistoConnect {
 
 			if(preg_match('/\/codisto-sync\//', $_SERVER['REQUEST_URI']))
 			{
+				define('WP_ADMIN', true);
 				$_POST['aelia_cs_currency'] = get_option('woocommerce_currency');
 			}
 		}
