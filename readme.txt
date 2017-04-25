@@ -97,6 +97,11 @@ No, MarketPlace Connect currently only works with eBay
 * upgrade readme to cover 4.7.4 as latest tested version
 * fix pre-registration backdrop UI
 
+= 1.2.46 - 13/12/2016 =
+
+* sort variation attributes by user-entered sequence
+* set admin context when synchronizing
+
 = 1.2.45 - 13/12/2016 =
 
 * upgrade readme to cover 4.7.0 as latest tested version
