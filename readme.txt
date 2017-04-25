@@ -2,8 +2,8 @@
 Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
-Tested up to: 4.7.0
-Stable tag: 1.2.46
+Tested up to: 4.7.4
+Stable tag: 1.2.45
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -91,11 +91,6 @@ No, MarketPlace Connect currently only works with eBay
 3. Order Management
 
 == Changelog ==
-
-= 1.2.46 - 13/12/2016 =
-
-* sort variation attributes by user-entered sequence
-* set admin context when synchronizing
 
 = 1.2.45 - 13/12/2016 =
 
