@@ -2158,7 +2158,7 @@ final class CodistoConnect {
 
 			</style>
 
-				<iframe id="dummy-data" frameborder="0" src="https://codisto.com/xpressgriddemo/"></iframe>
+				<iframe id="dummy-data" frameborder="0" src="https://codisto.com/xpressgriddemo/ebayedit/"></iframe>
 				<div id="dummy-data-overlay"></div>
 				<div id="create-account-modal">
 				<h1>Codisto Connect - Account Creation</h1>
