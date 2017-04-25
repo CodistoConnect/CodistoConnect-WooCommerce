@@ -1,14 +1,14 @@
 <?php
 /**
  * @package MarketPlace Connect by Codisto
- * @version 1.2.45
+ * @version 1.2.47
  */
 /*
 Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 Author: Codisto
-Version: 1.2.45
+Version: 1.2.47
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-define('CODISTOCONNECT_VERSION', '1.2.45');
+define('CODISTOCONNECT_VERSION', '1.2.47');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 if( ! class_exists('CodistoConnect') ) :
@@ -509,6 +509,32 @@ final class CodistoConnect {
 
 							$product->skus[] = $child_product_data;
 						}
+
+						$productvariant = array();
+						$variationattrs = get_post_meta( $product->id, '_product_attributes', true );
+						$attribute_keys  = array_keys( $variationattrs );
+						$attribute_total = sizeof( $attribute_keys );
+
+						for ( $i = 0; $i < $attribute_total; $i ++ ) {
+							$attribute = $variationattrs[ $attribute_keys[ $i ] ];
+
+							$name = wc_attribute_label($attribute['name']);
+							if($attribute['is_taxonomy']){
+								$valmap = array();
+								$terms = get_terms(array('taxonomy' => $attribute['name']));
+								foreach($terms as $term) {
+									$valmap[] = $term->name;
+								}
+								$value = implode("|", $valmap);
+							} else {
+								$value = $attribute['value'];
+							}
+							$sequence = $attribute['position'];
+
+							$productvariant[] = array( 'name' => $name, 'values' => $value, 'sequence' => $sequence );
+						}
+
+						$product->variantvalues = $productvariant;
 
 						$attrs = array();
 
@@ -2158,7 +2184,7 @@ final class CodistoConnect {
 
 			</style>
 
-				<iframe id="dummy-data" frameborder="0" src="https://codisto.com/xpressgriddemo/"></iframe>
+				<iframe id="dummy-data" frameborder="0" src="https://codisto.com/xpressgriddemo/ebayedit/"></iframe>
 				<div id="dummy-data-overlay"></div>
 				<div id="create-account-modal">
 				<h1>Codisto Connect - Account Creation</h1>
@@ -2559,6 +2585,7 @@ final class CodistoConnect {
 
 			if(preg_match('/\/codisto-sync\//', $_SERVER['REQUEST_URI']))
 			{
+				define('WP_ADMIN', true);
 				$_POST['aelia_cs_currency'] = get_option('woocommerce_currency');
 			}
 		}
