@@ -1,30 +1,35 @@
-=== WooCommerce eBay Integration - MarketPlace Connect by Codisto ===
+=== WooCommerce Amazon & eBay Integration - MarketPlace Connect by Codisto ===
 Contributors: codisto
-Tags: ecommerce, e-commerce, woocommerce, ebay, paypal, integration, multi-channel, listings, store, sales, sell, shop
+Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
 Tested up to: 4.7.4
-Stable tag: 1.2.47
+Stable tag: 1.2.49
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
-MarketPlace Connect by Codisto - WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
+MarketPlace Connect by Codisto - WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 
 == Description ==
 
-Convert your WooCommerce store into a fully integrated eBay store in minutes.  Codisto Marketplace Connect is the new standard for integrated eBay selling. We believe alternative solutions are too hard & time consuming to setup and use. So we applied 15 years' experience with ecommerce platforms, eBay integration, developer work flows and merchant selling processes to make eBay better for both merchants and developers.
+Sell on Amazon & eBay directly from WooCommerce.
 
-Marketplace Connect incorporates maximum automation to get you selling quickly and clever product design to make managing product catalogs on eBay quick & easy. By auto-categorizing products into the most appropriate eBay category, including a professional mobile optimized sales template and applying eBay best practice selling defaults to your products as standard suggestions out the box, you're ready to list your entire catalog on eBay without any configuration. There is no more building from ground zero, product by product, going through the time consuming process of having to create profiles and templates first. If you’re not happy with a suggested setting, our XpressGrid interface makes changing the suggestions fast & simple. Or you can simply apply profiles for traditional listing management.
+Real time sync of catalog, inventory and orders.
 
-Powerful control via full real time inventory synchronization between your ecommerce platform and eBay, full template editing & logic, custom attribute mapping, advanced freight  functionality & multi-account support means Marketplace Connect is also designed for the largest online businesses looking for advanced options and deeper configuration.
+The only full catalog sync native WooCommerce extension for integrating Amazon & eBay.
+
+Amazon & eBay integration is all Codisto does.  By solely focusing on Amazon & eBay integration, Codisto ensures it is the leading provider of SaaS marketplace integration extensions.
 
 = Key Features =
 
-* Real time, two-way synchronization of product catalog & inventory between WooCommerce & eBay
-* Orders from eBay sent to WooCommerce for efficient fulfilment
+* Real time, two-way synchronization of product catalog & inventory between WooCommerce - Amazon & eBay
+* Orders from Amazon & eBay sent to WooCommerce for efficient fulfilment
+* Automatic ASIN matching from UPC data
+* Simply ASIN lookup for non UPC data
+* Create unique Amazon listings directly from within WooCommerce
 * Products auto-categorized into most appropriate eBay category
-* Professional, full editable, mobile optimized template apply to every listing
-* List on any eBay marketplace worldwide
-* Supports multi-account/multi eBay marketplace
+* Professional, full editable, mobile optimized template apply to every eBay listing
+* List on any Amazon and/or eBay marketplace worldwide
+* Supports multi-account/multi Amazon/eBay marketplace
 * XpressGrid multi edit for simple management
 * Order control for sending to WooCommerce
 * Automatic feedback& shipping tracking on eBay
@@ -37,19 +42,19 @@ Powerful control via full real time inventory synchronization between your ecomm
 
 = More Information =
 
-Visit <https://codisto.com/connect/> to read more about Marketplace Connect including documentation, installation instructions and pricing.
+Visit https://codisto.com/connect/ to read more about Marketplace Connect including documentation, installation instructions and pricing.
 
 Pricing starts at $49 USD per month.
 
 == Installation ==
 
 1. Install MarketPlace Connect by Codisto either via the WordPress.org plugin repository, or by uploading the files to your server
-2. Choose either “Connect your eBay account” or “Enter your email address” and follow the setup instructions.
+2. Choose either “Connect your Amazon/eBay account” or “Enter your email address” and follow the setup instructions.
 3. Choose which items you wish to list from the Codisto > Listings screen and click publish
 
 == Frequently Asked Questions ==
 
-= Does MarketPlace Connect work with all eBay sites? =
+= Does MarketPlace Connect work with all Amazon & eBay sites? =
 
 Yes, it does.
 
@@ -57,20 +62,21 @@ Yes, it does.
 
 MarketPlace Connect requires a recent version of WordPress (4.2+) with WooCommerce (2.2+) installed. Your server should run on Linux and have PHP 5.3.
 
-= Does MarketPlace Connect just list my products on eBay or provide full catalog synchronization? =
+= Does MarketPlace Connect just list my products on Amazon/eBay or provide full catalog synchronization? =
 
-MarketPlace connect is more than just a listing tool.  It keeps your whole catalog – products, prices, images, descriptions, inventory levels and more in sync with eBay in real time.  Orders from eBay are automatically sent to WooCommerce and inventory reduced in real time so you never oversell on either channel.
+MarketPlace connect is more than just a listing tool. It keeps your whole catalog – products, prices, images, descriptions, inventory levels and more in sync with Amazon/eBay in real time. Orders from Amazon/eBay are automatically sent to WooCommerce and inventory reduced in real time so you never oversell on either channel.  Further, you can of course choose which products from your catalog to list.
 
 = How easy is MarketPlace Connect to setup and use? =
 
-MarketPlace Connect was designed for merchants to increase their sales by adding the eBay channel for virtually no effort and keep their current WooCommerce fulfilment processes.
-This has been achieved by applying the maximum automation to setting up and managing eBay.  There are many areas of automation from categorizing products on eBay, applying a professional template, upscaling images, UPC/EAN error prevention, automatic tax rate detection for orders and many more.
-If you’re happy with our standard template, eBay best practice selling values e.g. 30 days returns and free shipping, once MarketPlace Connect has installed, you can list your entire catalog in just 4 clicks.  There is no easier way to list on eBay anywhere, let alone have full integration.
+MarketPlace Connect was designed for merchants to increase their sales by adding the Amazon & eBay channels for virtually no effort and keep their current WooCommerce fulfilment processes.
+This has been achieved by applying the maximum automation to setting up and managing Amazon/eBay. There are many areas of automation from categorizing products on eBay, applying a professional template, upscaling images, UPC/EAN error prevention, automatic tax rate detection for orders and many more.
+If you’re happy with our standard template, eBay best practice selling values e.g. 30 days returns and free shipping, once MarketPlace Connect has installed, you can list your entire catalog in just 4 clicks.
+Amazon ASIN matches is fully automated if you have UPC data and there is a quick and easy search tool if you don’t have UPC data. There is no better performing solution that makes it as easy to list on Amazon/eBay anywhere, let alone offer full, real time integration.
 
-= I already have listed my products on eBay. Can MarketPlace Connect import them to WooCommerce? =
+= I already have listed my products on Amazon/eBay. Can MarketPlace Connect import them to WooCommerce? =
 
-No, MarketPlace Connect is designed to let WooCommerce be the “source of true” – you contine to manage your products in WordPress - and use MarketPlace connect to manage which products and how they are listed on eBay.
-But it is possible to map existing eBay listings to products in WooCommerce once they are in WooCommerce with the ‘map products’ function.
+No, MarketPlace Connect is designed to let WooCommerce be the “source of true” – you contine to manage your products in WordPress – and use MarketPlace connect to manage which products and how they are listed on Amazon/eBay.
+But it is possible to map existing Amazon/eBay listings to products in WooCommerce once they are in WooCommerce with the ‘map products’ function.
 
 = Does MarketPlace Connect support auction style listings? =
 
@@ -80,10 +86,6 @@ No, MarketPlace Connect is designed for merchants with catalogs who want to crea
 
 Yes, there are! Please check out our growing knowledgebase at <http://help.codisto.com/>
 
-= Is there a MarketPlace Connect for Amazon? =
-
-No, MarketPlace Connect currently only works with eBay
-
 == Screenshots ==
 
 1. XpressGrid listing mananagement
@@ -91,6 +93,15 @@ No, MarketPlace Connect currently only works with eBay
 3. Order Management
 
 == Changelog ==
+
+= 1.2.49 - 01/05/2017 =
+
+* Amazon release
+* readme update
+
+= 1.2.48 - 01/05/2017 =
+
+* remove control characters from signup fields
 
 = 1.2.47 - 25/04/2017 =
 

@@ -1,14 +1,14 @@
 <?php
 /**
  * @package MarketPlace Connect by Codisto
- * @version 1.2.47
+ * @version 1.2.49
  */
 /*
 Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 Author: Codisto
-Version: 1.2.47
+Version: 1.2.49
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-define('CODISTOCONNECT_VERSION', '1.2.47');
+define('CODISTOCONNECT_VERSION', '1.2.48');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 if( ! class_exists('CodistoConnect') ) :
@@ -270,8 +270,8 @@ final class CodistoConnect {
 					'currency' => $currency,
 					'dimension_unit' => $dimension_unit,
 					'weight_unit' => $weight_unit,
-				 	'country_code' => $country_code,
-				 	'state_code' => $state_code );
+					'country_code' => $country_code,
+					'state_code' => $state_code );
 
 				$this->sendHttpHeaders('200 OK', array(
 					'Content-Type' => 'application/json',
@@ -1981,10 +1981,16 @@ final class CodistoConnect {
 
 	public function create_account()
 	{
+		$blogversion = preg_replace('/[\x0C\x0D]/', ' ', preg_replace('/[\x00-\x1F\x7F]/', '', get_bloginfo('version')));
+		$blogurl = preg_replace('/[\x0C\x0D]/', ' ', preg_replace('/[\x00-\x1F\x7F]/', '', get_site_url()));
+		$blogdescription = preg_replace('/[\x0C\x0D]/', ' ', preg_replace('/[\x00-\x1F\x7F]/', '', get_option('blogdescription')));
+
 		if($_SERVER['REQUEST_METHOD'] === 'POST')
 		{
 			if($_POST['method'] == 'email')
 			{
+				$signupemail = wp_unslash( $_POST['email'] );
+
 				$httpOptions = array(
 								'method' => 'POST',
 								'headers' => array( 'Content-Type' => 'application/json' ),
@@ -1994,10 +2000,10 @@ final class CodistoConnect {
 								'body' => $this->json_encode( array (
 
 									'type' => 'woocommerce',
-									'version' => get_bloginfo( 'version' ),
-									'url' => get_site_url(),
-									'email' => wp_unslash( $_POST['email'] ),
-									'storename' => get_option('blogdescription') ,
+									'version' => $blogversion,
+									'url' => $blogurl,
+									'email' => $signupemail,
+									'storename' => $blogdescription ,
 									'resellerkey' => $this->reseller_key(),
 									'codistoversion' => CODISTOCONNECT_VERSION
 
@@ -2013,26 +2019,26 @@ final class CodistoConnect {
 				} else {
 
 					$postdata = array (
-					    'type' => 'woocommerce',
-					    'version' => get_bloginfo( 'version' ),
-					    'url' => get_site_url(),
-					    'email' => wp_unslash( $_POST['email'] ),
-					    'storename' => get_option('blogdescription') ,
-					    'resellerkey' => $this->reseller_key(),
-					    'codistoversion' => CODISTOCONNECT_VERSION
+						'type' => 'woocommerce',
+						'version' => $blogversion,
+						'url' => $blogurl,
+						'email' => $signupemail,
+						'storename' => $blogdescription,
+						'resellerkey' => $this->reseller_key(),
+						'codistoversion' => CODISTOCONNECT_VERSION
 					);
 					$str = $this->json_encode( $postdata );
 
 					$curl = curl_init();
 					curl_setopt_array( $curl, array(
-					    CURLOPT_RETURNTRANSFER => 1,
-					    CURLOPT_URL => 'https://ui.codisto.com/create',
-					    CURLOPT_POST => 1,
-					    CURLOPT_POSTFIELDS => $str,
-					    CURLOPT_HTTPHEADER => array(
-					        'Content-Type: application/json',
-					        'Content-Length: ' . strlen($str)
-					    )
+						CURLOPT_RETURNTRANSFER => 1,
+						CURLOPT_URL => 'https://ui.codisto.com/create',
+						CURLOPT_POST => 1,
+						CURLOPT_POSTFIELDS => $str,
+						CURLOPT_HTTPHEADER => array(
+							'Content-Type: application/json',
+							'Content-Length: ' . strlen($str)
+						)
 					));
 					$response = curl_exec( $curl );
 					curl_close( $curl );
@@ -2050,12 +2056,14 @@ final class CodistoConnect {
 			}
 			else
 			{
+				$blogdescription = preg_replace('/[\x0C\x0D]/', ' ', preg_replace('/[\x00-\x1F\x7F]/', '', get_option('blogdescription')));
+
 				wp_redirect('https://ui.codisto.com/register?finalurl='.
 						urlencode(admin_url('admin-post.php?action=codisto_create')).
 						'&type=woocommerce'.
-						'&version='.urlencode(get_bloginfo( 'version' )).
-						'&url='.urlencode(get_site_url()).
-						'&storename='.urlencode(get_option('blogdescription')).
+						'&version='.urlencode($blogversion).
+						'&url='.urlencode($blogurl).
+						'&storename='.urlencode($blogdescription).
 						'&storecurrency='.urlencode(get_option('woocommerce_currency')).
 						'&resellerkey='.urlencode($this->reseller_key()).
 						'&codistoversion='.urlencode(CODISTOCONNECT_VERSION));
@@ -2222,10 +2230,10 @@ final class CodistoConnect {
 				</form>
 				<div class="footer">
 						Once you create an account we will begin synchronizing your catalog data.<br>
-				  		Sit tight, this may take several minutes depending on the size of your catalog.<br>
+						Sit tight, this may take several minutes depending on the size of your catalog.<br>
 						When completed, you'll have the world's best eBay integration at your fingertips.<br><br/>
 						You'll be able to:
-						 	<ul>
+							<ul>
 								<li>Sync in real-time between WooCommerce &amp; eBay</li>
 								<li>have Codisto auto-categorize your products into eBay categories</li>
 								<li>Access our sophisticated template engine for amazing listings</li>
