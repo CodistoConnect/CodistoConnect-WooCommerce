@@ -1,14 +1,14 @@
 <?php
 /**
  * @package MarketPlace Connect by Codisto
- * @version 1.2.49
+ * @version 1.2.50
  */
 /*
 Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
 Author: Codisto
-Version: 1.2.49
+Version: 1.2.50
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -2325,18 +2325,18 @@ final class CodistoConnect {
 	{
 		if ( current_user_can( 'manage_woocommerce' ) )
 		{
-			add_menu_page( __('eBay | Codisto'), __('eBay | Codisto'), 'edit_posts', 'codisto', array( $this, 'ebay_tab' ), 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgDQogICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiDQoJIHZpZXdCb3g9IjAgMCAyMCAyMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8cGF0aCBzdHlsZT0iZmlsbDojOTk5OTk5OyIgZD0iTTE3LDBIM0MxLjMsMCwwLDEuMywwLDN2MTRjMCwxLjYsMS4zLDMsMywzaDE0YzEuNywwLDMtMS40LDMtM1YzQzIwLDEuMywxOC43LDAsMTcsMHogTTkuMywxNC4xDQoJYzAuNCwwLjUsMC45LDAuNywxLjYsMC43YzAuNywwLDEuMy0wLjMsMS45LTAuOWwyLjcsMi43Yy0xLjIsMS4yLTIuOCwxLjktNC42LDEuOWMtMS45LDAtMy40LTAuNi00LjctMS45Yy0wLjgtMC44LTEuMy0xLjgtMS41LTMNCgljLTAuMS0wLjctMC4yLTEuOS0wLjItMy42czAuMS0yLjksMC4yLTMuNmMwLjItMS4yLDAuNy0yLjMsMS41LTNDNy41LDIuMSw5LDEuNSwxMC45LDEuNWMxLjksMCwzLjQsMC42LDQuNiwxLjlsLTIuNywyLjcNCgljLTAuNi0wLjYtMS4yLTAuOS0xLjktMC45Yy0wLjcsMC0xLjIsMC4yLTEuNiwwLjdDOC44LDYuNCw4LjYsNy44LDguNiwxMEM4LjYsMTIuMiw4LjgsMTMuNiw5LjMsMTQuMXoiLz4NCjwvc3ZnPg0K', '55.501' );
+			add_menu_page( __('Amazon & eBay'), __('Amazon & eBay'), 'edit_posts', 'codisto', array( $this, 'ebay_tab' ), 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgDQogICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiDQoJIHZpZXdCb3g9IjAgMCAyMCAyMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8cGF0aCBzdHlsZT0iZmlsbDojOTk5OTk5OyIgZD0iTTE3LDBIM0MxLjMsMCwwLDEuMywwLDN2MTRjMCwxLjYsMS4zLDMsMywzaDE0YzEuNywwLDMtMS40LDMtM1YzQzIwLDEuMywxOC43LDAsMTcsMHogTTkuMywxNC4xDQoJYzAuNCwwLjUsMC45LDAuNywxLjYsMC43YzAuNywwLDEuMy0wLjMsMS45LTAuOWwyLjcsMi43Yy0xLjIsMS4yLTIuOCwxLjktNC42LDEuOWMtMS45LDAtMy40LTAuNi00LjctMS45Yy0wLjgtMC44LTEuMy0xLjgtMS41LTMNCgljLTAuMS0wLjctMC4yLTEuOS0wLjItMy42czAuMS0yLjksMC4yLTMuNmMwLjItMS4yLDAuNy0yLjMsMS41LTNDNy41LDIuMSw5LDEuNSwxMC45LDEuNWMxLjksMCwzLjQsMC42LDQuNiwxLjlsLTIuNywyLjcNCgljLTAuNi0wLjYtMS4yLTAuOS0xLjktMC45Yy0wLjcsMC0xLjIsMC4yLTEuNiwwLjdDOC44LDYuNCw4LjYsNy44LDguNiwxMEM4LjYsMTIuMiw4LjgsMTMuNiw5LjMsMTQuMXoiLz4NCjwvc3ZnPg0K', '55.501' );
 
 			$pages = array();
 
-			$pages[] = add_submenu_page('codisto', __('Listings'), __('Listings'), 'edit_posts', 'codisto', array( $this, 'ebay_tab' ) );
-			$pages[] = add_submenu_page('codisto', __('Orders'), __('Orders'), 'edit_posts', 'codisto-orders', array( $this, 'orders' ) );
-			$pages[] = add_submenu_page('codisto', __('Categories'), __('Categories'), 'edit_posts', 'codisto-categories', array( $this, 'categories' ) );
-			$pages[] = add_submenu_page('codisto', __('Attributes'), __('Attributes'), 'edit_posts', 'codisto-attributes', array( $this, 'attributes' ) );
-			$pages[] = add_submenu_page('codisto', __('Import Listings'), __('Import Listings'), 'edit_posts', 'codisto-import', array( $this, 'import' ) );
-			$pages[] = add_submenu_page('codisto', __('Templates'), __('Templates'), 'edit_posts', 'codisto-templates', array( $this, 'templates' ) );
-			$pages[] = add_submenu_page('codisto', __('Account'), __('Account'), 'edit_posts', 'codisto-account', array( $this, 'account' ) );
+			$pages[] = add_submenu_page('codisto', __('Marketplace Listings'), __('Marketplace Listings'), 'edit_posts', 'codisto', array( $this, 'ebay_tab' ) );
+			$pages[] = add_submenu_page('codisto', __('Marketplace Orders'), __('Marketplace Orders'), 'edit_posts', 'codisto-orders', array( $this, 'orders' ) );
+			$pages[] = add_submenu_page('codisto', __('eBay Store Categories'), __('eBay Store Categories'), 'edit_posts', 'codisto-categories', array( $this, 'categories' ) );
+			$pages[] = add_submenu_page('codisto', __('Attribute Mapping'), __('Attribute Mapping'), 'edit_posts', 'codisto-attributes', array( $this, 'attributes' ) );
+			$pages[] = add_submenu_page('codisto', __('Link eBay Listings'), __('Link eBay Listings'), 'edit_posts', 'codisto-import', array( $this, 'import' ) );
+			$pages[] = add_submenu_page('codisto', __('eBay Templates'), __('eBay Templates'), 'edit_posts', 'codisto-templates', array( $this, 'templates' ) );
 			$pages[] = add_submenu_page('codisto', __('Settings'), __('Settings'), 'edit_posts', 'codisto-settings', array( $this, 'settings' ) );
+			$pages[] = add_submenu_page('codisto', __('Account'), __('Account'), 'edit_posts', 'codisto-account', array( $this, 'account' ) );
 
 			foreach($pages as $page)
 			{
