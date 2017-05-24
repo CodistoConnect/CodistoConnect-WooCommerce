@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-define('CODISTOCONNECT_VERSION', '1.2.48');
+define('CODISTOCONNECT_VERSION', '1.3.0');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 if( ! class_exists('CodistoConnect') ) :
@@ -271,7 +271,8 @@ final class CodistoConnect {
 					'dimension_unit' => $dimension_unit,
 					'weight_unit' => $weight_unit,
 					'country_code' => $country_code,
-					'state_code' => $state_code );
+					'state_code' => $state_code,
+				 	'version' => CODISTOCONNECT_VERSION );
 
 				$this->sendHttpHeaders('200 OK', array(
 					'Content-Type' => 'application/json',
