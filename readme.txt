@@ -94,6 +94,10 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 == Changelog ==
 
+= 1.3.0 - 24/05/2017 =
+
+* transmit plugin version during synchronisation
+
 = 1.2.50 - 09/05/2017 =
 
 * updated menu items
