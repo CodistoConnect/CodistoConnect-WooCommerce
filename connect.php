@@ -1,14 +1,14 @@
 <?php
 /**
  * @package MarketPlace Connect by Codisto
- * @version 1.3.0
+ * @version 1.3.1
  */
 /*
 Plugin Name: MarketPlace Connect by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
-Description: WooCommerce eBay Integration - Convert a WooCommerce store into a fully integrated eBay store in minutes
+Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
 Author: Codisto
-Version: 1.3.0
+Version: 1.3.1
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -22,8 +22,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 include_once( ABSPATH . 'wp-admin/includes/file.php' );
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+include_once( ABSPATH . 'wp-admin/includes/class-wp-screen.php' );
+include_once( ABSPATH . 'wp-admin/includes/screen.php' );
 
-define('CODISTOCONNECT_VERSION', '1.3.0');
+define('CODISTOCONNECT_VERSION', '1.3.1');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 if( ! class_exists('CodistoConnect') ) :
@@ -2594,7 +2596,7 @@ final class CodistoConnect {
 
 			if(preg_match('/\/codisto-sync\//', $_SERVER['REQUEST_URI']))
 			{
-				define('WP_ADMIN', true);
+				set_current_screen('dashboard');
 				$_POST['aelia_cs_currency'] = get_option('woocommerce_currency');
 			}
 		}
