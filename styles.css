@@ -1,3 +1,7 @@
+.codisto.mobile #wpbody
+{
+	left: 0px !important;
+}
 .codisto #wpbody
 {
 	position: fixed !important;
