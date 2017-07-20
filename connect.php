@@ -1,10 +1,10 @@
 <?php
 /**
- * @package MarketPlace Connect by Codisto
+ * @package Codisto LINQ by Codisto
  * @version 1.3.2
  */
 /*
-Plugin Name: MarketPlace Connect by Codisto
+Plugin Name: Codisto LINQ by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
 Author: Codisto
