@@ -1,4 +1,4 @@
-=== WooCommerce Amazon & eBay Integration - MarketPlace Connect by Codisto ===
+=== WooCommerce Amazon & eBay Integration - Codisto LINQ by Codisto ===
 Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
@@ -7,7 +7,7 @@ Stable tag: 1.3.2
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
-MarketPlace Connect by Codisto - WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
+Codisto LINQ by Codisto - WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
 
 == Description ==
 
@@ -42,45 +42,45 @@ Amazon & eBay integration is all Codisto does.  By solely focusing on Amazon & e
 
 = More Information =
 
-Visit https://codisto.com/connect/ to read more about Marketplace Connect including documentation, installation instructions and pricing.
+Visit https://codisto.com/connect/ to read more about Codisto LINQ including documentation, installation instructions and pricing.
 
 Pricing starts at $49 USD per month.
 
 == Installation ==
 
-1. Install MarketPlace Connect by Codisto either via the WordPress.org plugin repository, or by uploading the files to your server
+1. Install Codisto LINQ by Codisto either via the WordPress.org plugin repository, or by uploading the files to your server
 2. Choose either “Connect your Amazon/eBay account” or “Enter your email address” and follow the setup instructions.
 3. Choose which items you wish to list from the Codisto > Listings screen and click publish
 
 == Frequently Asked Questions ==
 
-= Does MarketPlace Connect work with all Amazon & eBay sites? =
+= Does Codisto LINQ work with all Amazon & eBay sites? =
 
 Yes, it does.
 
-= What are the requirements to run MarketPlace Connect? =
+= What are the requirements to run Codisto LINQ? =
 
-MarketPlace Connect requires a recent version of WordPress (4.2+) with WooCommerce (2.2+) installed. Your server should run on Linux and have PHP 5.3.
+Codisto LINQ requires a recent version of WordPress (4.2+) with WooCommerce (2.2+) installed. Your server should run on Linux and have PHP 5.3.
 
-= Does MarketPlace Connect just list my products on Amazon/eBay or provide full catalog synchronization? =
+= Does Codisto LINQ just list my products on Amazon/eBay or provide full catalog synchronization? =
 
-MarketPlace connect is more than just a listing tool. It keeps your whole catalog – products, prices, images, descriptions, inventory levels and more in sync with Amazon/eBay in real time. Orders from Amazon/eBay are automatically sent to WooCommerce and inventory reduced in real time so you never oversell on either channel.  Further, you can of course choose which products from your catalog to list.
+Codisto LINQ is more than just a listing tool. It keeps your whole catalog – products, prices, images, descriptions, inventory levels and more in sync with Amazon/eBay in real time. Orders from Amazon/eBay are automatically sent to WooCommerce and inventory reduced in real time so you never oversell on either channel.  Further, you can of course choose which products from your catalog to list.
 
-= How easy is MarketPlace Connect to setup and use? =
+= How easy is Codisto LINQ to setup and use? =
 
-MarketPlace Connect was designed for merchants to increase their sales by adding the Amazon & eBay channels for virtually no effort and keep their current WooCommerce fulfilment processes.
+Codisto LINQ was designed for merchants to increase their sales by adding the Amazon & eBay channels for virtually no effort and keep their current WooCommerce fulfilment processes.
 This has been achieved by applying the maximum automation to setting up and managing Amazon/eBay. There are many areas of automation from categorizing products on eBay, applying a professional template, upscaling images, UPC/EAN error prevention, automatic tax rate detection for orders and many more.
-If you’re happy with our standard template, eBay best practice selling values e.g. 30 days returns and free shipping, once MarketPlace Connect has installed, you can list your entire catalog in just 4 clicks.
+If you’re happy with our standard template, eBay best practice selling values e.g. 30 days returns and free shipping, once Codisto LINQ has installed, you can list your entire catalog in just 4 clicks.
 Amazon ASIN matches is fully automated if you have UPC data and there is a quick and easy search tool if you don’t have UPC data. There is no better performing solution that makes it as easy to list on Amazon/eBay anywhere, let alone offer full, real time integration.
 
-= I already have listed my products on Amazon/eBay. Can MarketPlace Connect import them to WooCommerce? =
+= I already have listed my products on Amazon/eBay. Can Codisto LINQ import them to WooCommerce? =
 
-No, MarketPlace Connect is designed to let WooCommerce be the “source of true” – you contine to manage your products in WordPress – and use MarketPlace connect to manage which products and how they are listed on Amazon/eBay.
+No, Codisto LINQ is designed to let WooCommerce be the “source of true” – you contine to manage your products in WordPress – and use Codisto LINQ to manage which products and how they are listed on Amazon/eBay.
 But it is possible to map existing Amazon/eBay listings to products in WooCommerce once they are in WooCommerce with the ‘map products’ function.
 
-= Does MarketPlace Connect support auction style listings? =
+= Does Codisto LINQ support auction style listings? =
 
-No, MarketPlace Connect is designed for merchants with catalogs who want to create fixed price, good til cancelled listings.
+No, Codisto LINQ is designed for merchants with catalogs who want to create fixed price, good til cancelled listings.
 
 = Are there any more FAQ? =
 
