@@ -1840,6 +1840,9 @@ final class CodistoConnect {
 			'connection',
 			'accept-encoding'
 		);
+		if($_SERVER['X-LSCACHE'] == 'on') {
+			$headerfilter[] = 'if-none-match';
+		}
 		foreach($incomingHeaders as $name => $value)
 		{
 			if(!in_array(trim(strtolower($name)), $headerfilter))
