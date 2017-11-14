@@ -96,7 +96,7 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 = 1.3.4 - 14/11/2017 =
 
-* use currency converted prices in orders for currency converted listings
+* use currency converted prices in orders where applicable
 
 = 1.3.3 - 20/07/2017 =
 
