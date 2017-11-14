@@ -1248,7 +1248,7 @@ final class CodistoConnect {
 					$shipping_tax = 0;
 					$cart_discount = 0;
 					$cart_discount_tax = 0;
-					$total = (float)$ordercontent->ordertotal;
+					$total = (float)$ordercontent->defaultcurrencytotal;
 					$tax = 0;
 
 					if(!$order_id)
