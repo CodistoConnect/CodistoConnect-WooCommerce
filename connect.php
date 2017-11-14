@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Codisto LINQ by Codisto
- * @version 1.3.3
+ * @version 1.3.4
  */
 /*
 Plugin Name: Codisto LINQ by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
 Author: Codisto
-Version: 1.3.3
+Version: 1.3.4
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -25,7 +25,7 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 include_once( ABSPATH . 'wp-admin/includes/class-wp-screen.php' );
 include_once( ABSPATH . 'wp-admin/includes/screen.php' );
 
-define('CODISTOCONNECT_VERSION', '1.3.3');
+define('CODISTOCONNECT_VERSION', '1.3.4');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 if( ! class_exists('CodistoConnect') ) :
@@ -1326,8 +1326,8 @@ final class CodistoConnect {
 									wc_add_order_item_meta( $item_id, '_tax_class', '' );
 								}
 
-								$line_total = wc_format_decimal( (float)$orderline->linetotal );
-								$line_total_tax = wc_format_decimal( (float)$orderline->linetotalinctax - (float)$orderline->linetotal );
+								$line_total = wc_format_decimal( (float)$orderline->defaultcurrencylinetotal );
+								$line_total_tax = wc_format_decimal( (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal );
 
 								wc_add_order_item_meta( $item_id, '_line_subtotal',	 $line_total );
 								wc_add_order_item_meta( $item_id, '_line_total',		$line_total );
@@ -1344,10 +1344,10 @@ final class CodistoConnect {
 											'order_item_type' 		=> 'shipping'
 										) );
 
-								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->linetotal) );
+								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->defaultcurrencylinetotal) );
 
-								$shipping += (real)$orderline->linetotal;
-								$shipping_tax += (real)$orderline->linetotalinctax - (real)$orderline->linetotal;
+								$shipping += (real)$orderline->defaultcurrencylinetotal;
+								$shipping_tax += (real)$orderline->defaultcurrencylinetotalinctax - (real)$orderline->defaultcurrencylinetotal;
 							}
 						}
 
@@ -1384,8 +1384,8 @@ final class CodistoConnect {
 						{
 							if($orderline->productcode[0] != 'FREIGHT')
 							{
-								$line_total = wc_format_decimal( (float)$orderline->linetotal );
-								$line_total_tax = wc_format_decimal( (float)$orderline->linetotalinctax - (float)$orderline->linetotal );
+								$line_total = wc_format_decimal( (float)$orderline->defaultcurrencylinetotal );
+								$line_total_tax = wc_format_decimal( (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal );
 
 								$tax += $line_total_tax;
 							}
@@ -1398,10 +1398,10 @@ final class CodistoConnect {
 											'order_item_type' 		=> 'shipping'
 										) );
 
-								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->linetotal) );
+								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->defaultcurrencylinetotal) );
 
-								$shipping += (real)$orderline->linetotal;
-								$shipping_tax += (real)$orderline->linetotalinctax - (real)$orderline->linetotal;
+								$shipping += (real)$orderline->defaultcurrencylinetotal;
+								$shipping_tax += (real)$orderline->defaultcurrencylinetotalinctax - (real)$orderline->defaultcurrencylinetotal;
 							}
 						}
 
