@@ -1241,6 +1241,9 @@ final class CodistoConnect {
 					}
 
 					$customer_note = @count($ordercontent->instructions) ? strval($ordercontent->instructions) : '';
+					$merchant_note = @count($ordercontent->merchantinstructions) ? strval($ordercontent->merchantinstructions) : '';
+
+					$adjustStock = @count($ordercontent->adjuststock) ? (($ordercontent->adjuststock == "false") ? false : true) : true;
 
 					$order_id = $wpdb->get_var($wpdb->prepare("SELECT ID FROM `{$wpdb->prefix}posts` AS P WHERE ID IN (SELECT post_id FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_orderid' AND meta_value = %d)", (int)$ordercontent->orderid));
 
@@ -1370,11 +1373,16 @@ final class CodistoConnect {
 
 							// payment_complete
 							add_post_meta( $order_id, '_paid_date', current_time( 'mysql' ), true );
-							if(!get_post_meta( $order_id, '_order_stock_reduced', true))
+							if($adjustStock && !get_post_meta( $order_id, '_order_stock_reduced', true))
 							{
 								$order->reduce_order_stock();
 							}
 						}
+
+						if($merchant_note) {
+							$order->add_order_note( $merchant_note, 0 );
+						}
+
 					}
 					else
 					{
@@ -1424,7 +1432,7 @@ final class CodistoConnect {
 
 							// payment_complete
 							add_post_meta( $order_id, '_paid_date', current_time( 'mysql' ), true );
-							if(!get_post_meta( $order_id, '_order_stock_reduced', true))
+							if($adjustStock && !get_post_meta( $order_id, '_order_stock_reduced', true))
 							{
 								$order->reduce_order_stock();
 							}
