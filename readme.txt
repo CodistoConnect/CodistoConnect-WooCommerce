@@ -2,8 +2,8 @@
 Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
-Tested up to: 4.8.2
-Stable tag: 1.3.4
+Tested up to: 4.9
+Stable tag: 1.3.5
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -93,6 +93,10 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 3. Order Management
 
 == Changelog ==
+
+= 1.3.5 - 14/11/2017 =
+
+* stock adjustment node and merchant notes in order creation
 
 = 1.3.4 - 14/11/2017 =
 
