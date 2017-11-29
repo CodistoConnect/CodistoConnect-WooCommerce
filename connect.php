@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Codisto LINQ by Codisto
- * @version 1.3.5
+ * @version 1.3.6
  */
 /*
 Plugin Name: Codisto LINQ by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
 Author: Codisto
-Version: 1.3.5
+Version: 1.3.6
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -25,7 +25,7 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 include_once( ABSPATH . 'wp-admin/includes/class-wp-screen.php' );
 include_once( ABSPATH . 'wp-admin/includes/screen.php' );
 
-define('CODISTOCONNECT_VERSION', '1.3.5');
+define('CODISTOCONNECT_VERSION', '1.3.6');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 if( ! class_exists('CodistoConnect') ) :
@@ -267,6 +267,8 @@ final class CodistoConnect {
 				$country_code = isset($default_location[0]) ? $default_location[0] : '';
 				$state_code = isset($default_location[1]) ? $default_location[1] : '';
 
+				$shipping_tax_class = get_option('woocommerce_shipping_tax_class');
+
 				$response = array( 'ack' => 'ok',
 					'logo' => $logo_url,
 					'currency' => $currency,
@@ -274,6 +276,7 @@ final class CodistoConnect {
 					'weight_unit' => $weight_unit,
 					'country_code' => $country_code,
 					'state_code' => $state_code,
+					'shipping_tax_class' => $shipping_tax_class,
 				 	'version' => CODISTOCONNECT_VERSION );
 
 				$this->sendHttpHeaders('200 OK', array(
