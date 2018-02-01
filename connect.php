@@ -1464,7 +1464,7 @@ final class CodistoConnect {
 							// update_status
 							$order->post_status = 'wc-cancelled';
 							$update_post_data  = array(
-								'ID'         	=> $order_id,
+								'ID'		 	=> $order_id,
 								'post_status'	=> 'wc-cancelled',
 								'post_date'		=> current_time( 'mysql', 0 ),
 								'post_date_gmt' => current_time( 'mysql', 1 )
@@ -1485,7 +1485,7 @@ final class CodistoConnect {
 								// update_status
 								$order->post_status = 'wc-processing';
 								$update_post_data  = array(
-									'ID'         	=> $order_id,
+									'ID'		 	=> $order_id,
 									'post_status'	=> 'wc-processing',
 									'post_date'		=> current_time( 'mysql', 0 ),
 									'post_date_gmt' => current_time( 'mysql', 1 )
@@ -1500,7 +1500,7 @@ final class CodistoConnect {
 								// update_status
 								$order->post_status = 'wc-pending';
 								$update_post_data  = array(
-									'ID'         	=> $order_id,
+									'ID'		 	=> $order_id,
 									'post_status'	=> 'wc-pending',
 									'post_date'		=> current_time( 'mysql', 0 ),
 									'post_date_gmt' => current_time( 'mysql', 1 )
@@ -1516,7 +1516,7 @@ final class CodistoConnect {
 							// update_status
 							$order->post_status = 'wc-completed';
 							$update_post_data  = array(
-								'ID'         	=> $order_id,
+								'ID'		 	=> $order_id,
 								'post_status'	=> 'wc-completed',
 								'post_date'		=> current_time( 'mysql', 0 ),
 								'post_date_gmt' => current_time( 'mysql', 1 )
@@ -2007,6 +2007,7 @@ final class CodistoConnect {
 			if($_POST['method'] == 'email')
 			{
 				$signupemail = wp_unslash( $_POST['email'] );
+				$countrycode = wp_unslash( $_POST['countrycode'] );
 
 				$httpOptions = array(
 								'method' => 'POST',
@@ -2020,6 +2021,7 @@ final class CodistoConnect {
 									'version' => $blogversion,
 									'url' => $blogurl,
 									'email' => $signupemail,
+									'country' => $countrycode,
 									'storename' => $blogdescription ,
 									'resellerkey' => $this->reseller_key(),
 									'codistoversion' => CODISTOCONNECT_VERSION
@@ -2240,6 +2242,13 @@ final class CodistoConnect {
 						</label>
 					</div>
 
+					<div class="selection">
+						Default Store Country:<br/>
+						<div class="select-html-wrapper"></div>
+						<br/>
+						This is important for creating your initial store defaults.
+					</div>
+
 					<div class="next">
 						<button class="button button-primary">Next</button>
 					</div>
@@ -2266,6 +2275,23 @@ final class CodistoConnect {
 						$("#create-account-modal .option").removeClass("active");
 						$(this).addClass("active").find("INPUT[type=radio]").attr("checked", "checked");
 
+					});
+					$("#create-account-modal .selection").css({
+						opacity : 0.1
+					});
+
+					$.ajax({
+						type: "GET",
+						url: "https://ui.codisto.com/getcountrylist",
+						dataType : "jsonp",
+						success: function(o){
+							$(".select-html-wrapper").html(o);
+						},
+						complete: function(){
+							$("#create-account-modal .selection").css({
+								opacity : 1
+							});
+						}
 					});
 
 				});
