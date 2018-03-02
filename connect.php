@@ -336,6 +336,7 @@ final class CodistoConnect {
 
 				$page = isset($_GET['page']) ? (int)$_GET['page'] : 0;
 				$count = isset($_GET['count']) ? (int)$_GET['count'] : 0;
+				$marker = isset($_GET['marker']) ? (int)$_GET['marker'] : 0;
 
 				$product_ids = isset($_GET['product_ids']) ? json_decode( wp_unslash( $_GET['product_ids'] ) ) : null;
 
@@ -358,8 +359,8 @@ final class CodistoConnect {
 						"WHERE post_type = 'product' ".
 						"		AND post_status IN ('publish', 'future', 'pending', 'private') ".
 						"	".(is_array($product_ids) ? 'AND id IN ('.implode(',', $product_ids).')' : '')."".
-						"ORDER BY ID LIMIT %d, %d",
-					$page * $count,
+						"       AND id > ".$marker." ".
+						"ORDER BY ID LIMIT %d",
 					$count
 				));
 
@@ -376,7 +377,7 @@ final class CodistoConnect {
 					$wc_product = $this->get_product($product->id);
 
 					$categoryproduct = $wc_product->get_categories();
-
+					$max_product_id = $product->id;
 					$product->sku = $wc_product->get_sku();
 					$product->name = html_entity_decode(apply_filters( 'woocommerce_product_title', $wc_product->post->post_title, $wc_product ), ENT_COMPAT | ENT_HTML401, 'UTF-8');
 					$product->enabled = $wc_product->is_purchasable() && ($wc_product->managing_stock() || $wc_product->is_in_stock());
@@ -782,6 +783,9 @@ final class CodistoConnect {
 				$response = array( 'ack' => 'ok', 'products' => $products );
 				if(isset($total_count))
 					$response['total_count'] = $total_count;
+
+				if(isset($max_product_id))
+					$response['max_product_id'] = $max_product_id;
 
 				$this->sendHttpHeaders('200 OK', array(
 					'Content-Type' => 'application/json',
