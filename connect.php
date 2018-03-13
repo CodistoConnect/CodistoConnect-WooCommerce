@@ -359,9 +359,9 @@ final class CodistoConnect {
 						"WHERE post_type = 'product' ".
 						"		AND post_status IN ('publish', 'future', 'pending', 'private') ".
 						"	".(is_array($product_ids) ? 'AND id IN ('.implode(',', $product_ids).')' : '')."".
-						"       AND id > ".$marker." ".
+						"       AND id > %d ".
 						"ORDER BY ID LIMIT %d",
-					$count
+					$marker, $count
 				));
 
 				if(!is_array($product_ids) &&
@@ -852,10 +852,10 @@ final class CodistoConnect {
 					"	AND ID IN (SELECT post_id ".
 					"				FROM `{$wpdb->prefix}postmeta` ".
 					"				WHERE meta_key = '_codisto_orderid') ".
-					"	AND id > ".$marker." ".
+					"	AND id > %d ".
 					"ORDER BY ID ".
 					"	LIMIT %d",
-					$count
+					$marker, $count
 				));
 
 				if($page == 0)
