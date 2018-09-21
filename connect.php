@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Codisto LINQ by Codisto
- * @version 1.3.8
+ * @version 1.3.9
  */
 /*
 Plugin Name: Codisto LINQ by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
 Author: Codisto
-Version: 1.3.8
+Version: 1.3.9
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -27,7 +27,7 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 include_once( ABSPATH . 'wp-admin/includes/class-wp-screen.php' );
 include_once( ABSPATH . 'wp-admin/includes/screen.php' );
 
-define('CODISTOCONNECT_VERSION', '1.3.8');
+define('CODISTOCONNECT_VERSION', '1.3.9');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 if( ! class_exists('CodistoConnect') ) :
@@ -852,35 +852,70 @@ final class CodistoConnect {
 
 				foreach($orders as $order)
 				{
-					$ship_date = get_post_meta( $order->post_id, '_date_shipped', true );
-					if($ship_date)
+					$tracking_items = get_post_meta( $order->post_id, '_wc_shipment_tracking_items', true );
+					$tracking_item = $tracking_items[0];
+
+					if($tracking_items && class_exists('WC_Shipment_Tracking_Actions'))
 					{
-						if(is_numeric($ship_date))
-						{
-							$ship_date = date('Y-m-d H:i:s', $ship_date);
+						$shipmenttracking = WC_Shipment_Tracking_Actions::get_instance();
+						$formatted = $shipmenttracking->get_formatted_tracking_item( $order->post_id, $tracking_item );
+
+						if($tracking_item['date_shipped']) {
+
+							if(is_numeric($tracking_item['date_shipped']))
+							{
+								$ship_date = date('Y-m-d H:i:s', $tracking_item['date_shipped']);
+							}
+
+							$order->ship_date = $tracking_item['date_shipped'];
+
 						}
 
-						$order->ship_date = $ship_date;
-					}
+						if($formatted['formatted_tracking_provider']) {
 
-					$carrier = get_post_meta( $order->post_id, '_tracking_provider', true);
-					if($carrier)
-					{
-						if($carrier === 'custom')
-						{
-							$carrier = get_post_meta( $order->post_id, '_custom_tracking_provider', true);
+							$order->carrier = $formatted['formatted_tracking_provider'];
+
 						}
 
+						if($tracking_item['tracking_number']) {
+
+							$order->track_number = $tracking_item['tracking_number'];
+
+						}
+
+
+					} else {
+
+						$ship_date = get_post_meta( $order->post_id, '_date_shipped', true );
+						if($ship_date)
+						{
+							if(is_numeric($ship_date))
+							{
+								$ship_date = date('Y-m-d H:i:s', $ship_date);
+							}
+
+							$order->ship_date = $ship_date;
+						}
+
+						$carrier = get_post_meta( $order->post_id, '_tracking_provider', true);
 						if($carrier)
 						{
-							$order->carrier = $carrier;
-						}
-					}
+							if($carrier === 'custom')
+							{
+								$carrier = get_post_meta( $order->post_id, '_custom_tracking_provider', true);
+							}
 
-					$tracking_number = get_post_meta( $order->post_id, '_tracking_number', true);
-					if($tracking_number)
-					{
-						$order->track_number = $tracking_number;
+							if($carrier)
+							{
+								$order->carrier = $carrier;
+							}
+						}
+
+						$tracking_number = get_post_meta( $order->post_id, '_tracking_number', true);
+						if($tracking_number)
+						{
+							$order->track_number = $tracking_number;
+						}
 					}
 
 					unset($order->post_id);
