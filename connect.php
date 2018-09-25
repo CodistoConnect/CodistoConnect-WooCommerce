@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Codisto LINQ by Codisto
- * @version 1.3.9
+ * @version 1.3.10
  */
 /*
 Plugin Name: Codisto LINQ by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
 Author: Codisto
-Version: 1.3.9
+Version: 1.3.10
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -27,7 +27,7 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 include_once( ABSPATH . 'wp-admin/includes/class-wp-screen.php' );
 include_once( ABSPATH . 'wp-admin/includes/screen.php' );
 
-define('CODISTOCONNECT_VERSION', '1.3.9');
+define('CODISTOCONNECT_VERSION', '1.3.10');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 if( ! class_exists('CodistoConnect') ) :
@@ -50,8 +50,7 @@ final class CodistoConnect {
 	{
 		if(isset($_GET['page']) &&
 			substr($_GET['page'], 0, 7) === 'codisto' &&
-			$_GET['page'] !== 'codisto-templates')
-		{
+			$_GET['page'] !== 'codisto-templates') {
 			$headers = array(
 				'Cache-Control' => 'private, max-age=0',
 				'Expires' => gmdate( "D, d M Y H:i:s", time() - 300 ) . " GMT"
@@ -64,8 +63,7 @@ final class CodistoConnect {
 	public function check_hash()
 	{
 		if(!isset($_SERVER['HTTP_X_CODISTONONCE']) ||
-			!isset($_SERVER['HTTP_X_CODISTOKEY']))
-		{
+			!isset($_SERVER['HTTP_X_CODISTOKEY'])) {
 			$this->sendHttpHeaders('400 Security Error', array(
 				'Content-Type' => 'application/json',
 				'Cache-Control' => 'no-cache, no-store',
@@ -80,8 +78,7 @@ final class CodistoConnect {
 		$r = get_option('codisto_key') . $_SERVER['HTTP_X_CODISTONONCE'];
 		$base = hash('sha256', $r, true);
 		$checkHash = base64_encode($base);
-		if(!hash_equals($_SERVER['HTTP_X_CODISTOKEY'], $checkHash))
-		{
+		if(!hash_equals($_SERVER['HTTP_X_CODISTOKEY'], $checkHash)) {
 			$this->sendHttpHeaders('400 Security Error', array(
 				'Content-Type' => 'application/json',
 				'Cache-Control' => 'no-cache, no-store',
@@ -104,8 +101,7 @@ final class CodistoConnect {
 	private function sendHttpHeaders($status, $headers)
 	{
 		if(defined( 'ADVANCEDCACHEPROBLEM' ) &&
-			false == strpos($_SERVER['REQUEST_URI'], 'wp-admin'))
-		{
+			false == strpos($_SERVER['REQUEST_URI'], 'wp-admin')) {
 			$_SERVER['REQUEST_URI'] = '/wp-admin'.$_SERVER['REQUEST_URI'];
 		}
 
@@ -118,32 +114,22 @@ final class CodistoConnect {
 
 	private function json_encode($arg)
 	{
-		if(function_exists('wp_json_encode'))
-		{
+		if(function_exists('wp_json_encode')) {
 			return wp_json_encode($arg);
-		}
-		else if(function_exists('json_encode'))
-		{
+		} else if(function_exists('json_encode')) {
 			return json_encode($arg);
-		}
-		else
-		{
+		} else {
 			throw new Exception('PHP missing json library - please upgrade php or wordpress');
 		}
 	}
 
 	private function get_product($id)
 	{
-		if(function_exists('wc_get_product'))
-		{
+		if(function_exists('wc_get_product')) {
 			return wc_get_product($id);
-		}
-		else if(function_exists('get_product'))
-		{
+		} else if(function_exists('get_product')) {
 			return get_product($id);
-		}
-		else
-		{
+		} else {
 			throw new Exception('WooCommerce wc_get_product function is missing - please reinstall or activate WooCommerce');
 		}
 	}
@@ -198,13 +184,11 @@ final class CodistoConnect {
 		{
 			@ob_end_clean();
 		}
-		if(ob_get_level() > 0)
-		{
+		if(ob_get_level() > 0) {
 			@ob_clean();
 		}
 
-		if( !in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) )))
-		{
+		if( !in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ))) {
 			$this->sendHttpHeaders('500 Config Error', array(
 				'Content-Type' => 'application/json',
 				'Cache-Control' => 'no-cache, no-store',
@@ -217,13 +201,10 @@ final class CodistoConnect {
 		}
 
 		$type = $wp->query_vars['codisto-sync-route'];
-		if(strtolower($_SERVER['REQUEST_METHOD']) == 'get')
-		{
+		if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
 			if($type == 'test' ||
-				($type == 'sync' && preg_match('/\/sync\/testHash\?/', $_SERVER['REQUEST_URI'])))
-			{
-				if(!$this->check_hash())
-				{
+				($type == 'sync' && preg_match('/\/sync\/testHash\?/', $_SERVER['REQUEST_URI']))) {
+				if(!$this->check_hash()) {
 					exit();
 				}
 
@@ -235,18 +216,14 @@ final class CodistoConnect {
 				));
 
 				echo $this->json_encode(array( 'ack' => 'ok' ));
-			}
-			else if($type === 'settings')
-			{
-				if(!$this->check_hash())
-				{
+			} else if($type === 'settings') {
+				if(!$this->check_hash()) {
 					exit();
 				}
 
 				$logo_url = get_header_image();
 
-				if(function_exists('site_logo'))
-				{
+				if(function_exists('site_logo')) {
 					$logo = site_logo()->logo;
 					$logo_id = get_theme_mod( 'custom_logo' );
 					$logo_id = $logo_id ? $logo_id : $logo['id'];
@@ -290,30 +267,23 @@ final class CodistoConnect {
 
 				echo $this->json_encode($response);
 				exit();
-			}
-			else if($type === 'tax')
-			{
-				if(!$this->check_hash())
-				{
+
+			} else if($type === 'tax') {
+
+				if(!$this->check_hash()) {
 					exit();
 				}
 
 				$tax_enabled = true;
-				if(function_exists( 'wc_tax_enabled' ))
-				{
+				if(function_exists( 'wc_tax_enabled' )) {
 					$tax_enabled = wc_tax_enabled();
-				}
-				else
-				{
+				} else {
 					$tax_enabled = get_option( 'woocommerce_calc_taxes' ) === 'yes';
 				}
 
-				if($tax_enabled)
-				{
+				if($tax_enabled) {
 					$rates = $wpdb->get_results("SELECT tax_rate_country AS country, tax_rate_state AS state, tax_rate AS rate, tax_rate_name AS name, tax_rate_class AS class, tax_rate_order AS sequence, tax_rate_priority AS priority FROM `{$wpdb->prefix}woocommerce_tax_rates` ORDER BY tax_rate_order");
-				}
-				else
-				{
+				} else {
 					$rates = array();
 				}
 
@@ -328,11 +298,10 @@ final class CodistoConnect {
 
 				echo $this->json_encode($response);
 				exit();
-			}
-			else if($type === 'products')
-			{
-				if(!$this->check_hash())
-				{
+
+			} else if($type === 'products') {
+
+				if(!$this->check_hash()) {
 					exit();
 				}
 
@@ -341,15 +310,14 @@ final class CodistoConnect {
 
 				$product_ids = isset($_GET['product_ids']) ? json_decode( wp_unslash( $_GET['product_ids'] ) ) : null;
 
-				if(!is_null($product_ids))
-				{
-					if(!is_array($product_ids))
+				if(!is_null($product_ids)) {
+					if(!is_array($product_ids)) {
 						$product_ids = array($product_ids);
+					}
 
 					$product_ids = array_filter($product_ids, create_function('$v', 'return is_numeric($v);'));
 
-					if(!isset($_GET['count']))
-					{
+					if(!isset($_GET['count'])) {
 						$count = count($product_ids);
 					}
 				}
@@ -366,8 +334,7 @@ final class CodistoConnect {
 				));
 
 				if(!is_array($product_ids) &&
-						$page === 0)
-				{
+					$page === 0) {
 					$total_count = $wpdb->get_var("SELECT COUNT(*) FROM `{$wpdb->prefix}posts` WHERE post_type = 'product' AND post_status IN ('publish', 'future', 'pending', 'private')");
 				}
 
@@ -388,19 +355,15 @@ final class CodistoConnect {
 					$product->tax_class = $wc_product->get_tax_class();
 					$product->stock_control = $wc_product->managing_stock();
 					$product->stock_level = $wc_product->get_stock_quantity();
-					if( method_exists( $wc_product, 'get_type' ) )
-					{
+					if( method_exists( $wc_product, 'get_type' ) ) {
 						$product->type = $wc_product->get_type();
-					}
-					else
-					{
+					} else {
 						$product->type = $wc_product->product_type;
 					}
 					$product->description = apply_filters('the_content', $wc_product->post->post_content);
 					$product->short_description = apply_filters('the_content', $wc_product->post->post_excerpt);
 
-					if( method_exists( $wc_product, 'get_width' ) )
-					{
+					if( method_exists( $wc_product, 'get_width' ) ) {
 						$product->width = $wc_product->get_width();
 						if(!is_numeric($product->width))
 							unset($product->width);
@@ -410,27 +373,24 @@ final class CodistoConnect {
 						$product->length = $wc_product->get_length();
 						if(!is_numeric($product->length))
 							unset($product->length);
-					}
-					else
-					{
+					} else {
 						$product->length = $wc_product->length;
 						$product->width = $wc_product->width;
 						$product->height = $wc_product->height;
 					}
 
 					$product->weight = $wc_product->get_weight();
-					if(!is_numeric($product->weight))
+					if(!is_numeric($product->weight)) {
 						unset($product->weight);
+					}
 
-					if($product->is_taxable && 'yes' === get_option( 'woocommerce_prices_include_tax' ))
-					{
+					if($product->is_taxable && 'yes' === get_option( 'woocommerce_prices_include_tax' )) {
 						$tax_rates = WC_Tax::get_shop_base_rate( $product->tax_class );
 						$taxes = WC_Tax::calc_tax( $product->listprice , $tax_rates, true );
 						$product->listprice = $product->listprice - array_sum( $taxes );
 					}
 
-					if($product->type == 'variable')
-					{
+					if($product->type == 'variable') {
 						$product->skus = array();
 
 						foreach($wc_product->get_children() as $child_id)
@@ -577,9 +537,7 @@ final class CodistoConnect {
 
 						$product->options = $attrs;
 
-					}
-					else if($product->type == 'grouped')
-					{
+					} else if($product->type == 'grouped') {
 						$product->skus = array();
 
 						foreach($wc_product->get_children() as $child_id)
@@ -600,8 +558,7 @@ final class CodistoConnect {
 					$product->categories = array();
 					$product_categories = get_the_terms($product->id, 'product_cat');
 
-					if(is_array($product_categories))
-					{
+					if(is_array($product_categories)) {
 						$sequence = 0;
 						foreach($product_categories as $category)
 						{
@@ -619,8 +576,7 @@ final class CodistoConnect {
 					$primaryimage_path = wp_get_attachment_image_src($wc_product->get_image_id(), 'full');
 					$primaryimage_path = $primaryimage_path[0];
 
-					if($primaryimage_path)
-					{
+					if($primaryimage_path) {
 						$product->images[] = array( 'source' => $primaryimage_path, 'sequence' => 0 );
 
 						$imagesUsed[$primaryimage_path] = true;
@@ -647,20 +603,15 @@ final class CodistoConnect {
 
 					foreach($wc_product->get_attributes() as $attribute)
 					{
-						if(!$attribute['is_variation'])
-						{
-							if(!array_key_exists($attribute['name'], $attributesUsed))
-							{
+						if(!$attribute['is_variation']) {
+							if(!array_key_exists($attribute['name'], $attributesUsed)) {
 								$attributesUsed[$attribute['name']] = true;
 
 								$attributeName = wc_attribute_label($attribute['name']);
 
-								if(!$attribute['is_taxonomy'])
-								{
+								if(!$attribute['is_taxonomy']) {
 									$product->attributes[] = array( 'name' => $attributeName, 'value' => $attribute['value'] );
-								}
-								else
-								{
+								} else {
 									$attributeValue = implode( ', ', wc_get_product_terms( $product->id, $attribute['name'], array( 'fields' => 'names' ) ) );
 
 									$product->attributes[] = array( 'name' => $attributeName, 'value' => $attributeValue );
@@ -672,10 +623,9 @@ final class CodistoConnect {
 					foreach(get_post_custom_keys($product->id) as $attribute)
 					{
 						if(!(substr($attribute, 0, 1) === '_' ||
-							substr($attribute, 0, 3) === 'pa_'))
-						{
-							if(!array_key_exists($attribute, $attributesUsed))
-							{
+							substr($attribute, 0, 3) === 'pa_')) {
+
+							if(!array_key_exists($attribute, $attributesUsed)) {
 								$attributesUsed[$attribute] = true;
 
 								$value = get_post_meta($product->id, $attribute, false);
@@ -694,8 +644,8 @@ final class CodistoConnect {
 
 					// acf
 
-					if($acf_installed)
-					{
+					if($acf_installed) {
+
 						if( function_exists( 'get_field_objects' ) )
 						{
 							$fields = get_field_objects( $product->id );
@@ -794,9 +744,9 @@ final class CodistoConnect {
 
 				echo $this->json_encode($response);
 				exit();
-			}
-			else if($type === 'categories')
-			{
+
+			} else if($type === 'categories') {
+
 				if(!$this->check_hash())
 				{
 					exit();
@@ -826,11 +776,10 @@ final class CodistoConnect {
 
 				echo $this->json_encode($response);
 				exit();
-			}
-			else if($type === 'orders')
-			{
-				if(!$this->check_hash())
-				{
+
+			} else if($type === 'orders') {
+
+				if(!$this->check_hash()) {
 					exit();
 				}
 
@@ -843,8 +792,7 @@ final class CodistoConnect {
 					$count
 				));
 
-				if($page == 0)
-				{
+				if($page == 0) {
 					$total_count = $wpdb->get_var("SELECT COUNT(*) FROM `{$wpdb->prefix}posts` AS P WHERE post_type = 'shop_order' AND ID IN (SELECT post_id FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_orderid')");
 				}
 
@@ -855,8 +803,7 @@ final class CodistoConnect {
 					$tracking_items = get_post_meta( $order->post_id, '_wc_shipment_tracking_items', true );
 					$tracking_item = $tracking_items[0];
 
-					if($tracking_items && class_exists('WC_Shipment_Tracking_Actions'))
-					{
+					if($tracking_items && class_exists('WC_Shipment_Tracking_Actions')) {
 						$shipmenttracking = WC_Shipment_Tracking_Actions::get_instance();
 						$formatted = $shipmenttracking->get_formatted_tracking_item( $order->post_id, $tracking_item );
 
@@ -936,21 +883,21 @@ final class CodistoConnect {
 
 				echo $this->json_encode($response);
 				exit();
-			}
-			else if($type == 'sync')
-			{
-				if($_SERVER['HTTP_X_ACTION'] === 'TEMPLATE')
-				{
-					if(!$this->check_hash())
-					{
+
+			} else if($type == 'sync') {
+
+				if($_SERVER['HTTP_X_ACTION'] === 'TEMPLATE') {
+
+					if(!$this->check_hash()) {
 						exit();
 					}
 
 					$ebayDesignDir = WP_CONTENT_DIR . '/ebay/';
 
 					$merchantid = (int)$_GET['merchantid'];
-					if(!$merchantid)
+					if(!$merchantid) {
 						$merchantid = 0;
+					}
 
 					$templatedb = get_temp_dir() . '/ebay-template-'.$merchantid.'.db';
 
@@ -970,8 +917,7 @@ final class CodistoConnect {
 					$db->exec('CREATE TABLE IF NOT EXISTS File(Name text NOT NULL PRIMARY KEY, Content blob NOT NULL, LastModified datetime NOT NULL, Changed bit NOT NULL DEFAULT -1)');
 					$db->exec('COMMIT TRANSACTION');
 
-					if(isset($_GET['markreceived']))
-					{
+					if(isset($_GET['markreceived'])) {
 						$update = $db->prepare('UPDATE File SET LastModified = ? WHERE Name = ?');
 
 						$files = $db->query('SELECT Name FROM File WHERE Changed != 0');
@@ -1003,9 +949,7 @@ final class CodistoConnect {
 
 						echo $this->json_encode(array( 'ack' => 'ok' ));
 						exit();
-					}
-					else
-					{
+					} else {
 						$insert = $db->prepare('INSERT OR IGNORE INTO File(Name, Content, LastModified) VALUES (?, ?, ?)');
 						$update = $db->prepare('UPDATE File SET Content = ?, Changed = -1 WHERE Name = ? AND LastModified != ?');
 
@@ -1072,16 +1016,13 @@ final class CodistoConnect {
 						$fileCount = $fileCountRow['fileCount'];
 						$db = null;
 
-						if($fileCount == 0)
-						{
+						if($fileCount == 0) {
 							$this->sendHttpHeaders('204 No Content', array(
 								'Cache-Control' => 'no-cache, must-revalidate',
 								'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
 								'Pragma' => 'no-cache'
 							));
-						}
-						else
-						{
+						} else {
 							$headers = array(
 								'Cache-Control' => 'no-cache, must-revalidate',
 								'Pragma' => 'no-cache',
@@ -1112,10 +1053,9 @@ final class CodistoConnect {
 		}
 		else
 		{
-			if($type === 'createorder')
-			{
-				if(!$this->check_hash())
-				{
+			if($type === 'createorder') {
+
+				if(!$this->check_hash()) {
 					exit();
 				}
 
@@ -1146,8 +1086,7 @@ final class CodistoConnect {
 
 					$billing_states = WC()->countries->get_states( $billing_country_code );
 
-					if($billing_states)
-					{
+					if($billing_states) {
 						$billing_division_match = preg_replace('/\s+/', '', strtolower($billing_division));
 
 						foreach($billing_states as $state_code => $state_name)
@@ -1172,17 +1111,13 @@ final class CodistoConnect {
 					$shipping_country_code = (string)$shipping_address->countrycode;
 					$shipping_division = (string)$shipping_address->division;
 
-					if($billing_country_code === $shipping_country_code)
-					{
+					if($billing_country_code === $shipping_country_code) {
 						$shipping_states = $billing_states;
-					}
-					else
-					{
+					} else {
 						$shipping_states = WC()->countries->get_states( $shipping_country_code );
 					}
 
-					if($shipping_states)
-					{
+					if($shipping_states) {
 						$shipping_division_match = preg_replace('/\s+/', '', strtolower($shipping_division));
 
 						foreach($shipping_states as $state_code => $state_name)
@@ -1221,25 +1156,24 @@ final class CodistoConnect {
 							);
 
 					$email = (string)$billing_address->email;
-					if(!$email)
+					if(!$email) {
 						$email = (string)$shipping_address->email;
+					}
 
-					if($email)
-					{
-						$user = get_user_by('email', $email);
-						if(!$user)
-						{
+					if($email) {
+
+						$userid = $wpdb->get_var($wpdb->prepare("SELECT ID FROM `{$wpdb->prefix}users` WHERE user_email = %s", $email));
+						if(!$userid) {
 							$username = (string)$ordercontent->ebayusername;
-							if(!$username)
-							{
+							if(!$username) {
 								$username = current( explode( '@', $email ) );
 							}
 
-							if($username)
+							if($username) {
 								$username = sanitize_user($username);
+							}
 
-							if(username_exists($username))
-							{
+							if(username_exists($username)) {
 								$counter = 1;
 								$newusername = $username.$counter;
 
@@ -1269,14 +1203,10 @@ final class CodistoConnect {
 							}
 
 							do_action( 'woocommerce_created_customer', $customer_id, $customer_data, true );
+						} else {
+							$customer_id = $userid;
 						}
-						else
-						{
-							$customer_id = $user->ID;
-						}
-					}
-					else
-					{
+					} else {
 						$customer_id = 0;
 					}
 
@@ -1294,8 +1224,8 @@ final class CodistoConnect {
 					$total = (float)$ordercontent->defaultcurrencytotal;
 					$tax = 0;
 
-					if(!$order_id)
-					{
+					if(!$order_id) {
+
 						$new_order_data_callback = array( $this, 'order_set_date' );
 
 						add_filter( 'woocommerce_new_order_data', $new_order_data_callback, 1, 1 );
@@ -1316,25 +1246,24 @@ final class CodistoConnect {
 
 						foreach($ordercontent->orderlines->orderline as $orderline)
 						{
-							if($orderline->productcode[0] != 'FREIGHT')
-							{
+							if($orderline->productcode[0] != 'FREIGHT') {
 								$productcode = (string)$orderline->productcode;
-								if($productcode == null)
+								if($productcode == null) {
 									$productcode = '';
+								}
 								$productname = (string)$orderline->productname;
-								if($productname == null)
+								if($productname == null) {
 									$productname = '';
+								}
 
 								$product_id = $orderline->externalreference[0];
-								if($product_id != null)
-								{
+								if($product_id != null) {
 									$product_id = intval($product_id);
 								}
 
 								$variation_id = 0;
 
-								if( get_post_type( $product_id ) === 'product_variation' )
-								{
+								if( get_post_type( $product_id ) === 'product_variation' ) {
 									$variation_id = $product_id;
 									$product_id = wp_get_post_parent_id( $variation_id );
 
@@ -1356,14 +1285,11 @@ final class CodistoConnect {
 
 								wc_add_order_item_meta( $item_id, '_qty', $qty );
 
-								if(!is_null($product_id) && $product_id !== 0)
-								{
+								if(!is_null($product_id) && $product_id !== 0) {
 									wc_add_order_item_meta( $item_id, '_product_id', $product_id );
 									wc_add_order_item_meta( $item_id, '_variation_id', $variation_id );
 									wc_add_order_item_meta( $item_id, '_tax_class', '' );
-								}
-								else
-								{
+								} else {
 									wc_add_order_item_meta( $item_id, '_product_id', 0 );
 									wc_add_order_item_meta( $item_id, '_variation_id', 0);
 									wc_add_order_item_meta( $item_id, '_tax_class', '' );
@@ -1379,9 +1305,7 @@ final class CodistoConnect {
 								wc_add_order_item_meta( $item_id, '_line_tax_data',		array( 'total' => array( 1 => $line_total_tax ), 'subtotal' => array( 1 => $line_total_tax ) ) );
 
 								$tax += $line_total_tax;
-							}
-							else
-							{
+							} else {
 								$item_id = wc_add_order_item( $order_id, array(
 											'order_item_name' 		=> (string)$orderline->productname,
 											'order_item_type' 		=> 'shipping'
@@ -1394,8 +1318,7 @@ final class CodistoConnect {
 							}
 						}
 
-						if($ordercontent->paymentstatus == 'complete')
-						{
+						if($ordercontent->paymentstatus == 'complete') {
 							$transaction_id = (string)$ordercontent->orderpayments[0]->orderpayment->transactionid;
 
 							if($transaction_id)
@@ -1423,22 +1346,17 @@ final class CodistoConnect {
 							$order->add_order_note( $merchant_note, 0 );
 						}
 
-					}
-					else
-					{
+					} else {
 						$order = wc_get_order( $order_id );
 
 						foreach($ordercontent->orderlines->orderline as $orderline)
 						{
-							if($orderline->productcode[0] != 'FREIGHT')
-							{
+							if($orderline->productcode[0] != 'FREIGHT') {
 								$line_total = wc_format_decimal( (float)$orderline->defaultcurrencylinetotal );
 								$line_total_tax = wc_format_decimal( (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal );
 
 								$tax += $line_total_tax;
-							}
-							else
-							{
+							} else {
 								$order->remove_order_items( 'shipping' );
 
 								$item_id = wc_add_order_item( $order_id, array(
@@ -1453,8 +1371,7 @@ final class CodistoConnect {
 							}
 						}
 
-						if($ordercontent->paymentstatus == 'complete')
-						{
+						if($ordercontent->paymentstatus == 'complete') {
 							$transaction_id = (string)$ordercontent->orderpayments[0]->orderpayment->transactionid;
 
 							if($transaction_id)
@@ -1494,8 +1411,7 @@ final class CodistoConnect {
 					$order->set_total( $tax, 'tax' );
 					$order->set_total( $total, 'total');
 
-					if($ordercontent->orderstate == 'cancelled')
-					{
+					if($ordercontent->orderstate == 'cancelled') {
 						if(!$order->has_status('cancelled'))
 						{
 							// update_status
@@ -1512,11 +1428,9 @@ final class CodistoConnect {
 
 							wc_delete_shop_order_transients( $order_id );
 						}
-					}
-					else if($ordercontent->orderstate == 'inprogress' || $ordercontent->orderstate == 'processing')
-					{
-						if($ordercontent->paymentstatus == 'complete')
-						{
+					} else if($ordercontent->orderstate == 'inprogress' || $ordercontent->orderstate == 'processing') {
+
+						if($ordercontent->paymentstatus == 'complete') {
 							if(!$order->has_status('processing'))
 							{
 								// update_status
@@ -1529,11 +1443,8 @@ final class CodistoConnect {
 								);
 								wp_update_post( $update_post_data );
 							}
-						}
-						else
-						{
-							if(!$order->has_status('pending'))
-							{
+						} else {
+							if(!$order->has_status('pending')) {
 								// update_status
 								$order->post_status = 'wc-pending';
 								$update_post_data  = array(
@@ -1545,9 +1456,9 @@ final class CodistoConnect {
 								wp_update_post( $update_post_data );
 							}
 						}
-					}
-					else if($ordercontent->orderstate == 'complete')
-					{
+
+					} else if($ordercontent->orderstate == 'complete') {
+
 						if(!$order->has_status('completed'))
 						{
 							// update_status
@@ -1568,6 +1479,7 @@ final class CodistoConnect {
 
 							wc_delete_shop_order_transients( $order_id );
 						}
+
 					}
 
 					$wpdb->query('COMMIT');
@@ -1598,13 +1510,11 @@ final class CodistoConnect {
 					echo $this->json_encode($response);
 					exit();
 				}
-			}
-			else if($type == 'sync')
-			{
-				if($_SERVER['HTTP_X_ACTION'] === 'TEMPLATE')
-				{
-					if(!$this->check_hash())
-					{
+
+			} else if($type == 'sync') {
+
+				if($_SERVER['HTTP_X_ACTION'] === 'TEMPLATE') {
+					if(!$this->check_hash()) {
 						exit();
 					}
 
@@ -1635,14 +1545,11 @@ final class CodistoConnect {
 					{
 						$fileName = $ebayDesignDir.$name;
 
-						if(strpos($name, '..') === false)
-						{
-							if(!file_exists($fileName))
-							{
+						if(strpos($name, '..') === false) {
+							if(!file_exists($fileName)) {
 								$dir = dirname($fileName);
 
-								if(!is_dir($dir))
-								{
+								if(!is_dir($dir)) {
 									mkdir($dir.'/', 0755, true);
 								}
 
@@ -1663,30 +1570,30 @@ final class CodistoConnect {
 					echo $this->json_encode( array( 'ack' => 'ok' ) );
 					exit();
 				}
-			}
-			else if($type == 'index/calc')
-			{
+
+			} else if($type == 'index/calc') {
+
 				$product_ids = array();
 				$quantities = array();
 
 				for($i = 0; ; $i++)
 				{
-					if(!isset($_POST['PRODUCTCODE('.$i.')']))
+					if(!isset($_POST['PRODUCTCODE('.$i.')'])) {
 						break;
+					}
 
 					$productid = (int)$_POST['PRODUCTID('.$i.')'];
-					if(!$productid)
-					{
+					if(!$productid) {
 						$productcode = $_POST['PRODUCTCODE('.$i.')'];
 						$productid = wc_get_product_id_by_sku( $productcode );
 					}
 
 					$productqty = $_POST['PRODUCTQUANTITY('.$i.')'];
-					if(!$productqty && $productqty != 0)
+					if(!$productqty && $productqty != 0) {
 						$productqty = 1;
+					}
 
 					WC()->cart->add_to_cart( $productid, $productqty );
-
 				}
 
 				WC()->customer->set_location($_POST['COUNTRYCODE'], $_POST['DIVISION'], $_POST['POSTALCODE'], $_POST['PLACE']);
@@ -1700,27 +1607,22 @@ final class CodistoConnect {
 				$methods = WC()->shipping()->get_shipping_methods();
 				foreach($methods as $method)
 				{
-					if(file_exists(plugin_dir_path( __FILE__ ).'shipping/'.$method->id))
-					{
+					if(file_exists(plugin_dir_path( __FILE__ ).'shipping/'.$method->id)) {
 						include( plugin_dir_path( __FILE__ ).'shipping/'.$method->id );
-					}
-					else
-					{
+					} else {
 						foreach($method->rates as $method => $rate)
 						{
 							$method_name = $rate->get_label();
-							if(!$method_name)
+							if(!$method_name) {
 								$method_name = 'Shipping';
+							}
 
 							$method_cost = $rate->cost;
-							if(is_numeric($method_cost))
-							{
-								if(isset($rate->taxes) && is_array($rate->taxes))
-								{
+							if(is_numeric($method_cost)) {
+								if(isset($rate->taxes) && is_array($rate->taxes)) {
 									foreach($rate->taxes as $tax)
 									{
-										if(is_numeric($tax))
-										{
+										if(is_numeric($tax)) {
 											$method_cost += $tax;
 										}
 									}
@@ -1749,8 +1651,7 @@ final class CodistoConnect {
 	public function order_is_editable($editable, $order)
 	{
 		$codisto_order_id = get_post_meta( $order->id, '_codisto_orderid', true);
-		if(is_numeric($codisto_order_id) && $codisto_order_id !== 0)
-		{
+		if(is_numeric($codisto_order_id) && $codisto_order_id !== 0) {
 			return false;
 		}
 
@@ -1760,8 +1661,7 @@ final class CodistoConnect {
 	public function order_buttons($order)
 	{
 		$codisto_order_id = get_post_meta( $order->id, '_codisto_orderid', true);
-		if(is_numeric($codisto_order_id) && $codisto_order_id !== 0)
-		{
+		if(is_numeric($codisto_order_id) && $codisto_order_id !== 0) {
 			$ebay_user = get_post_meta($order->id, '_codisto_ebayuser', true);
 
 			?>
@@ -1787,21 +1687,18 @@ final class CodistoConnect {
 		{
 			@ob_end_clean();
 		}
-		if(ob_get_level() > 0)
-		{
+		if(ob_get_level() > 0) {
 			@ob_clean();
 		}
 
-		if(isset($_GET['productid']))
-		{
+		if(isset($_GET['productid'])) {
 			wp_redirect(admin_url('post.php?post='.urlencode( wp_unslash( $_GET['productid'] ) ).'&action=edit#codisto_product_data'));
 			exit;
 		}
 
 		$HostKey = get_option('codisto_key');
 
-		if (!function_exists('getallheaders'))
-		{
+		if (!function_exists('getallheaders')) {
 			 function getallheaders()
 			 {
 				$headers = array();
@@ -1827,16 +1724,12 @@ final class CodistoConnect {
 		$querystring = preg_replace('/q=[^&]*&/', '', $_SERVER['QUERY_STRING']);
 		$path = $wp->query_vars['codisto-proxy-route'] . (preg_match('/\/(?:\\?|$)/', $_SERVER['REQUEST_URI']) ? '/' : '');
 
-
 		$storeId = '0';
 		$merchantid = get_option('codisto_merchantid');
 
-		if(isset($_GET['merchantid']))
-		{
+		if(isset($_GET['merchantid'])) {
 			$merchantid = (int)$_GET['merchantid'];
-		}
-		else
-		{
+		} else {
 			$storematch = array();
 
 			if(preg_match('/^ebaytab\/(\d+)\/(\d+)(?:\/|$)/', $path, $storematch))
@@ -1855,8 +1748,7 @@ final class CodistoConnect {
 			}
 		}
 
-		if(!$merchantid)
-		{
+		if(!$merchantid) {
 			$this->sendHttpHeaders('404 Not Found', array(
 				'Content-Type' => 'text/html',
 				'Cache-Control' => 'no-cache, no-store',
@@ -1893,8 +1785,9 @@ final class CodistoConnect {
 		}
 		foreach($incomingHeaders as $name => $value)
 		{
-			if(!in_array(trim(strtolower($name)), $headerfilter))
+			if(!in_array(trim(strtolower($name)), $headerfilter)) {
 				$requestHeaders[$name] = $value;
+			}
 		}
 
 		$httpOptions = array(
@@ -1908,13 +1801,11 @@ final class CodistoConnect {
 
 		$upload_dir = wp_upload_dir();
 		$certPath = $upload_dir['basedir'].'/codisto.crt';
-		if(file_exists($certPath))
-		{
+		if(file_exists($certPath)) {
 			$httpOptions['sslcertificates'] = $certPath;
 		}
 
-		if(strtolower($httpOptions['method']) == 'post')
-		{
+		if(strtolower($httpOptions['method']) == 'post') {
 			$httpOptions['body'] = file_get_contents("php://input");
 		}
 
@@ -1922,10 +1813,8 @@ final class CodistoConnect {
 		{
 			$response = wp_remote_request($remoteUrl, $httpOptions);
 
-			if(is_wp_error($response))
-			{
-				if($retry >= 3)
-				{
+			if(is_wp_error($response)) {
+				if($retry >= 3) {
 					$this->sendHttpHeaders('500 Server Error', array(
 						'Content-Type' => 'text/html',
 						'Cache-Control' => 'no-cache, no-store',
@@ -1936,12 +1825,10 @@ final class CodistoConnect {
 					exit();
 				}
 
-				if($response->get_error_code() == 'http_request_failed')
-				{
+				if($response->get_error_code() == 'http_request_failed') {
 					$certResponse = wp_remote_get('http://ui.codisto.com/codisto.crt');
 
-					if(!is_wp_error($certResponse))
-					{
+					if(!is_wp_error($certResponse)) {
 						@file_put_contents($certPath, $certResponse['body']);
 						$httpOptions['sslcertificates'] = $certPath;
 						continue;
@@ -1956,8 +1843,7 @@ final class CodistoConnect {
 		}
 
 		if(defined( 'ADVANCEDCACHEPROBLEM' ) &&
-			false == strpos($_SERVER['REQUEST_URI'], 'wp-admin'))
-		{
+			false == strpos($_SERVER['REQUEST_URI'], 'wp-admin')) {
 			$_SERVER['REQUEST_URI'] = '/wp-admin'.$_SERVER['REQUEST_URI'];
 		}
 
@@ -1965,8 +1851,7 @@ final class CodistoConnect {
 
 		$filterHeaders = array('server', 'content-length', 'transfer-encoding', 'date', 'connection', 'x-storeviewmap', 'content-encoding');
 
-		if(function_exists( 'header_remove' ))
-		{
+		if(function_exists( 'header_remove' )) {
 			@header_remove( 'Last-Modified' );
 			@header_remove( 'Pragma' );
 			@header_remove( 'Cache-Control' );
@@ -1976,19 +1861,15 @@ final class CodistoConnect {
 
 		foreach(wp_remote_retrieve_headers($response) as $header => $value)
 		{
-			if(!in_array(strtolower($header), $filterHeaders, true))
-			{
-				if(is_array($value))
-				{
+			if(!in_array(strtolower($header), $filterHeaders, true)) {
+				if(is_array($value)) {
 					header($header.': '.$value[0], true);
 
 					for($i = 1; $i < count($value); $i++)
 					{
 						header($header.': '.$value[$i], false);
 					}
-				}
-				else
-				{
+				} else {
 					header($header.': '.$value, true);
 				}
 			}
@@ -2003,17 +1884,12 @@ final class CodistoConnect {
 		global $wp;
 
 		if(! empty( $wp->query_vars['codisto'] ) &&
-			in_array($wp->query_vars['codisto'], array('proxy','sync'), true))
-		{
+			in_array($wp->query_vars['codisto'], array('proxy','sync'), true)) {
 			$codistoMode = $wp->query_vars['codisto'];
 
-			if($codistoMode == 'sync')
-			{
+			if($codistoMode == 'sync') {
 				$this->sync();
-			}
-
-			else if($codistoMode == 'proxy')
-			{
+			} else if($codistoMode == 'proxy') {
 				if( current_user_can( 'manage_woocommerce' ) )
 				{
 					$this->proxy();
@@ -2039,10 +1915,9 @@ final class CodistoConnect {
 		$blogurl = preg_replace('/[\x0C\x0D]/', ' ', preg_replace('/[\x00-\x1F\x7F]/', '', get_site_url()));
 		$blogdescription = preg_replace('/[\x0C\x0D]/', ' ', preg_replace('/[\x00-\x1F\x7F]/', '', get_option('blogdescription')));
 
-		if($_SERVER['REQUEST_METHOD'] === 'POST')
-		{
-			if($_POST['method'] == 'email')
-			{
+		if($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+			if($_POST['method'] == 'email') {
 				$signupemail = wp_unslash( $_POST['email'] );
 
 				$httpOptions = array(
@@ -2107,9 +1982,8 @@ final class CodistoConnect {
 				wp_cache_flush();
 
 				wp_redirect('admin.php?page=codisto');
-			}
-			else
-			{
+
+			} else {
 				$blogdescription = preg_replace('/[\x0C\x0D]/', ' ', preg_replace('/[\x00-\x1F\x7F]/', '', get_option('blogdescription')));
 
 				wp_redirect('https://ui.codisto.com/register?finalurl='.
@@ -2122,16 +1996,11 @@ final class CodistoConnect {
 						'&resellerkey='.urlencode($this->reseller_key()).
 						'&codistoversion='.urlencode(CODISTOCONNECT_VERSION));
 			}
-		}
-		else
-		{
+		} else {
 			$regtoken = '';
-			if(isset($_GET['regtoken']))
-			{
+			if(isset($_GET['regtoken'])) {
 				$regtoken = wp_unslash( $_GET['regtoken'] );
-			}
-			else
-			{
+			} else {
 				$query = array();
 				parse_str( $_SERVER['QUERY_STRING'], $query );
 
@@ -2199,8 +2068,9 @@ final class CodistoConnect {
 
 	public function update_template()
 	{
-		if ( !current_user_can('edit_themes') )
+		if ( !current_user_can('edit_themes') ) {
 			wp_die('<p>'.__('You do not have sufficient permissions to edit templates for this site.').'</p>');
+		}
 
 		check_admin_referer( 'edit-ebay-template' );
 
@@ -2214,8 +2084,7 @@ final class CodistoConnect {
 		$updated = false;
 
 		$f = fopen( $file, 'w' );
-		if( $f !== false)
-		{
+		if( $f !== false) {
 			fwrite( $f, $content );
 			fclose( $f );
 
@@ -2230,8 +2099,8 @@ final class CodistoConnect {
 	{
 		$merchantid = get_option('codisto_merchantid');
 
-		if(!is_numeric($merchantid))
-		{
+		if(!is_numeric($merchantid)) {
+
 			$email = get_option( 'admin_email' );
 
 			$paypal_settings = get_option('woocommerce_paypal_settings');
@@ -2310,14 +2179,15 @@ final class CodistoConnect {
 
 
 			<?php
-		}
-		else
-		{
+
+		} else {
+
 			?>
 			<div id="codisto-container">
 				<iframe class="<?php echo $tabclass ?>" src="<?php echo htmlspecialchars($url)?>" frameborder="0"></iframe>
 			</div>
 			<?php
+
 		}
 	}
 
@@ -2377,8 +2247,7 @@ final class CodistoConnect {
 
 	public function admin_menu()
 	{
-		if ( current_user_can( 'manage_woocommerce' ) )
-		{
+		if ( current_user_can( 'manage_woocommerce' ) ) {
 			add_menu_page( __('Amazon & eBay'), __('Amazon & eBay'), 'edit_posts', 'codisto', array( $this, 'ebay_tab' ), 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgDQogICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiDQoJIHZpZXdCb3g9IjAgMCAyMCAyMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8cGF0aCBzdHlsZT0iZmlsbDojOTk5OTk5OyIgZD0iTTE3LDBIM0MxLjMsMCwwLDEuMywwLDN2MTRjMCwxLjYsMS4zLDMsMywzaDE0YzEuNywwLDMtMS40LDMtM1YzQzIwLDEuMywxOC43LDAsMTcsMHogTTkuMywxNC4xDQoJYzAuNCwwLjUsMC45LDAuNywxLjYsMC43YzAuNywwLDEuMy0wLjMsMS45LTAuOWwyLjcsMi43Yy0xLjIsMS4yLTIuOCwxLjktNC42LDEuOWMtMS45LDAtMy40LTAuNi00LjctMS45Yy0wLjgtMC44LTEuMy0xLjgtMS41LTMNCgljLTAuMS0wLjctMC4yLTEuOS0wLjItMy42czAuMS0yLjksMC4yLTMuNmMwLjItMS4yLDAuNy0yLjMsMS41LTNDNy41LDIuMSw5LDEuNSwxMC45LDEuNWMxLjksMCwzLjQsMC42LDQuNiwxLjlsLTIuNywyLjcNCgljLTAuNi0wLjYtMS4yLTAuOS0xLjktMC45Yy0wLjcsMC0xLjIsMC4yLTEuNiwwLjdDOC44LDYuNCw4LjYsNy44LDguNiwxMEM4LjYsMTIuMiw4LjgsMTMuNiw5LjMsMTQuMXoiLz4NCjwvc3ZnPg0K', '55.501' );
 
 			$pages = array();
@@ -2401,18 +2270,13 @@ final class CodistoConnect {
 
 	public function admin_body_class($classes)
 	{
-		if(isset($_GET['page']))
-		{
+		if(isset($_GET['page'])) {
 			$page = wp_unslash( $_GET['page'] );
 
-			if(substr( $page, 0, 7 ) === 'codisto')
-			{
-				if($page === 'codisto')
-				{
+			if(substr( $page, 0, 7 ) === 'codisto') {
+				if($page === 'codisto') {
 					return "$classes codisto";
-				}
-				else if($page === 'codisto-templates')
-				{
+				} else if($page === 'codisto-templates') {
 					return "$classes $page";
 				}
 
@@ -2430,20 +2294,17 @@ final class CodistoConnect {
 
 	public function bulk_edit_save($product)
 	{
-		if(!$this->ping)
-		{
+		if(!$this->ping) {
 			$this->ping = array();
 		}
 
-		if(!isset($this->ping['products']))
-		{
+		if(!isset($this->ping['products'])) {
 			$this->ping['products'] = array();
 		}
 
 		$pingProducts = $this->ping['products'];
 
-		if(!in_array( $product->id, $pingProducts ) )
-		{
+		if(!in_array( $product->id, $pingProducts ) ) {
 			$pingProducts[] = $product->id;
 		}
 
@@ -2452,8 +2313,7 @@ final class CodistoConnect {
 
 	public function option_save($value)
 	{
-		if(!$this->ping)
-		{
+		if(!$this->ping) {
 			$this->ping = array();
 		}
 
@@ -2462,22 +2322,18 @@ final class CodistoConnect {
 
 	public function post_save($id, $post)
 	{
-		if($post->post_type == 'product')
-		{
-			if(!$this->ping)
-			{
+		if($post->post_type == 'product') {
+			if(!$this->ping) {
 				$this->ping = array();
 			}
 
-			if(!isset($this->ping['products']))
-			{
+			if(!isset($this->ping['products'])) {
 				$this->ping['products'] = array();
 			}
 
 			$pingProducts = $this->ping['products'];
 
-			if(!in_array( $id, $pingProducts ) )
-			{
+			if(!in_array( $id, $pingProducts ) ) {
 				$pingProducts[] = $id;
 			}
 
@@ -2491,24 +2347,19 @@ final class CodistoConnect {
 
 		foreach ( $order->get_items() as $item )
 		{
-			if ( $item['product_id'] > 0 )
-			{
-				if(is_string( get_post_status( $item['product_id'] ) ) )
-				{
+			if ( $item['product_id'] > 0 ) {
+				if(is_string( get_post_status( $item['product_id'] ) ) ) {
 					$product_ids[] = $item['product_id'];
 				}
 			}
 		}
 
-		if(count($product_ids) > 0)
-		{
-			if(!$this->ping)
-			{
+		if(count($product_ids) > 0) {
+			if(!$this->ping) {
 				$this->ping = array();
 			}
 
-			if(!isset($this->ping['products']))
-			{
+			if(!isset($this->ping['products'])) {
 				$this->ping['products'] = array();
 			}
 
@@ -2516,8 +2367,7 @@ final class CodistoConnect {
 
 			foreach($product_ids as $id)
 			{
-				if(!in_array($id, $pingProducts))
-				{
+				if(!in_array($id, $pingProducts)) {
 					$pingProducts[] = $id;
 				}
 			}
@@ -2529,8 +2379,8 @@ final class CodistoConnect {
 	public function signal_edits()
 	{
 		if(is_array($this->ping) &&
-			isset($this->ping['products']))
-		{
+			isset($this->ping['products'])) {
+
 			$response = wp_remote_post('https://api.codisto.com/'.get_option('codisto_merchantid'), array(
 				  'method'		=> 'POST',
 				  'timeout'		=> 5,
@@ -2541,10 +2391,9 @@ final class CodistoConnect {
 				  'body'		=> 'action=sync&productid=['.implode(',', $this->ping['products']).']'
 				  )
 			);
-		}
 
-		else if(is_array($this->ping))
-		{
+		} else if(is_array($this->ping)) {
+
 			$response = wp_remote_post('https://api.codisto.com/'.get_option('codisto_merchantid'), array(
 				  'method'		=> 'POST',
 				  'timeout'		=> 5,
@@ -2555,6 +2404,7 @@ final class CodistoConnect {
 				  'body'		=> 'action=sync'
 				  )
 			);
+
 		}
 	}
 
