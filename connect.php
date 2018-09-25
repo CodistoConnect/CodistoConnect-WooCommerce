@@ -13,7 +13,7 @@ Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 2.0.0
-WC tested up to: 3.4.4
+WC tested up to: 3.4.5
 */
 
 error_reporting(E_ERROR | E_PARSE);
