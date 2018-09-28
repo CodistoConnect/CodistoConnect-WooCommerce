@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Codisto LINQ by Codisto
- * @version 1.3.10
+ * @version 1.3.11
  */
 /*
 Plugin Name: Codisto LINQ by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
 Author: Codisto
-Version: 1.3.10
+Version: 1.3.11
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -27,7 +27,7 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 include_once( ABSPATH . 'wp-admin/includes/class-wp-screen.php' );
 include_once( ABSPATH . 'wp-admin/includes/screen.php' );
 
-define('CODISTOCONNECT_VERSION', '1.3.10');
+define('CODISTOCONNECT_VERSION', '1.3.11');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 if( ! class_exists('CodistoConnect') ) :
@@ -1155,6 +1155,8 @@ final class CodistoConnect {
 								'shipping_phone'		=> (string)$shipping_address->phone,
 							);
 
+					$order_id = $wpdb->get_var($wpdb->prepare("SELECT ID FROM `{$wpdb->prefix}posts` AS P WHERE ID IN (SELECT post_id FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_orderid' AND meta_value = %d)", (int)$ordercontent->orderid));
+
 					$email = (string)$billing_address->email;
 					if(!$email) {
 						$email = (string)$shipping_address->email;
@@ -1163,7 +1165,7 @@ final class CodistoConnect {
 					if($email) {
 
 						$userid = $wpdb->get_var($wpdb->prepare("SELECT ID FROM `{$wpdb->prefix}users` WHERE user_email = %s", $email));
-						if(!$userid) {
+						if(!$userid && !$order_id) {
 							$username = (string)$ordercontent->ebayusername;
 							if(!$username) {
 								$username = current( explode( '@', $email ) );
@@ -1215,7 +1217,6 @@ final class CodistoConnect {
 
 					$adjustStock = @count($ordercontent->adjuststock) ? (($ordercontent->adjuststock == "false") ? false : true) : true;
 
-					$order_id = $wpdb->get_var($wpdb->prepare("SELECT ID FROM `{$wpdb->prefix}posts` AS P WHERE ID IN (SELECT post_id FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_orderid' AND meta_value = %d)", (int)$ordercontent->orderid));
 
 					$shipping = 0;
 					$shipping_tax = 0;
