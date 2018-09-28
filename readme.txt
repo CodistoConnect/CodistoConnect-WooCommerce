@@ -3,7 +3,7 @@ Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
 Tested up to: 4.9.8
-Stable tag: 1.3.10
+Stable tag: 1.3.11
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -93,6 +93,10 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 3. Order Management
 
 == Changelog ==
+
+= 1.3.11 - 28/09/2018 =
+
+* only create users/customers on new orders
 
 = 1.3.10 - 25/09/2018 =
 
