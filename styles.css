@@ -10,6 +10,21 @@
 	bottom: 0px;
 	top: 32px;
 }
+
+@media (max-width: 960px) {
+	.codisto #wpbody
+	{
+		left: 36px !important;
+	}
+}
+
+@media (max-width: 782px) {
+	.codisto #wpbody
+	{
+		left: 0px !important;
+	}
+}
+
 .codisto .folded #wpbody
 {
 	left: 36px !important;
@@ -22,7 +37,6 @@
 {
 	display: none !important;
 }
-
 
 #codisto-container
 {
@@ -110,7 +124,6 @@
 #create-account-modal FORM
 {
 	background-color: #fff;
-	padding-top: 20px;
 	padding-bottom: 20px;
 }
 
@@ -120,19 +133,34 @@
 	text-align: center;
 }
 
+#create-account-modal input[type=email],
+#create-account-modal input[type=text]
+{
+	margin-bottom: 15px;
+	border-radius:3px;
+	padding:4px;
+}
+
 #create-account-modal .next
 {
-	padding: 20px; text-align: right; width: 87%; margin-left: auto; margin-right: auto; padding-bottom: 2px;
+	padding-bottom: 2px;
 }
 
 #create-account-modal .next .button
 {
 	width: 80px;
+	font-size: 15px;
+}
+
+#create-account-modal .body
+{
+	padding: 20px;
+	background: #fff;
 }
 
 #create-account-modal .footer
 {
-	padding: 15px;
+	padding: 20px;
 	background-color: rgba(255,255,255,0.9);
 	border-top: 1px solid #e5e5e5;
 }
@@ -156,6 +184,11 @@
 #dummy-data
 {
 	position: absolute; z-index: 0; top: 0px; left: 0px; bottom: 0px; right: 0px; width:100%; height:100%
+}
+
+#create-account-modal .error-message {
+	color:#b10000;
+	display:none;
 }
 
 .codisto-templates UL.file-list LI:last-child

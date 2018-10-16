@@ -785,15 +785,16 @@ final class CodistoConnect {
 
 				$page = isset($_GET['page']) ? (int)$_GET['page'] : 0;
 				$count = isset($_GET['count']) ? (int)$_GET['count'] : 0;
+				$merchantid = isset($_GET['merchantid']) ? (int)$_GET['merchantid'] : 0;
 
-				$orders = $wpdb->get_results( $wpdb->prepare(
-					"SELECT (SELECT meta_value FROM `{$wpdb->prefix}postmeta` WHERE post_id = P.id AND meta_key = '_codisto_orderid') AS id, ID AS post_id, post_status AS status FROM `{$wpdb->prefix}posts` AS P WHERE post_type = 'shop_order' AND ID IN (SELECT post_id FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_orderid') ORDER BY ID LIMIT %d, %d",
+				$orders = $wpdb->get_results( $wpdb->prepare("SELECT ( SELECT meta_value FROM `{$wpdb->prefix}postmeta` WHERE post_id = P.id AND meta_key = '_codisto_orderid' AND ( EXISTS ( SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.id ) OR NOT EXISTS ( SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.id ) ) ) AS id, ID AS post_id, post_status AS status FROM `{$wpdb->prefix}posts` AS P WHERE post_type = 'shop_order' AND ID IN (SELECT post_id FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_orderid' AND ( EXISTS ( SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.id ) OR NOT EXISTS ( SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.id ) )) ORDER BY ID LIMIT %d, %d",
+					$merchantid,
 					$page * $count,
 					$count
 				));
 
 				if($page == 0) {
-					$total_count = $wpdb->get_var("SELECT COUNT(*) FROM `{$wpdb->prefix}posts` AS P WHERE post_type = 'shop_order' AND ID IN (SELECT post_id FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_orderid')");
+					$total_count = $wpdb->get_var("SELECT COUNT(*) FROM `{$wpdb->prefix}posts` AS P WHERE post_type = 'shop_order' AND ID IN ( SELECT post_id FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_orderid' AND ( EXISTS ( SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.id ) OR NOT EXISTS (SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.id )))", $merchantid);
 				}
 
 				$order_data = array();
@@ -914,7 +915,12 @@ final class CodistoConnect {
 					$db->exec('PRAGMA journal_mode=MEMORY');
 
 					$db->exec('BEGIN EXCLUSIVE TRANSACTION');
-					$db->exec('CREATE TABLE IF NOT EXISTS File(Name text NOT NULL PRIMARY KEY, Content blob NOT NULL, LastModified datetime NOT NULL, Changed bit NOT NULL DEFAULT -1)');
+					$db->exec('CREATE TABLE IF NOT EXISTS File(\
+						Name text NOT NULL PRIMARY KEY, \
+						Content blob NOT NULL, \
+						LastModified datetime NOT NULL, \
+						Changed bit NOT NULL DEFAULT -1\
+					)');
 					$db->exec('COMMIT TRANSACTION');
 
 					if(isset($_GET['markreceived'])) {
@@ -1130,6 +1136,31 @@ final class CodistoConnect {
 						}
 					}
 
+					$amazonorderid = (string)$ordercontent->amazonorderid;
+					if(!$amazonorderid) {
+						$amazonorderid = '';
+					}
+
+					$amazonfulfillmentchannel = (string)$ordercontent->amazonfulfillmentchannel;
+					if(!$amazonfulfillmentchannel) {
+						$amazonfulfillmentchannel = '';
+					}
+
+					$ebayusername = (string)$ordercontent->ebayusername;
+					if(!$ebayusername) {
+						$ebayusername = '';
+					}
+
+					$ebaysalesrecordnumber = (string)$ordercontent->ebaysalesrecordnumber;
+					if(!$ebaysalesrecordnumber) {
+						$ebaysalesrecordnumber = '';
+					}
+
+					$ebaytransactionid = (string)$ordercontent->ebaytransactionid;
+					if(!$ebaytransactionid) {
+						$ebaytransactionid = '';
+					}
+
 					$address_data = array(
 								'billing_first_name'	=> $billing_first_name,
 								'billing_last_name'		=> $billing_last_name,
@@ -1155,7 +1186,15 @@ final class CodistoConnect {
 								'shipping_phone'		=> (string)$shipping_address->phone,
 							);
 
-					$order_id = $wpdb->get_var($wpdb->prepare("SELECT ID FROM `{$wpdb->prefix}posts` AS P WHERE ID IN (SELECT post_id FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_orderid' AND meta_value = %d)", (int)$ordercontent->orderid));
+					$order_id_sql = "SELECT ID FROM `{$wpdb->prefix}posts` AS P WHERE EXISTS (SELECT 1 FROM `{$wpdb->prefix}postmeta` " .
+					" WHERE meta_key = '_codisto_orderid' AND meta_value = %d AND post_id = P.ID ) " .
+					" AND (".
+						" EXISTS (SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.ID)" .
+						" OR NOT EXISTS (SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.ID)"
+					.")" .
+					" LIMIT 1";
+
+					$order_id = $wpdb->get_var($wpdb->prepare($order_id_sql, (int)$ordercontent->orderid, (int)$ordercontent->merchantid));
 
 					$email = (string)$billing_address->email;
 					if(!$email) {
@@ -1166,7 +1205,7 @@ final class CodistoConnect {
 
 						$userid = $wpdb->get_var($wpdb->prepare("SELECT ID FROM `{$wpdb->prefix}users` WHERE user_email = %s", $email));
 						if(!$userid && !$order_id) {
-							$username = (string)$ordercontent->ebayusername;
+							$username = $ebayusername;
 							if(!$username) {
 								$username = current( explode( '@', $email ) );
 							}
@@ -1217,7 +1256,6 @@ final class CodistoConnect {
 
 					$adjustStock = @count($ordercontent->adjuststock) ? (($ordercontent->adjuststock == "false") ? false : true) : true;
 
-
 					$shipping = 0;
 					$shipping_tax = 0;
 					$cart_discount = 0;
@@ -1231,14 +1269,43 @@ final class CodistoConnect {
 
 						add_filter( 'woocommerce_new_order_data', $new_order_data_callback, 1, 1 );
 
-						$order = wc_create_order( array( 'customer_id' => $customer_id, 'customer_note' => $customer_note, 'created_via' => 'eBay' ) );
+						$createby = 'eBay';
+						if($amazonorderid) {
+							$createdby = 'Amazon';
+						}
+
+						$order = wc_create_order( array( 'customer_id' => $customer_id, 'customer_note' => $customer_note, 'created_via' => $createby ) );
 
 						remove_filter( 'woocommerce_new_order_data', $new_order_data_callback );
 
 						$order_id = $order->id;
 
-						update_post_meta( $order_id, '_codisto_orderid', (int)$ordercontent->orderid);
-						update_post_meta( $order_id, '_codisto_ebayuser', (string)$ordercontent->ebayusername);
+						update_post_meta( $order_id, '_codisto_orderid', (int)$ordercontent->orderid );
+						update_post_meta( $order_id, '_codisto_merchantid', (int)$ordercontent->merchantid );
+
+						if($amazonorderid) {
+							update_post_meta( $order_id, '_codisto_amazonorderid', $amazonorderid );
+						}
+						if($amazonfulfillmentchannel) {
+							update_post_meta( $order_id, '_codisto_amazonfulfillmentchannel', $amazonfulfillmentchannel );
+						}
+
+						if($ebayusername) {
+							update_post_meta( $order_id, '_codisto_ebayusername', $ebayusername );
+						}
+
+						if($ebayusername) {
+							update_post_meta( $order_id, '_codisto_ebayusername', $ebayusername );
+						}
+
+						if($ebaysalesrecordnumber) {
+							update_post_meta( $order_id, '_codisto_ebaysalesrecordnumber', $ebaysalesrecordnumber );
+						}
+
+						if($ebaytransactionid) {
+							update_post_meta( $order_id, '_codisto_ebaytransactionid', $ebaytransactionid );
+						}
+
 						update_post_meta( $order_id, '_order_currency', (string)$ordercontent->transactcurrency);
 						update_post_meta( $order_id, '_customer_ip_address', '-' );
 						delete_post_meta( $order_id, '_prices_include_tax' );
@@ -1664,13 +1731,14 @@ final class CodistoConnect {
 		$codisto_order_id = get_post_meta( $order->id, '_codisto_orderid', true);
 		if(is_numeric($codisto_order_id) && $codisto_order_id !== 0) {
 			$ebay_user = get_post_meta($order->id, '_codisto_ebayuser', true);
-
-			?>
-			<p class="form-field form-field-wide codisto-order-buttons">
-			<a href="<?php echo htmlspecialchars(admin_url('codisto/ebaysale?orderid='.$codisto_order_id)) ?>" target="codisto!sale" class="button"><?php _e('eBay Order') ?> &rarr;</a>
-			<a href="<?php echo htmlspecialchars(admin_url('codisto/ebayuser?orderid='.$codisto_order_id)) ?>" target="codisto!user" class="button"><?php _e('eBay User') ?><?php echo $ebay_user ? ' : '.htmlspecialchars($ebay_user) : ''; ?> &rarr;</a>
-			</p>
-			<?php
+			if($ebay_user) {
+				?>
+				<p class="form-field form-field-wide codisto-order-buttons">
+				<a href="<?php echo htmlspecialchars(admin_url('codisto/ebaysale?orderid='.$codisto_order_id)) ?>" target="codisto!sale" class="button"><?php _e('eBay Order') ?> &rarr;</a>
+				<a href="<?php echo htmlspecialchars(admin_url('codisto/ebayuser?orderid='.$codisto_order_id)) ?>" target="codisto!user" class="button"><?php _e('eBay User') ?><?php echo $ebay_user ? ' : '.htmlspecialchars($ebay_user) : ''; ?> &rarr;</a>
+				</p>
+				<?php
+			}
 		}
 	}
 
@@ -2119,61 +2187,81 @@ final class CodistoConnect {
 				<iframe id="dummy-data" frameborder="0" src="https://codisto.com/xpressgriddemo/ebayedit/"></iframe>
 				<div id="dummy-data-overlay"></div>
 				<div id="create-account-modal">
-				<h1>Codisto Connect - Account Creation</h1>
-				<form action="<?php echo htmlspecialchars(admin_url('admin-post.php')); ?>" method="post">
-					<input type="hidden" name="action" value="codisto_create"/>
+					<img style="float:right; margin-top:26px; margin-right:15px;" height="30" src="https://codisto.com/images/codistodarkgrey.png">
+					<h1>Create your Account</h1>
+					<div class="body">
+						<form id="codisto-form" action="<?php echo htmlspecialchars(admin_url('admin-post.php')); ?>" method="post">
+						<p>To get started, enter your email address.</p>
+						<p>Your email address will be used to communicate important account information and to
+							provide a better support experience for any enquiries with your Codisto account.</p>
 
-					<div class="option active">
-						<label>
-							<input type="radio" name="method" checked="checked" value="ebay">
-							<div style="display: inline-block;">
-								<img style="height: 20px;" src="https://d31wxntiwn0x96.cloudfront.net/connect/29137/ebaytab/images/ebay.png" scale="0">
-								<div style="padding-top: 6px;">Link your eBay account to create an account automatically</div>
-							</div>
-						</label>
-					</div>
+						<input type="hidden" name="action" value="codisto_create"/>
+						<input type="hidden" name="method" value="email"/>
 
-					<div class="or">
-					<strong>OR</strong>
-					</div>
+						<div>
+							<input type="email" name="email" required placeholder="Enter Your Email Address" size="40">
+						</div>
+						<div>
+							<input type="email" name="emailconfirm" required placeholder="Confirm Your Email Address" size="40">
+						</div>
 
-					<div class="option">
-						<label>
-							<input type="radio" name="method" value="email">
-							<div style="display: inline-block;">
-								<input type="text" name="email" value="<?php echo htmlspecialchars( $email ) ?>" size="40">
-								<div style="padding-top: 10px;">Use your email address (you can link eBay later)</div>
-							</div>
-						</label>
-					</div>
+						<div class="next">
+							<button type="submit" class="button btn-lg">Continue</button>
+						</div>
+						<div class="error-message">
+							<strong>Your email addresses do not match.</strong>
+						</div>
 
-					<div class="next">
-						<button class="button button-primary">Next</button>
-					</div>
-
-				</form>
-				<div class="footer">
+						</div>
+					</form>
+					<div class="footer">
 						Once you create an account we will begin synchronizing your catalog data.<br>
 						Sit tight, this may take several minutes depending on the size of your catalog.<br>
-						When completed, you'll have the world's best eBay integration at your fingertips.<br><br/>
-						You'll be able to:
-							<ul>
-								<li>Sync in real-time between WooCommerce &amp; eBay</li>
-								<li>have Codisto auto-categorize your products into eBay categories</li>
-								<li>Access our sophisticated template engine for amazing listings</li>
-								<li>and lots more…</li>
-							</ul>
+						When completed, you'll have the world's best eBay & Amazon integration at your fingertips.<br>
+					</div>
 				</div>
-				</div>
+
 				<script>
 				jQuery(function($) {
 
-					$("#create-account-modal").on("click", ".option", function(e) {
+					$("#codisto-form").on("change", function(e){
 
-						$("#create-account-modal .option").removeClass("active");
-						$(this).addClass("active").find("INPUT[type=radio]").attr("checked", "checked");
+						checkButton();
 
 					});
+
+					$("#codisto-form").on("keyup", function(e){
+
+						checkButton();
+
+					});
+
+					$("#codisto-form").on("submit", function(e) {
+
+						var email = $("#codisto-form input[name=email]").val();
+						var emailconfirm = $("#codisto-form input[name=emailconfirm]").val();
+						if(email != emailconfirm) {
+							e.stopPropagation();
+							e.preventDefault();
+							$(".error-message").show();
+						} else {
+							$(".error-message").hide();
+						}
+
+					});
+
+					function checkButton() {
+
+						var email = $("#codisto-form input[name=email]").val();
+						var emailconfirm = $("#codisto-form input[name=emailconfirm]").val();
+						if(email && emailconfirm
+							&& (email == emailconfirm)) {
+							$("#codisto-form").find(".next button").addClass("button-primary");
+						} else {
+							$("#codisto-form").find(".next button").removeClass("button-primary");
+						}
+
+					}
 
 				});
 				</script>
@@ -2239,6 +2327,11 @@ final class CodistoConnect {
 		include 'templates.php';
 	}
 
+	public function multisite()
+	{
+		include 'multisite.php';
+	}
+
 	public function settings()
 	{
 		$adminUrl = admin_url('codisto/settings/');
@@ -2249,18 +2342,29 @@ final class CodistoConnect {
 	public function admin_menu()
 	{
 		if ( current_user_can( 'manage_woocommerce' ) ) {
-			add_menu_page( __('Amazon & eBay'), __('Amazon & eBay'), 'edit_posts', 'codisto', array( $this, 'ebay_tab' ), 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgDQogICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiDQoJIHZpZXdCb3g9IjAgMCAyMCAyMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8cGF0aCBzdHlsZT0iZmlsbDojOTk5OTk5OyIgZD0iTTE3LDBIM0MxLjMsMCwwLDEuMywwLDN2MTRjMCwxLjYsMS4zLDMsMywzaDE0YzEuNywwLDMtMS40LDMtM1YzQzIwLDEuMywxOC43LDAsMTcsMHogTTkuMywxNC4xDQoJYzAuNCwwLjUsMC45LDAuNywxLjYsMC43YzAuNywwLDEuMy0wLjMsMS45LTAuOWwyLjcsMi43Yy0xLjIsMS4yLTIuOCwxLjktNC42LDEuOWMtMS45LDAtMy40LTAuNi00LjctMS45Yy0wLjgtMC44LTEuMy0xLjgtMS41LTMNCgljLTAuMS0wLjctMC4yLTEuOS0wLjItMy42czAuMS0yLjksMC4yLTMuNmMwLjItMS4yLDAuNy0yLjMsMS41LTNDNy41LDIuMSw5LDEuNSwxMC45LDEuNWMxLjksMCwzLjQsMC42LDQuNiwxLjlsLTIuNywyLjcNCgljLTAuNi0wLjYtMS4yLTAuOS0xLjktMC45Yy0wLjcsMC0xLjIsMC4yLTEuNiwwLjdDOC44LDYuNCw4LjYsNy44LDguNiwxMEM4LjYsMTIuMiw4LjgsMTMuNiw5LjMsMTQuMXoiLz4NCjwvc3ZnPg0K', '55.501' );
+
+			$mainpage = 'codisto';
+			$type = 'ebay_tab';
+
+			if(is_multisite()) {
+				$mainpage = 'codisto-multisite';
+				$type = 'multisite';
+			}
+
+			add_menu_page( __('Amazon & eBay'), __('Amazon & eBay'), 'edit_posts', $mainpage, array( $this, $type ), 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4cHgiIGhlaWdodD0iMThweCIgdmlld0JveD0iMCAwIDE3MjUuMDAwMDAwIDE3MjUuMDAwMDAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0Ij4gPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsMTcyNS4wMDAwMDApIHNjYWxlKDAuMTAwMDAwLC0wLjEwMDAwMCkiIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0ibm9uZSI+PHBhdGggZD0iTTgzNDAgMTcyNDAgYy0yMTk1IC03MCAtNDI1MyAtOTYyIC01ODEwIC0yNTIwIC0xNDYzIC0xNDYyIC0yMzM3IC0zMzU5IC0yNTAwIC01NDI1IC0yOSAtMzYyIC0yOSAtOTcwIDAgLTEzMzUgMTM4IC0xNzc0IDgwNyAtMzQzOCAxOTMxIC00ODA1IDM1MyAtNDMxIDc4NCAtODYwIDEyMTQgLTEyMTEgMTM2MiAtMTExMiAzMDIzIC0xNzc3IDQ3ODAgLTE5MTQgMzczIC0yOSA5NjAgLTI5IDEzMzUgMCAxNzU3IDEzNSAzNDIyIDgwMSA0Nzg1IDE5MTQgNDU0IDM3MCA5MDYgODI3IDEyNzcgMTI4OCAxNDcgMTgyIDMzNiA0NDEgNDcxIDY0NSAxMTUgMTc0IDMxNyA1MDcgMzE3IDUyMyAwIDYgMyAxMCA4IDEwIDQgMCAxMiAxMCAxOCAyMyAxOCAzOSA4OSAxNzIgOTQgMTc3IDUgNSA3NiAxNDggMTY5IDMzOSAyMyA0NiA0MSA5MCA0MSA5OCAwIDcgNSAxMyAxMCAxMyA2IDAgMTAgNyAxMCAxNSAwIDggNCAyMyAxMCAzMyA1IDkgMjEgNDQgMzUgNzcgMTUgMzMgMzAgNjggMzYgNzcgNSAxMCA5IDIyIDkgMjggMCA1IDEyIDM1IDI2IDY3IDQ3IDEwNSA1NCAxMjQgNTQgMTM4IDAgOCAzIDE1IDggMTUgNCAwIDE1IDI4IDI2IDYzIDEwIDM0IDI0IDcxIDMxIDgyIDcgMTEgMTYgMzYgMjAgNTUgNCAxOSAxMSA0MCAxNSA0NSA0IDYgMTEgMjYgMTUgNDUgNCAxOSAxMSAzNyAxNCA0MCA3IDUgMjEgNTAgNTcgMTgwIDkgMzAgMTkgNjAgMjQgNjUgNCA2IDE1IDQ0IDI0IDg1IDEwIDQxIDIxIDc5IDI2IDg1IDExIDEzIDEzMSA1MzEgMTY5IDcyNSAxNjMgODQ5IDE5OCAxNzY0IDEwMCAyNjMwIC0yNjMgMjMyOSAtMTQ2OCA0NDQ2IC0zMzQ5IDU4ODIgLTczMyA1NTkgLTE1ODcgMTAxMiAtMjQ2NSAxMzA2IC03NjQgMjU3IC0xNjAwIDQxMSAtMjM2NSA0MzcgLTMyMSAxMSAtNDQyIDEyIC02NzAgNXogbS0yOTI1IC0yNjYwIGM2NzEgLTQxIDEyMTQgLTIzMCAxNjk0IC01OTAgNDg1IC0zNjQgODI1IC03NjYgMTY1NiAtMTk2NSAyNzggLTQwMSA5NjggLTE0NDggMTEyMCAtMTcwMCAyMTcgLTM1OCA0MjcgLTg0NCA1MTEgLTExNzUgMTE0IC00NTUgMTEyIC03OTYgLTEwIC0xNDEwIC0zOSAtMTk5IC0xNTAgLTU0MCAtMjQzIC03NDYgLTEyNCAtMjc2IC0yOTQgLTU0NSAtNDkyIC03NzcgLTQyIC00OSAtODggLTEwMiAtMTAyIC0xMTkgbC0yNSAtMzAgLTQxMyA2MjIgLTQxMiA2MjIgMzQgODIgYzU1IDEzMCAxMTggMzY3IDE1MyA1ODEgMjUgMTU1IDE1IDU0MCAtMjAgNzMxIC05MyA1MDkgLTI5NiA5MDcgLTEwMDcgMTk3NCAtNTU3IDgzNiAtMTAyMCAxNDU4IC0xMzUxIDE4MTMgLTQ0NyA0ODAgLTk2NSA3MDUgLTE1MzYgNjY3IC03NzEgLTUxIC0xNDM2IC00ODcgLTE3ODYgLTExNzAgLTk3IC0xODggLTE2MiAtMzg1IC0xODUgLTU2MyAtMjcgLTE5NCAtOSAtNTA2IDQwIC03MDIgMTA5IC00MzcgMzk0IC05NjIgMTA3NSAtMTk3MiA4MjQgLTEyMjQgMTI1MyAtMTc2NiAxNjcyIC0yMTExIDE5MSAtMTU4IDQwMSAtMjYwIDY4NyAtMzM1IGw5MCAtMjMgMTM4IC0yMDUgYzc3IC0xMTIgMjg1IC00MjEgNDYzIC02ODYgbDMyNCAtNDgxIC02MyAtMTEgYy00NjcgLTgxIC05MDggLTc3IC0xMzUzIDE0IC03NDMgMTUzIC0xMzQ5IDUzNSAtMTkxNCAxMjA5IC0yODggMzQ0IC04MzkgMTExMiAtMTQ0MSAyMDExIC01MDEgNzQ3IC03MzQgMTEzOSAtOTEyIDE1MzUgLTE1NiAzNDUgLTIzNCA2MDQgLTI4MyA5NDUgLTIxIDE0MyAtMjQgNTA1IC02IDY2MCAxMzQgMTEyNiA2ODcgMjAxNyAxNjUyIDI2NjAgNjQ4IDQzMiAxMjU0IDYyNyAyMDIwIDY1MyAzMCAxIDEzMiAtMyAyMjUgLTh6IG00ODYwIC0yNjMwIGM2NzEgLTQxIDEyMTQgLTIzMCAxNjk0IC01OTAgMzUzIC0yNjQgNjM0IC01NjAgMTAxMyAtMTA2NSAzMjEgLTQyOSAxMjE3IC0xNzIxIDEyMTAgLTE3NDYgLTEgLTUgNzggLTEyNSAxNzYgLTI2NyAyNTggLTM3MyAzMzggLTQ5OSA1MTUgLTgxMyAxMTEgLTE5NyAyMzggLTQ3NSAyODcgLTYyOSA0NSAtMTQwIDcxIC0yMjkgNzYgLTI1NCAzIC0xNyAxNCAtNjYgMjUgLTEwOCA1NiAtMjIyIDg0IC01MTQgNzQgLTc2MyAtNCAtODggLTkgLTE2MiAtMTAgLTE2NSAtMyAtNSAtMTUgLTkwIC0zMSAtMjE1IC0zIC0yNyAtMTAgLTcwIC0xNSAtOTUgLTUgLTI1IC0xNCAtNzAgLTE5IC0xMDAgLTMzIC0xNjkgLTE3MSAtNjIwIC0xOTAgLTYyMCAtNSAwIC0xMSAtMTQgLTE1IC0zMCAtNCAtMTcgLTExIC0zMCAtMTYgLTMwIC02IDAgLTggLTMgLTYgLTcgMyAtNSAtMyAtMjQgLTEzIC00MyAtMTEgLTE5IC0yNCAtNDYgLTMwIC02MCAtMTkgLTQ0IC04NSAtMTc1IC05MCAtMTgwIC0zIC0zIC0xMyAtMjEgLTIzIC00MCAtMzQgLTYzIC01MiAtOTUgLTU4IC0xMDAgLTMgLTMgLTE0IC0yMSAtMjUgLTQwIC0xMCAtMTkgLTIxIC0zNyAtMjQgLTQwIC0zIC0zIC0zMSAtNDMgLTYyIC05MCAtNjIgLTk0IC0yNDQgLTMxMiAtMzYxIC00MzQgLTQzIC00NCAtNzcgLTgzIC03NyAtODcgMCAtNCAtNDggLTUwIC0xMDcgLTEwMyAtNTIwIC00NjIgLTExMjUgLTc4OCAtMTcyOCAtOTMxIC02NTggLTE1NiAtMTM2NSAtMTEzIC0yMDA0IDEyMyAtNTAxIDE4NCAtOTg3IDU0OSAtMTQyMSAxMDY2IC0zMTQgMzc0IC03NTYgOTk1IC0xNDQxIDIwMjMgLTQ4NCA3MjcgLTU5MyA4OTkgLTc0NyAxMTg4IC0yNTYgNDgwIC0zODUgODQ5IC00NDggMTI4MCAtMjEgMTQzIC0yNCA1MDUgLTYgNjYwIDg1IDcxMyAzNDAgMTMzNiA3NTggMTg1MiAxMjQgMTUzIDIwMSAyNDAgMjA3IDIzMyAyIC0zIDE4MSAtMjc2IDM5NyAtNjA4IGwzOTMgLTYwNCAtMjIgLTM2IGMtOTIgLTE1NiAtMTY4IC0zMzMgLTIxMCAtNDk0IC00MSAtMTU0IC01MSAtMjQxIC01MSAtNDM1IDAgLTQ2MSAxMjYgLTgyMCA1MjAgLTE0ODQgMzQgLTU3IDY1IC0xMDYgNjkgLTEwOSAzIC0zIDEyIC0xNyAxOCAtMzEgMjcgLTYzIDQ1OCAtNzI0IDcwNiAtMTA4NCA3MjggLTEwNTkgMTA5NiAtMTUxMyAxNDg1IC0xODMzIDE1OSAtMTMxIDMyNSAtMjIwIDU0MSAtMjkxIDIyOSAtNzYgMjkzIC04NSA1NzEgLTg2IDIxMiAwIDI2MSAzIDM2MSAyMyAzMTEgNTkgNTg4IDE3MCA4MzEgMzMzIDE0NiA5OSAzMjUgMjU3IDQ0MCAzOTAgODcgMTAwIDE2OCAyMDQgMTY4IDIxNSAwIDMgMTAgMjAgMjMgMzcgODggMTI0IDIxMSA0MDggMjUyIDU4NCA5IDM3IDIwIDg0IDI1IDEwNCAzNSAxMzEgNDEgNDgxIDEwIDYzNyAtMjYgMTMxIC0xMDIgMzQ3IC0xODggNTMyIC0xNiAzNiAtNDggMTA0IC03MCAxNTEgLTc2IDE2NCAtMzYxIDYzOCAtNDE5IDY5NiAtMTIgMTMgLTgxIDExNiAtMTU0IDIzMCAtNDYxIDcyNiAtMTEwMiAxNjI2IC0xNDc5IDIwNzggLTQxNSA0OTggLTc3NSA3NDYgLTEyMjkgODQ5IC02MiAxMyAtMTE0IDI2IC0xMTYgMjggLTIzIDI4IC04NTUgMTM1MSAtODUyIDEzNTUgMTggMTcgMzIyIDYxIDQ5NyA3MiAxOTcgMTIgMjI4IDEyIDQxNSAxeiIvPiA8L2c+IDwvc3ZnPg==', '55.501' );
 
 			$pages = array();
 
-			$pages[] = add_submenu_page('codisto', __('Marketplace Listings'), __('Marketplace Listings'), 'edit_posts', 'codisto', array( $this, 'ebay_tab' ) );
-			$pages[] = add_submenu_page('codisto', __('Marketplace Orders'), __('Marketplace Orders'), 'edit_posts', 'codisto-orders', array( $this, 'orders' ) );
-			$pages[] = add_submenu_page('codisto', __('eBay Store Categories'), __('eBay Store Categories'), 'edit_posts', 'codisto-categories', array( $this, 'categories' ) );
-			$pages[] = add_submenu_page('codisto', __('Attribute Mapping'), __('Attribute Mapping'), 'edit_posts', 'codisto-attributes', array( $this, 'attributes' ) );
-			$pages[] = add_submenu_page('codisto', __('Link eBay Listings'), __('Link eBay Listings'), 'edit_posts', 'codisto-import', array( $this, 'import' ) );
-			$pages[] = add_submenu_page('codisto', __('eBay Templates'), __('eBay Templates'), 'edit_posts', 'codisto-templates', array( $this, 'templates' ) );
-			$pages[] = add_submenu_page('codisto', __('Settings'), __('Settings'), 'edit_posts', 'codisto-settings', array( $this, 'settings' ) );
-			$pages[] = add_submenu_page('codisto', __('Account'), __('Account'), 'edit_posts', 'codisto-account', array( $this, 'account' ) );
+			if(!is_multisite()) {
+				$pages[] = add_submenu_page('codisto', __('Marketplace Listings'), __('Marketplace Listings'), 'edit_posts', 'codisto', array( $this, 'ebay_tab' ) );
+				$pages[] = add_submenu_page('codisto', __('Marketplace Orders'), __('Marketplace Orders'), 'edit_posts', 'codisto-orders', array( $this, 'orders' ) );
+				$pages[] = add_submenu_page('codisto', __('eBay Store Categories'), __('eBay Store Categories'), 'edit_posts', 'codisto-categories', array( $this, 'categories' ) );
+				$pages[] = add_submenu_page('codisto', __('Attribute Mapping'), __('Attribute Mapping'), 'edit_posts', 'codisto-attributes', array( $this, 'attributes' ) );
+				$pages[] = add_submenu_page('codisto', __('Link eBay Listings'), __('Link eBay Listings'), 'edit_posts', 'codisto-import', array( $this, 'import' ) );
+				$pages[] = add_submenu_page('codisto', __('eBay Templates'), __('eBay Templates'), 'edit_posts', 'codisto-templates', array( $this, 'templates' ) );
+				$pages[] = add_submenu_page('codisto', __('Settings'), __('Settings'), 'edit_posts', 'codisto-settings', array( $this, 'settings' ) );
+				$pages[] = add_submenu_page('codisto', __('Account'), __('Account'), 'edit_posts', 'codisto-account', array( $this, 'account' ) );
+			}
 
 			foreach($pages as $page)
 			{
@@ -2278,6 +2382,8 @@ final class CodistoConnect {
 				if($page === 'codisto') {
 					return "$classes codisto";
 				} else if($page === 'codisto-templates') {
+					return "$classes $page";
+				} else if($page === 'codisto-multisite') {
 					return "$classes $page";
 				}
 
@@ -2383,27 +2489,27 @@ final class CodistoConnect {
 			isset($this->ping['products'])) {
 
 			$response = wp_remote_post('https://api.codisto.com/'.get_option('codisto_merchantid'), array(
-				  'method'		=> 'POST',
-				  'timeout'		=> 5,
-				  'redirection' => 0,
-				  'httpversion' => '1.0',
-				  'blocking'	=> true,
-				  'headers'		=> array('X-HostKey' => get_option('codisto_key') , 'Content-Type' => 'application/x-www-form-urlencoded' ),
-				  'body'		=> 'action=sync&productid=['.implode(',', $this->ping['products']).']'
-				  )
+					'method'		=> 'POST',
+					'timeout'		=> 5,
+					'redirection' => 0,
+					'httpversion' => '1.0',
+					'blocking'	=> true,
+					'headers'		=> array('X-HostKey' => get_option('codisto_key') , 'Content-Type' => 'application/x-www-form-urlencoded' ),
+					'body'		=> 'action=sync&productid=['.implode(',', $this->ping['products']).']'
+				)
 			);
 
 		} else if(is_array($this->ping)) {
 
 			$response = wp_remote_post('https://api.codisto.com/'.get_option('codisto_merchantid'), array(
-				  'method'		=> 'POST',
-				  'timeout'		=> 5,
-				  'redirection' => 0,
-				  'httpversion' => '1.0',
-				  'blocking'	=> true,
-				  'headers'		=> array('X-HostKey' => get_option('codisto_key') , 'Content-Type' => 'application/x-www-form-urlencoded' ),
-				  'body'		=> 'action=sync'
-				  )
+					'method'		=> 'POST',
+					'timeout'		=> 5,
+					'redirection' => 0,
+					'httpversion' => '1.0',
+					'blocking'	=> true,
+					'headers'		=> array('X-HostKey' => get_option('codisto_key') , 'Content-Type' => 'application/x-www-form-urlencoded' ),
+					'body'		=> 'action=sync'
+				)
 			);
 
 		}
@@ -2441,8 +2547,17 @@ final class CodistoConnect {
 		return array_merge( $action_links, $links );
 	}
 
+	function admin_notice_info() {
+		if( get_transient( 'codisto-admin-notice' ) ){
+			$class = 'notice notice-info is-dismissible';
+			printf( '<div class="%1$s"><p>Codisto LINQ Successfully Activated! <a class="button action" href="admin.php?page=codisto">Click here</a> get started.</p></div>', esc_attr( $class ) );
+		}
+	}
+
+
 	public function init_plugin()
 	{
+
 		$homeUrl = preg_replace('/^https?:\/\//', '', trim(home_url()));
 		$siteUrl = preg_replace('/^https?:\/\//', '', trim(site_url()));
 		$adminUrl = preg_replace('/^https?:\/\//', '', trim(admin_url()));
@@ -2474,6 +2589,7 @@ final class CodistoConnect {
 		add_action( 'admin_post_codisto_create',			array( $this, 'create_account' ) );
 		add_action( 'admin_post_codisto_update_template',	array( $this, 'update_template' ) );
 		add_action( 'admin_menu',							array( $this, 'admin_menu' ) );
+		add_action( 'admin_notices', 						array( $this, 'admin_notice_info' ) );
 		add_filter( 'admin_body_class', 					array( $this, 'admin_body_class' ) );
 		add_action(	'woocommerce_product_bulk_edit_save', 	array( $this, 'bulk_edit_save' ) );
 		add_action( 'save_post',							array( $this, 'post_save' ), 10, 2 );
@@ -2488,16 +2604,17 @@ final class CodistoConnect {
 		add_filter( 'plugin_action_links_'.
 						plugin_basename( __FILE__ ),		array( $this, 'plugin_links' ) );
 		add_action( 'shutdown',								array( $this, 'signal_edits' ) );
+
 	}
 
 	public static function init() {
+
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 
 			add_action('init', array( self::$_instance, 'init_plugin' ) );
 
-			if(preg_match('/\/codisto-sync\//', $_SERVER['REQUEST_URI']))
-			{
+			if(preg_match('/\/codisto-sync\//', $_SERVER['REQUEST_URI'])) {
 				set_current_screen('dashboard');
 				$_POST['aelia_cs_currency'] = get_option('woocommerce_currency');
 			}
@@ -2505,9 +2622,9 @@ final class CodistoConnect {
 		return self::$_instance;
 	}
 }
-
 function codisto_activate()
 {
+
 	$homeUrl = preg_replace('/^https?:\/\//', '', trim(home_url()));
 	$siteUrl = preg_replace('/^https?:\/\//', '', trim(site_url()));
 	$adminUrl = preg_replace('/^https?:\/\//', '', trim(admin_url()));
@@ -2531,7 +2648,10 @@ function codisto_activate()
 		'top'
 	);
 
+	set_transient( 'codisto-admin-notice', true, 20 );
+
 	flush_rewrite_rules();
+
 }
 
 register_activation_hook( __FILE__, 'codisto_activate' );
