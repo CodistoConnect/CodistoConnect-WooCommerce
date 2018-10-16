@@ -915,12 +915,7 @@ final class CodistoConnect {
 					$db->exec('PRAGMA journal_mode=MEMORY');
 
 					$db->exec('BEGIN EXCLUSIVE TRANSACTION');
-					$db->exec('CREATE TABLE IF NOT EXISTS File(\
-						Name text NOT NULL PRIMARY KEY, \
-						Content blob NOT NULL, \
-						LastModified datetime NOT NULL, \
-						Changed bit NOT NULL DEFAULT -1\
-					)');
+					$db->exec('CREATE TABLE IF NOT EXISTS File(Name text NOT NULL PRIMARY KEY, Content blob NOT NULL, LastModified datetime NOT NULL, Changed bit NOT NULL DEFAULT -1)');
 					$db->exec('COMMIT TRANSACTION');
 
 					if(isset($_GET['markreceived'])) {
