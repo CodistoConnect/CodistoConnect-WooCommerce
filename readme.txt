@@ -96,6 +96,7 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 = 1.3.13 - 18/10/2018 =
 
+* speed up getting orders and tracking information
 
 = 1.3.12 - 16/10/2018 =
 
