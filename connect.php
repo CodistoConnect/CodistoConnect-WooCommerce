@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Codisto LINQ by Codisto
- * @version 1.3.12
+ * @version 1.3.13
  */
 /*
 Plugin Name: Codisto LINQ by Codisto
 Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
 Author: Codisto
-Version: 1.3.12
+Version: 1.3.13
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -27,7 +27,7 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 include_once( ABSPATH . 'wp-admin/includes/class-wp-screen.php' );
 include_once( ABSPATH . 'wp-admin/includes/screen.php' );
 
-define('CODISTOCONNECT_VERSION', '1.3.12');
+define('CODISTOCONNECT_VERSION', '1.3.13');
 define('CODISTOCONNECT_RESELLERKEY', '');
 
 if( ! class_exists('CodistoConnect') ) :
@@ -787,14 +787,28 @@ final class CodistoConnect {
 				$count = isset($_GET['count']) ? (int)$_GET['count'] : 0;
 				$merchantid = isset($_GET['merchantid']) ? (int)$_GET['merchantid'] : 0;
 
-				$orders = $wpdb->get_results( $wpdb->prepare("SELECT ( SELECT meta_value FROM `{$wpdb->prefix}postmeta` WHERE post_id = P.id AND meta_key = '_codisto_orderid' AND ( EXISTS ( SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.id ) OR NOT EXISTS ( SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.id ) ) ) AS id, ID AS post_id, post_status AS status FROM `{$wpdb->prefix}posts` AS P WHERE post_type = 'shop_order' AND ID IN (SELECT post_id FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_orderid' AND ( EXISTS ( SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.id ) OR NOT EXISTS ( SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.id ) )) ORDER BY ID LIMIT %d, %d",
+				$orders = $wpdb->get_results( $wpdb->prepare("SELECT (".
+					"SELECT meta_value FROM `{$wpdb->prefix}postmeta` WHERE post_id = P.id AND meta_key = '_codisto_orderid' AND ".
+						"(".
+							"EXISTS ( SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.id ) ".
+							"OR NOT EXISTS ( SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.id ) ".
+						")".
+					") AS id, ".
+					" ID AS post_id, post_status AS status FROM `{$wpdb->prefix}posts` AS P WHERE post_type = 'shop_order' AND ID IN (".
+						"SELECT post_id FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_orderid' AND (".
+							"EXISTS ( SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.id ) ".
+							"OR NOT EXISTS ( SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.id ) ".
+						")".
+					") ORDER BY ID LIMIT %d, %d",
+					$merchantid,
 					$merchantid,
 					$page * $count,
 					$count
 				));
 
 				if($page == 0) {
-					$total_count = $wpdb->get_var("SELECT COUNT(*) FROM `{$wpdb->prefix}posts` AS P WHERE post_type = 'shop_order' AND ID IN ( SELECT post_id FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_orderid' AND ( EXISTS ( SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.id ) OR NOT EXISTS (SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.id )))", $merchantid);
+					$total_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM `{$wpdb->prefix}posts` AS P WHERE post_type = 'shop_order' AND ID IN ( SELECT post_id FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_orderid' AND ( EXISTS ( SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.id ) OR NOT EXISTS (SELECT 1 FROM `{$wpdb->prefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.id )))",
+					$merchantid));
 				}
 
 				$order_data = array();
