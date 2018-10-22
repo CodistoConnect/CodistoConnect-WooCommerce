@@ -16,8 +16,6 @@ WC requires at least: 2.0.0
 WC tested up to: 3.4.5
 */
 
-error_reporting(E_ERROR | E_PARSE);
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -172,6 +170,7 @@ final class CodistoConnect {
 		global $wp;
 		global $wpdb;
 
+		error_reporting(E_ERROR | E_PARSE);
 		set_time_limit(0);
 
 		@ini_set('display_errors', '1');
@@ -1755,6 +1754,7 @@ final class CodistoConnect {
 	{
 		global $wp;
 
+		error_reporting(E_ERROR | E_PARSE);
 		set_time_limit(0);
 
 		@ini_set('zlib.output_compression', 'Off');
