@@ -45,12 +45,9 @@ else
 
 	<?php
 
-	if( is_dir( WP_CONTENT_DIR . '/ebay/' ) )
-	{
+	if( is_dir( WP_CONTENT_DIR . '/ebay/' ) ) {
 		$files = scandir( WP_CONTENT_DIR . '/ebay/' );
-	}
-	else
-	{
+	} else {
 		$files = array();
 	}
 
