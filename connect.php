@@ -2642,15 +2642,13 @@ final class CodistoConnect {
 
 			if ( preg_match( '/\/codisto-sync\//', $_SERVER['REQUEST_URI'] ) ) {
 
-				if ( in_array( 'woocommerce-aelia-currencyswitcher/woocommerce-aelia-currencyswitcher.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ))) {
+				// simulate admin context for sync of prices so appropriate filters run
+				require_once( ABSPATH . 'wp-admin/includes/admin.php' );
+				set_current_screen( 'dashboard' );
 
-					require_once( ABSPATH . 'wp-admin/includes/class-wp-screen.php' );
-					require_once( ABSPATH . 'wp-admin/includes/screen.php' );
+				// force aelia currency switcher to
+				$_POST['aelia_cs_currency'] = get_option('woocommerce_currency');
 
-					set_current_screen( 'dashboard' );
-					$_POST['aelia_cs_currency'] = get_option('woocommerce_currency');
-
-				}
 			}
 		}
 		return self::$_instance;
