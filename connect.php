@@ -20,11 +20,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-include_once( ABSPATH . 'wp-admin/includes/file.php' );
-include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-include_once( ABSPATH . 'wp-admin/includes/class-wp-screen.php' );
-include_once( ABSPATH . 'wp-admin/includes/screen.php' );
-
 define( 'CODISTOCONNECT_VERSION', '1.3.13' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
@@ -184,7 +179,7 @@ final class CodistoConnect {
 			@ob_clean();
 		}
 
-		if ( !in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ))) {
+		if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ))) {
 			$this->sendHttpHeaders(
 				'500 Config Error',
 				array(
@@ -2646,8 +2641,16 @@ final class CodistoConnect {
 			add_action( 'init', array( self::$_instance, 'init_plugin' ) );
 
 			if ( preg_match( '/\/codisto-sync\//', $_SERVER['REQUEST_URI'] ) ) {
-				set_current_screen( 'dashboard' );
-				$_POST['aelia_cs_currency'] = get_option('woocommerce_currency');
+
+				if ( in_array( 'woocommerce-aelia-currencyswitcher/woocommerce-aelia-currencyswitcher.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ))) {
+
+					require_once( ABSPATH . 'wp-admin/includes/class-wp-screen.php' );
+					require_once( ABSPATH . 'wp-admin/includes/screen.php' );
+
+					set_current_screen( 'dashboard' );
+					$_POST['aelia_cs_currency'] = get_option('woocommerce_currency');
+
+				}
 			}
 		}
 		return self::$_instance;
