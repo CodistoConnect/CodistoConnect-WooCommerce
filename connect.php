@@ -2639,6 +2639,7 @@ final class CodistoConnect {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 
+			register_activation_hook( __FILE__, array( 'CodistoConnect', 'activate' ) );
 			add_action( 'init', array( self::$_instance, 'init_plugin' ) );
 
 			if ( preg_match( '/\/codisto-sync\//', $_SERVER['REQUEST_URI'] ) ) {
@@ -2654,41 +2655,39 @@ final class CodistoConnect {
 		}
 		return self::$_instance;
 	}
+
+	public static function activate() {
+
+		$homeUrl = preg_replace( '/^https?:\/\//', '', trim( home_url() ) );
+		$siteUrl = preg_replace( '/^https?:\/\//', '', trim( site_url() ) );
+		$adminUrl = preg_replace( '/^https?:\/\//', '', trim( admin_url() ) );
+
+		$syncUrl = str_replace( $homeUrl, '', $siteUrl );
+		$syncUrl .= ( substr( $syncUrl, -1 ) == '/' ? '' : '/' );
+
+		// synchronisation end point
+		add_rewrite_rule(
+			'^'.preg_quote( ltrim( $syncUrl, '/' ), '/' ).'codisto-sync\/(.*)?',
+			'index.php?codisto=sync&codisto-sync-route=$matches[1]',
+			'top'
+		);
+
+		$adminUrl = str_replace( $homeUrl, '', $adminUrl );
+		$adminUrl .= ( substr( $adminUrl, -1 ) == '/' ? '' : '/' );
+
+		// proxy end point
+		add_rewrite_rule(
+			'^'.preg_quote( ltrim( $adminUrl, '/' ), '/' ).'codisto\/(.*)?',
+			'index.php?codisto=proxy&codisto-proxy-route=$matches[1]',
+			'top'
+		);
+
+		set_transient( 'codisto-admin-notice', true, 20 );
+
+		flush_rewrite_rules();
+
+	}
 }
-
-function codisto_activate() {
-
-	$homeUrl = preg_replace( '/^https?:\/\//', '', trim( home_url() ) );
-	$siteUrl = preg_replace( '/^https?:\/\//', '', trim( site_url() ) );
-	$adminUrl = preg_replace( '/^https?:\/\//', '', trim( admin_url() ) );
-
-	$syncUrl = str_replace( $homeUrl, '', $siteUrl );
-	$syncUrl .= ( substr( $syncUrl, -1 ) == '/' ? '' : '/' );
-
-	// synchronisation end point
-	add_rewrite_rule(
-		'^'.preg_quote( ltrim( $syncUrl, '/' ), '/' ).'codisto-sync\/(.*)?',
-		'index.php?codisto=sync&codisto-sync-route=$matches[1]',
-		'top'
-	);
-
-	$adminUrl = str_replace( $homeUrl, '', $adminUrl );
-	$adminUrl .= ( substr( $adminUrl, -1 ) == '/' ? '' : '/' );
-
-	// proxy end point
-	add_rewrite_rule(
-		'^'.preg_quote( ltrim( $adminUrl, '/' ), '/' ).'codisto\/(.*)?',
-		'index.php?codisto=proxy&codisto-proxy-route=$matches[1]',
-		'top'
-	);
-
-	set_transient( 'codisto-admin-notice', true, 20 );
-
-	flush_rewrite_rules();
-
-}
-
-register_activation_hook( __FILE__, 'codisto_activate' );
 
 endif;
 
