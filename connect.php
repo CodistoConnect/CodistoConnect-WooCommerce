@@ -32,6 +32,12 @@ final class CodistoConnect {
 
 	protected static $_instance = null;
 
+	/**
+	* method callback for query_vars filter
+	*
+	* @param array $vars array appended to with query variables to match
+	* @return array passed in $vars argument
+	*/
 	public function query_vars( $vars ) {
 
 		$vars[] = 'codisto';
@@ -40,6 +46,12 @@ final class CodistoConnect {
 		return $vars;
 	}
 
+	/**
+	* method callback for nocache_headers filter
+	*
+	* @param array $headers array with current no-cache headers
+	* @return array resultant no-cache headers
+	*/
 	public function nocache_headers( $headers ) {
 
 		if ( isset( $_GET['page'] ) &&
@@ -54,7 +66,12 @@ final class CodistoConnect {
 		return $headers;
 	}
 
-	public function check_hash() {
+	/**
+	* checks incoming request to see if satisfies shared key auth
+	*
+	* @return bool true for valid request, false for invalid request
+	*/
+	private function check_hash() {
 
 		if ( ! isset( $_SERVER['HTTP_X_CODISTONONCE'] ) ||
 			! isset( $_SERVER['HTTP_X_CODISTOKEY'] ) ) {
@@ -93,11 +110,25 @@ final class CodistoConnect {
 		return true;
 	}
 
+	/**
+	* filter for woocommerce woocommerce_new_order_data
+	*
+	* @param array $order_data data for new order as presented to filter
+	* @return array $order_data as passed in
+	*/
 	public function order_set_date( $order_data ) {
+
+		// force order date
 
 		return $order_data;
 	}
 
+	/**
+	* common http status and header output function
+	*
+	* @param integer $status the http status to send
+	* @param array $headers an array of headers to send
+	*/
 	private function sendHttpHeaders( $status, $headers ) {
 
 		if ( defined( 'ADVANCEDCACHEPROBLEM' ) &&
@@ -111,6 +142,12 @@ final class CodistoConnect {
 		}
 	}
 
+	/**
+	* provides a forward / backward compatible json_encode
+	*
+	* @param any $arg value to encode
+	* @return string json encdoed arg
+	*/
 	private function json_encode( $arg ) {
 		if ( function_exists( 'wp_json_encode') ) {
 			return wp_json_encode( $arg );
@@ -121,6 +158,12 @@ final class CodistoConnect {
 		}
 	}
 
+	/**
+	* helper function for retrieving a product from an id that caters to different versions of woocommerce
+	*
+	* @param integer $id product id to retrieve
+	* @return object woocommerce product object
+	*/
 	private function get_product( $id ) {
 		if ( function_exists( 'wc_get_product') ) {
 			return wc_get_product( $id );
@@ -131,6 +174,13 @@ final class CodistoConnect {
 		}
 	}
 
+	/**
+	* recursively scan a directory returning an array of all files contained within
+	*
+	* @param string $dir path to scan
+	* @param string Optional. $prefix is used to prepend a path to each path in the output array
+	* @return array array of files within directory passed as input
+	*/
 	private function files_in_dir( $dir, $prefix = '' ) {
 		$dir = rtrim( $dir, '\\/' );
 		$result = array();
@@ -159,6 +209,13 @@ final class CodistoConnect {
 		return $result;
 	}
 
+	/**
+	* sync handler
+	*
+	* the end point that allows synchronisation of catalog, ebay template and order data
+	* this function deliberately calls exit after emitting output to avoid the commnucations to the client
+	* being fouled by other code that assumes it can harmlessly inject, for example html comments
+	*/
 	public function sync() {
 
 		global $wp;
@@ -1758,6 +1815,13 @@ final class CodistoConnect {
 		}
 	}
 
+	/**
+	* wc_order_is_editable filter hook handler used to block edit of marketplace sourced orders
+	*
+	* @param boolean $editable current state of orders editable status
+	* @param object $order the order object to test for editability
+	* @return boolean status to whether the order can be edited
+	*/
 	public function order_is_editable( $editable, $order ) {
 		$codisto_order_id = get_post_meta( $order->id, '_codisto_orderid', true);
 		if ( is_numeric( $codisto_order_id ) && $codisto_order_id !== 0 ) {
@@ -1767,6 +1831,12 @@ final class CodistoConnect {
 		return $editable;
 	}
 
+	/**
+	* woocommerce_admin_order_data_after_order_details filter hook handler used to place
+	* marketplace specific buttons onto an order if an order is sourced from a marketplace
+	*
+	* @param object $order that the buttons are to be rendered for
+	*/
 	public function order_buttons( $order ) {
 		$codisto_order_id = get_post_meta( $order->id, '_codisto_orderid', true );
 		if ( is_numeric( $codisto_order_id ) && $codisto_order_id !== 0 ) {
@@ -1782,6 +1852,11 @@ final class CodistoConnect {
 		}
 	}
 
+	/**
+	* proxy is used to translate local requests to the wordpress instance that represent
+	* requests for UI and proxies those requests from the server back to Codisto
+	*
+	*/
 	public function proxy() {
 		global $wp;
 
@@ -1983,6 +2058,11 @@ final class CodistoConnect {
 		exit();
 	}
 
+	/**
+	* parse_request hook handler routes requests to proxy or sync via captured
+	* query vars
+	*
+	*/
 	public function parse() {
 
 		global $wp;
@@ -2005,10 +2085,19 @@ final class CodistoConnect {
 		}
 	}
 
+	/**
+	* used for affiliate marketing when the plugin is distributed by an affiliate partner
+	*
+	* @return string reseller key, the entity that has distributed the extension
+	*/
 	private function reseller_key() {
 		return CODISTOCONNECT_RESELLERKEY;
 	}
 
+	/**
+	* POST handler for create account on codisto servers for this woocommerce instance
+	*
+	*/
 	public function create_account() {
 
 		$blogversion = preg_replace( '/[\x0C\x0D]/', ' ', preg_replace( '/[\x00-\x1F\x7F]/', '', get_bloginfo( 'version' ) ) );
@@ -2016,6 +2105,8 @@ final class CodistoConnect {
 		$blogdescription = preg_replace( '/[\x0C\x0D]/', ' ', preg_replace( '/[\x00-\x1F\x7F]/', '', get_option( 'blogdescription' ) ) );
 
 		if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
+
+			check_admin_referer( 'codisto-create' );
 
 			if ( $_POST['method'] == 'email' ) {
 				$signupemail = wp_unslash( $_POST['email'] );
@@ -2087,11 +2178,12 @@ final class CodistoConnect {
 				wp_redirect( 'admin.php?page=codisto' );
 
 			} else {
+
 				$blogdescription = preg_replace( '/[\x0C\x0D]/', ' ', preg_replace( '/[\x00-\x1F\x7F]/', '', get_option( 'blogdescription' ) ) );
 
 				wp_redirect(
 					'https://ui.codisto.com/register?finalurl='.
-					urlencode( admin_url( 'admin-post.php?action=codisto_create' ) ).
+					urlencode( admin_url( 'admin-post.php?action=codisto_create&_wpnonce='.urlencode( wp_create_nonce( 'codisto-create' ) ) ) ).
 					'&type=woocommerce'.
 					'&version='.urlencode( $blogversion ).
 					'&url='.urlencode( $blogurl ).
@@ -2101,7 +2193,13 @@ final class CodistoConnect {
 					'&codistoversion='.urlencode( CODISTOCONNECT_VERSION )
 				);
 			}
+
 		} else {
+
+			if ( ! wp_verify_nonce( $_GET['_wpnonce'], 'codisto-create') ) {
+				wp_die( '<p>'.esc_html__( 'URL Security Check has failed, please start the process again.', 'codisto-linq' ).'</p>' );
+			}
+
 			$regtoken = '';
 			if ( isset($_GET['regtoken'] ) ) {
 				$regtoken = wp_unslash( $_GET['regtoken'] );
@@ -2115,17 +2213,17 @@ final class CodistoConnect {
 			}
 
 			$httpOptions = array(
-							'method' => 'POST',
-							'headers' => array( 'Content-Type' => 'application/json' ),
-							'timeout' => 60,
-							'httpversion' => '1.0',
-							'redirection' => 0,
-							'body' => $this->json_encode(
-								array (
-									'regtoken' => $regtoken
-								)
-							)
-						);
+				'method' => 'POST',
+				'headers' => array( 'Content-Type' => 'application/json' ),
+				'timeout' => 60,
+				'httpversion' => '1.0',
+				'redirection' => 0,
+				'body' => $this->json_encode(
+					array (
+						'regtoken' => $regtoken
+					)
+				)
+			);
 
 			$response = wp_remote_request( 'https://ui.codisto.com/create', $httpOptions );
 
@@ -2173,6 +2271,10 @@ final class CodistoConnect {
 		exit();
 	}
 
+	/**
+	* POST handler for saving edits to templates
+	*
+	*/
 	public function update_template() {
 
 		if ( !current_user_can( 'edit_themes' ) ) {
@@ -2202,7 +2304,15 @@ final class CodistoConnect {
 		exit();
 	}
 
+	/**
+	* common function used to render a proxied codisto page that checks
+	* for a valid registered Codisto account
+	*
+	* @param string $url used to render an iframe to hold the locally proxied content
+	* @param string $tabclass used to apply a css class to the iframe for specialised frame styling
+	*/
 	private function admin_tab( $url, $tabclass ) {
+
 		$merchantid = get_option( 'codisto_merchantid' );
 
 		if ( ! is_numeric( $merchantid ) ) {
@@ -2231,6 +2341,7 @@ final class CodistoConnect {
 						<p>Your email address will be used to communicate important account information and to
 							provide a better support experience for any enquiries with your Codisto account.</p>
 
+						<?php wp_nonce_field( 'codisto-create' ); ?>
 						<input type="hidden" name="action" value="codisto_create"/>
 						<input type="hidden" name="method" value="email"/>
 
@@ -2316,50 +2427,86 @@ final class CodistoConnect {
 		}
 	}
 
+	/**
+	* renders the 'manage listings' tab
+	*
+	*/
 	public function ebay_tab() {
 		$adminUrl = admin_url( 'codisto/ebaytab/0/'.get_option( 'codisto_merchantid' ).'/' );
 
 		$this->admin_tab( $adminUrl, 'codisto-bulk-editor' );
 	}
 
+	/**
+	* renders the 'manage orders' tab
+	*
+	*/
 	public function orders() {
 		$adminUrl = admin_url( 'codisto/ebaytab/0/'.get_option( 'codisto_merchantid' ).'/orders/' );
 
 		$this->admin_tab( $adminUrl, 'codisto-bulk-editor' );
 	}
 
+	/**
+	* renders the 'manage categories' tab
+	*
+	*/
 	public function categories() {
 		$adminUrl = admin_url( 'codisto/ebaytab/0/'.get_option( 'codisto_merchantid' ).'/categories/' );
 
 		$this->admin_tab( $adminUrl, 'codisto-bulk-editor' );
 	}
 
+	/**
+	* renders the 'attribute mapping' tab
+	*
+	*/
 	public function attributes() {
 		$adminUrl = admin_url( 'codisto/ebaytab/0/'.get_option( 'codisto_merchantid' ).'/attributemapping/' );
 
 		$this->admin_tab( $adminUrl, 'codisto-attributemapping' );
 	}
 
+	/**
+	* renders the 'import listings' tab
+	*
+	*/
 	public function import() {
 		$adminUrl = admin_url( 'codisto/ebaytab/0/'.get_option( 'codisto_merchantid' ).'/importlistings/' );
 
 		$this->admin_tab( $adminUrl, 'codisto-bulk-editor' );
 	}
 
+	/**
+	* renders the 'account' tab
+	*
+	*/
 	public function account() {
 		$adminUrl = admin_url( 'codisto/ebaytab/0/'.get_option( 'codisto_merchantid' ).'/account/' );
 
 		$this->admin_tab( $adminUrl, 'codisto-account' );
 	}
 
+	/**
+	* implements the templates link
+	*
+	*/
 	public function templates() {
 		include 'templates.php';
 	}
 
+	/**
+	* renders support message for multisite instances
+	*
+	*/
 	public function multisite() {
 		include 'multisite.php';
 	}
 
+	/**
+	* renders the 'settings' tab
+	*
+	*/
 	public function settings() {
 
 		$adminUrl = admin_url( 'codisto/settings/' );
@@ -2367,6 +2514,11 @@ final class CodistoConnect {
 		$this->admin_tab( $adminUrl, 'codisto-settings' );
 	}
 
+	/**
+	* admin_menu hook handler used to add the codisto menu entries to the
+	* wordpress admin menu
+	*
+	*/
 	public function admin_menu() {
 
 		if ( current_user_can( 'manage_woocommerce' ) ) {
@@ -2400,6 +2552,14 @@ final class CodistoConnect {
 		}
 	}
 
+	/**
+	* admin_body_class hook handler used to add a class to the page body
+	* to perform specific styling - mostly of the embedded iframe for proxied
+	* content
+	*
+	* @param array $classes the set of classes to be applied to the body
+	* @return array the classes array mutated in the function passed as input
+	*/
 	public function admin_body_class( $classes ) {
 		if ( isset($_GET['page'] ) ) {
 			$page = wp_unslash( $_GET['page'] );
@@ -2420,10 +2580,20 @@ final class CodistoConnect {
 		return $classes;
 	}
 
+	/**
+	* admin_styles hook used to apply the codisto admin css
+	*
+	*/
 	public function admin_styles() {
 		wp_enqueue_style( 'codisto-style' );
 	}
 
+	/**
+	* woocommerce_product_bulk_edit_save hook handler
+	* used to notify bulk changes to products to codisto
+	*
+	* @param object $product object being bulk saved
+	*/
 	public function bulk_edit_save( $product ) {
 		if ( ! $this->ping ) {
 			$this->ping = array();
@@ -2442,6 +2612,13 @@ final class CodistoConnect {
 		$this->ping['products'] = $pingProducts;
 	}
 
+	/**
+	* woocommerce_admin_settings_sanitize_option_woocommerce_currency hook handler
+	* used to notify changes to currency setting to codisto
+	*
+	* @param string $value currency value that is being set
+	* @return string the value input unchanged
+	*/
 	public function option_save( $value ) {
 
 		if ( ! $this->ping ) {
@@ -2451,6 +2628,12 @@ final class CodistoConnect {
 		return $value;
 	}
 
+	/**
+	* save_post hook handler used to notify changes to products to codisto
+	*
+	* @param integer $id of the product
+	* @param object $post object that represents the post (which is checked to be a product)
+	*/
 	public function post_save( $id, $post ) {
 
 		if ( $post->post_type == 'product' ) {
@@ -2472,7 +2655,14 @@ final class CodistoConnect {
 		}
 	}
 
+	/**
+	* woocommerce_reduce_order_stock hook handler used to notify stock changes
+	* to codisto
+	*
+	* @param object $order object that is having it's contained orders stock reduced
+	*/
 	public function order_reduce_stock( $order ) {
+
 		$product_ids = array();
 
 		foreach ( $order->get_items() as $item ) {
@@ -2504,6 +2694,11 @@ final class CodistoConnect {
 		}
 	}
 
+	/**
+	* takes collected set of signals during post handling and transmits to codisto
+	*
+	* this runs within the shutdown hook to avoid standard stalling admin processing
+	*/
 	public function signal_edits() {
 
 		if ( is_array( $this->ping ) &&
@@ -2540,7 +2735,14 @@ final class CodistoConnect {
 		}
 	}
 
+	/**
+	* woocommerce_product_data_tabs hook handler used to render marketplace product tab
+	*
+	* @param array $tabs current set of tabs for the product page
+	* @return array mutated tabs array to render the contained tabs on the woo product page
+	*/
 	public function add_ebay_product_tab( $tabs ) {
+
 		$tabs['codisto'] = array(
 								'label'	=> __( 'Amazon & eBay', 'codisto-linq' ),
 								'target' => 'codisto_product_data',
@@ -2550,7 +2752,12 @@ final class CodistoConnect {
 		return $tabs;
 	}
 
+	/**
+	* woocommerce_product_data_panels hook handler used to render marketplace product info
+	*
+	*/
 	public function ebay_product_tab_content() {
+
 		global $post;
 
 		?>
@@ -2560,7 +2767,14 @@ final class CodistoConnect {
 		<?php
 	}
 
+	/**
+	* plugin_action_links hook handler to render helpful links in plugin page
+	*
+	* @param array $links for plugin
+	* @return array passed through $links array
+	*/
 	public function plugin_links( $links ) {
+
 		$action_links = array(
 			'listings' => '<a href="' . admin_url( 'admin.php?page=codisto' ) . '" title="'.esc_html__( 'Manage Amazon & eBay Listings', 'codisto-linq' ).'">'.esc_html__( 'Manage Amazon & eBay Listings', 'codisto-linq' ).'</a>',
 			'settings' => '<a href="' . admin_url( 'admin.php?page=codisto-settings' ) . '" title="'.esc_html__( 'Codisto Settings', 'codisto-linq' ).'">'.esc_html__( 'Settings', 'codisto-linq' ).'</a>'
@@ -2569,14 +2783,22 @@ final class CodistoConnect {
 		return array_merge( $action_links, $links );
 	}
 
+	/**
+	* admin_notices hook handler to render post installation transient notice
+	*
+	*/
 	function admin_notice_info() {
+
 		if ( get_transient( 'codisto-admin-notice' ) ){
 			$class = 'notice notice-info is-dismissible';
 			printf( '<div class="%1$s"><p>'.esc_html__( 'Codisto LINQ Successfully Activated!', 'codisto-linq' ).' '. wp_kses( __('<a class="button action" href="admin.php?page=codisto">Click here</a> to get started.', 'codisto-linq' ) ).'</p></div>', esc_attr( $class ) );
 		}
 	}
 
-
+	/**
+	* plugin initialisation
+	*
+	*/
 	public function init_plugin() {
 
 		$homeUrl = preg_replace( '/^https?:\/\//', '', trim( home_url() ) );
@@ -2634,6 +2856,14 @@ final class CodistoConnect {
 
 	}
 
+	/**
+	* static init method for the plugin, registers the activation hook
+	* setups up the init_plugin action
+	*
+	* handles extra kludges to make the sync end point work for various
+	* third party extensions
+	*
+	*/
 	public static function init() {
 
 		if ( is_null( self::$_instance ) ) {
@@ -2656,6 +2886,11 @@ final class CodistoConnect {
 		return self::$_instance;
 	}
 
+	/**
+	* acivation hook handler - used to setup the admin notice as a transient
+	* and install rewrite rules for the sync and proxy end points
+	*
+	*/
 	public static function activate() {
 
 		$homeUrl = preg_replace( '/^https?:\/\//', '', trim( home_url() ) );
