@@ -112,19 +112,5 @@ if( file_exists( $file ) ) {
 	</div>
 </form>
 
-<script>
-jQuery(function($) {
-
-	$(".new-template").on("click", function(e) {
-
-		document.location.search = "page=codisto-templates&file=_new";
-
-	});
-
-	$("#filename").focus();
-
-});
-</script>
-
 <?php
 include(ABSPATH . 'wp-admin/admin-footer.php' );

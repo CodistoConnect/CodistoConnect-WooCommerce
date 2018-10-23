@@ -2314,7 +2314,7 @@ final class CodistoConnect {
 	private function admin_tab( $url, $tabclass ) {
 
 		$merchantid = get_option( 'codisto_merchantid' );
-
+		
 		if ( ! is_numeric( $merchantid ) ) {
 
 			$email = get_option( 'admin_email' );
@@ -2326,17 +2326,14 @@ final class CodistoConnect {
 
 			?>
 			<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:500,900,700,400">
-			<style>
 
-			</style>
-
-				<iframe id="dummy-data" frameborder="0" src="https://codisto.com/xpressgriddemo/ebayedit/"></iframe>
-				<div id="dummy-data-overlay"></div>
-				<div id="create-account-modal">
-					<img style="float:right; margin-top:26px; margin-right:15px;" height="30" src="https://codisto.com/images/codistodarkgrey.png">
-					<h1>Create your Account</h1>
-					<div class="body">
-						<form id="codisto-form" action="<?php echo htmlspecialchars( admin_url( 'admin-post.php' ) ); ?>" method="post">
+			<iframe id="dummy-data" frameborder="0" src="https://codisto.com/xpressgriddemo/ebayedit/"></iframe>
+			<div id="dummy-data-overlay"></div>
+			<div id="create-account-modal">
+				<img style="float:right; margin-top:26px; margin-right:15px;" height="30" src="https://codisto.com/images/codistodarkgrey.png">
+				<h1>Create your Account</h1>
+				<div class="body">
+					<form id="codisto-form" action="<?php echo htmlspecialchars( admin_url( 'admin-post.php' ) ); ?>" method="post">
 						<p>To get started, enter your email address.</p>
 						<p>Your email address will be used to communicate important account information and to
 							provide a better support experience for any enquiries with your Codisto account.</p>
@@ -2359,60 +2356,14 @@ final class CodistoConnect {
 							<strong>Your email addresses do not match.</strong>
 						</div>
 
-						</div>
 					</form>
-					<div class="footer">
-						Once you create an account we will begin synchronizing your catalog data.<br>
-						Sit tight, this may take several minutes depending on the size of your catalog.<br>
-						When completed, you'll have the world's best eBay & Amazon integration at your fingertips.<br>
-					</div>
 				</div>
-
-				<script>
-				jQuery(function($) {
-
-					$("#codisto-form").on("change", function(e){
-
-						checkButton();
-
-					});
-
-					$("#codisto-form").on("keyup", function(e){
-
-						checkButton();
-
-					});
-
-					$("#codisto-form").on("submit", function(e) {
-
-						var email = $("#codisto-form input[name=email]").val();
-						var emailconfirm = $("#codisto-form input[name=emailconfirm]").val();
-						if (email != emailconfirm) {
-							e.stopPropagation();
-							e.preventDefault();
-							$(".error-message").show();
-						} else {
-							$(".error-message").hide();
-						}
-
-					});
-
-					function checkButton() {
-
-						var email = $("#codisto-form input[name=email]").val();
-						var emailconfirm = $("#codisto-form input[name=emailconfirm]").val();
-						if (email && emailconfirm
-							&& (email == emailconfirm)) {
-							$("#codisto-form").find(".next button").addClass("button-primary");
-						} else {
-							$("#codisto-form").find(".next button").removeClass("button-primary");
-						}
-
-					}
-
-				});
-				</script>
-
+				<div class="footer">
+					Once you create an account we will begin synchronizing your catalog data.<br>
+					Sit tight, this may take several minutes depending on the size of your catalog.<br>
+					When completed, you'll have the world's best eBay & Amazon integration at your fingertips.<br>
+				</div>
+			</div>
 
 			<?php
 
@@ -2546,9 +2497,6 @@ final class CodistoConnect {
 				$pages[] = add_submenu_page( 'codisto', __( 'Account', 'codisto-linq' ), __( 'Account', 'codisto-linq' ), 'edit_posts', 'codisto-account', array( $this, 'account' ) );
 			}
 
-			foreach ( $pages as $page ) {
-				add_action( "admin_print_styles-{$page}", array( $this, 'admin_styles' ) );
-			}
 		}
 	}
 
@@ -2581,11 +2529,19 @@ final class CodistoConnect {
 	}
 
 	/**
-	* admin_styles hook used to apply the codisto admin css
+	* admin_scripts hook used to apply the codisto admin css+js
 	*
+	* @param string $hook the top level plugin page
 	*/
-	public function admin_styles() {
-		wp_enqueue_style( 'codisto-style' );
+	public function admin_scripts( $hook ) {
+
+		if ( preg_match ( '/codisto(?:-orders|-categories|-attributes|-import|-templates|-settings|-account|)$/', $hook ) ) {
+
+			wp_enqueue_style( 'codisto-style' );
+			wp_enqueue_script( 'codisto-script' );
+
+		}
+
 	}
 
 	/**
@@ -2825,12 +2781,14 @@ final class CodistoConnect {
 		);
 
 		wp_register_style( 'codisto-style', plugins_url( 'styles.css', __FILE__ ) );
+		wp_register_script( 'codisto-script', plugins_url( 'admin.js', __FILE__ ) );
 
 		add_filter( 'query_vars', 							array( $this, 'query_vars' ) );
 		add_filter( 'nocache_headers',						array( $this, 'nocache_headers' ) );
 		add_action( 'parse_request',						array( $this, 'parse' ), 0 );
 		add_action( 'admin_post_codisto_create',			array( $this, 'create_account' ) );
 		add_action( 'admin_post_codisto_update_template',	array( $this, 'update_template' ) );
+		add_action( 'admin_enqueue_scripts', 				array( $this, 'admin_scripts' ) );
 		add_action( 'admin_menu',							array( $this, 'admin_menu' ) );
 		add_action( 'admin_notices', 						array( $this, 'admin_notice_info' ) );
 		add_filter( 'admin_body_class', 					array( $this, 'admin_body_class' ) );
