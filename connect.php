@@ -1,7 +1,7 @@
 <?php
 /**
  * @package Codisto LINQ by Codisto
- * @version 1.3.15
+ * @version 1.3.16
  */
 /*
 Plugin Name: Codisto LINQ by Codisto
@@ -9,12 +9,12 @@ Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
 Text Domain: codisto-linq
 Author: Codisto
-Version: 1.3.15
+Version: 1.3.16
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 2.0.0
-WC tested up to: 3.4.5
+WC tested up to: 3.5.0
 Woo: 3545890:3c75b3f47161553cc222406137b96a7b
 */
 
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.15' );
+define( 'CODISTOCONNECT_VERSION', '1.3.16' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -1387,7 +1387,7 @@ final class CodistoConnect {
 
 						remove_filter( 'woocommerce_new_order_data', $new_order_data_callback );
 
-						$order_id = $order->id;
+						$order_id = $order->get_id();
 
 						update_post_meta( $order_id, '_codisto_orderid', (int)$ordercontent->orderid );
 						update_post_meta( $order_id, '_codisto_merchantid', (int)$ordercontent->merchantid );
@@ -1588,7 +1588,7 @@ final class CodistoConnect {
 					if ( $ordercontent->orderstate == 'cancelled' ) {
 						if ( ! $order->has_status( 'cancelled' ) ) {
 							// update_status
-							$order->post_status = 'wc-cancelled';
+							$order->set_status( 'cancelled' );
 							$update_post_data  = array(
 								'ID'         	=> $order_id,
 								'post_status'	=> 'wc-cancelled',
@@ -1606,7 +1606,7 @@ final class CodistoConnect {
 						if ( $ordercontent->paymentstatus == 'complete' ) {
 							if ( ! $order->has_status( 'processing' ) ) {
 								// update_status
-								$order->post_status = 'wc-processing';
+								$order->set_status( 'processing' );
 								$update_post_data  = array(
 									'ID'         	=> $order_id,
 									'post_status'	=> 'wc-processing',
@@ -1618,7 +1618,7 @@ final class CodistoConnect {
 						} else {
 							if ( ! $order->has_status( 'pending' ) ) {
 								// update_status
-								$order->post_status = 'wc-pending';
+								$order->set_status( 'pending' );
 								$update_post_data  = array(
 									'ID'         	=> $order_id,
 									'post_status'	=> 'wc-pending',
@@ -1633,7 +1633,7 @@ final class CodistoConnect {
 
 						if ( ! $order->has_status( 'completed' ) ) {
 							// update_status
-							$order->post_status = 'wc-completed';
+							$order->set_status( 'completed' );
 							$update_post_data  = array(
 								'ID'         	=> $order_id,
 								'post_status'	=> 'wc-completed',
@@ -1833,7 +1833,7 @@ final class CodistoConnect {
 	* @return boolean status to whether the order can be edited
 	*/
 	public function order_is_editable( $editable, $order ) {
-		$codisto_order_id = get_post_meta( $order->id, '_codisto_orderid', true);
+		$codisto_order_id = get_post_meta( $order->get_id(), '_codisto_orderid', true);
 		if ( is_numeric( $codisto_order_id ) && $codisto_order_id !== 0 ) {
 			return false;
 		}
@@ -1848,9 +1848,9 @@ final class CodistoConnect {
 	* @param object $order that the buttons are to be rendered for
 	*/
 	public function order_buttons( $order ) {
-		$codisto_order_id = get_post_meta( $order->id, '_codisto_orderid', true );
+		$codisto_order_id = get_post_meta( $order->get_id(), '_codisto_orderid', true );
 		if ( is_numeric( $codisto_order_id ) && $codisto_order_id !== 0 ) {
-			$ebay_user = get_post_meta( $order->id, '_codisto_ebayusername', true );
+			$ebay_user = get_post_meta( $order->get_id(), '_codisto_ebayusername', true );
 			if ( $ebay_user ) {
 				?>
 				<p class="form-field form-field-wide codisto-order-buttons">
