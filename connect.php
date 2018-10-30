@@ -1,7 +1,7 @@
 <?php
 /**
  * @package Codisto LINQ by Codisto
- * @version 1.3.13
+ * @version 1.3.14
  */
 /*
 Plugin Name: Codisto LINQ by Codisto
@@ -9,7 +9,7 @@ Plugin URI: http://wordpress.org/plugins/codistoconnect/
 Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
 Text Domain: codisto-linq
 Author: Codisto
-Version: 1.3.13
+Version: 1.3.14
 Author URI: https://codisto.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -1840,7 +1840,7 @@ final class CodistoConnect {
 	public function order_buttons( $order ) {
 		$codisto_order_id = get_post_meta( $order->id, '_codisto_orderid', true );
 		if ( is_numeric( $codisto_order_id ) && $codisto_order_id !== 0 ) {
-			$ebay_user = get_post_meta( $order->id, '_codisto_ebayuser', true );
+			$ebay_user = get_post_meta( $order->id, '_codisto_ebayusername', true );
 			if ( $ebay_user ) {
 				?>
 				<p class="form-field form-field-wide codisto-order-buttons">
@@ -2314,7 +2314,7 @@ final class CodistoConnect {
 	private function admin_tab( $url, $tabclass ) {
 
 		$merchantid = get_option( 'codisto_merchantid' );
-		
+
 		if ( ! is_numeric( $merchantid ) ) {
 
 			$email = get_option( 'admin_email' );
