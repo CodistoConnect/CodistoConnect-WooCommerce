@@ -96,6 +96,7 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 = 1.3.15 - 29/10/2018 =
 
+* handle tracking numbers from 'WooCommerce Shipping Tracking' (WCST)
 * general code improvements
 
 = 1.3.14 - 29/10/2018 =
