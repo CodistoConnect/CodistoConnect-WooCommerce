@@ -960,13 +960,22 @@ final class CodistoConnect {
 								$carrier = get_post_meta( $order->post_id, '_custom_tracking_provider', true );
 							}
 
-							if ( $carrier ) {
-								$order->carrier = $carrier;
-							}
+						} else {
+
+							$carrier = get_post_meta( $order->post_id, '_wcst_order_trackname', true);
+
+						}
+						if($carrier)
+						{
+							$order->carrier = $carrier;
 						}
 
-						$tracking_number = get_post_meta( $order->post_id, '_tracking_number', true );
-						if ( $tracking_number ) {
+						$tracking_number = get_post_meta( $order->post_id, '_tracking_number', true);
+						if ( !$tracking_number ) {
+							$tracking_number = get_post_meta( $order->post_id, '_wcst_order_trackno', true );
+						}
+						if($tracking_number)
+						{
 							$order->track_number = $tracking_number;
 						}
 					}
