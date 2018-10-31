@@ -1,8 +1,5 @@
 <?php
 /**
- * @package Codisto LINQ by Codisto
- * @version 1.3.16
- *
  * Plugin Name: Codisto LINQ by Codisto
  * Plugin URI: http://wordpress.org/plugins/codistoconnect/
  * Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
@@ -15,7 +12,10 @@
  * Woo: 3545890:3c75b3f47161553cc222406137b96a7b
  * WC requires at least: 2.0.0
  * WC tested up to: 3.5.0
-*/
+ *
+ * @package Codisto LINQ by Codisto
+ * @version 1.3.16
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
