@@ -2358,6 +2358,14 @@ final class CodistoConnect {
 							<input type="email" name="emailconfirm" required placeholder="Confirm Your Email Address" size="40">
 						</div>
 
+						<div class="selection">
+					        Default Store Country:<br/>
+					        <div class="select-html-wrapper"></div>
+					        This is important for creating your initial store defaults.
+							<br/>
+							<br/>
+					    </div>
+
 						<div class="next">
 							<button type="submit" class="button btn-lg">Continue</button>
 						</div>
