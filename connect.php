@@ -5,7 +5,7 @@
  * Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.18
+ * Version: 1.3.19
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
@@ -14,14 +14,14 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.18
+ * @version 1.3.19
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.18' );
+define( 'CODISTOCONNECT_VERSION', '1.3.19' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -1589,7 +1589,7 @@ final class CodistoConnect {
 							// update_status
 							$order->set_status( 'cancelled' );
 							$update_post_data  = array(
-								'ID'         	=> $order_id,
+								'ID'		 	=> $order_id,
 								'post_status'	=> 'wc-cancelled',
 								'post_date'		=> current_time( 'mysql', 0 ),
 								'post_date_gmt' => current_time( 'mysql', 1 )
@@ -1607,7 +1607,7 @@ final class CodistoConnect {
 								// update_status
 								$order->set_status( 'processing' );
 								$update_post_data  = array(
-									'ID'         	=> $order_id,
+									'ID'		 	=> $order_id,
 									'post_status'	=> 'wc-processing',
 									'post_date'		=> current_time( 'mysql', 0 ),
 									'post_date_gmt' => current_time( 'mysql', 1 )
@@ -1619,7 +1619,7 @@ final class CodistoConnect {
 								// update_status
 								$order->set_status( 'pending' );
 								$update_post_data  = array(
-									'ID'         	=> $order_id,
+									'ID'		 	=> $order_id,
 									'post_status'	=> 'wc-pending',
 									'post_date'		=> current_time( 'mysql', 0 ),
 									'post_date_gmt' => current_time( 'mysql', 1 )
@@ -1634,7 +1634,7 @@ final class CodistoConnect {
 							// update_status
 							$order->set_status( 'completed' );
 							$update_post_data  = array(
-								'ID'         	=> $order_id,
+								'ID'		 	=> $order_id,
 								'post_status'	=> 'wc-completed',
 								'post_date'		=> current_time( 'mysql', 0 ),
 								'post_date_gmt' => current_time( 'mysql', 1 )
@@ -2119,6 +2119,8 @@ final class CodistoConnect {
 
 			if ( $_POST['method'] == 'email' ) {
 				$signupemail = wp_unslash( $_POST['email'] );
+				$signupcountry = wp_unslash( $_POST['countrycode'] );
+				$signupphone = wp_unslash( $_POST['phone'] );
 
 				$httpOptions = array(
 								'method' => 'POST',
@@ -2152,6 +2154,8 @@ final class CodistoConnect {
 						'version' => $blogversion,
 						'url' => $blogurl,
 						'email' => $signupemail,
+						'phone' => $signupphone,
+						'country' => $signupcountry,
 						'storename' => $blogdescription,
 						'resellerkey' => $this->reseller_key(),
 						'codistoversion' => CODISTOCONNECT_VERSION
@@ -2335,6 +2339,7 @@ final class CodistoConnect {
 
 			?>
 			<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:500,900,700,400">
+			<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
 			<iframe id="dummy-data" frameborder="0" src="https://codisto.com/xpressgriddemo/ebayedit/"></iframe>
 			<div id="dummy-data-overlay"></div>
@@ -2344,7 +2349,7 @@ final class CodistoConnect {
 				<div class="body">
 					<form id="codisto-form" action="<?php echo htmlspecialchars( admin_url( 'admin-post.php' ) ); ?>" method="post">
 						<p>To get started, enter your email address.</p>
-						<p>Your email address will be used to communicate important account information and to
+						<p>Your email address and phone number will be used to communicate important account information and to
 							provide a better support experience for any enquiries with your Codisto account.</p>
 
 						<?php wp_nonce_field( 'codisto-create' ); ?>
@@ -2352,14 +2357,26 @@ final class CodistoConnect {
 						<input type="hidden" name="method" value="email"/>
 
 						<div>
-							<input type="email" name="email" required placeholder="Enter Your Email Address" size="40">
+							<i class="material-icons">email</i> <input type="email" name="email" required placeholder="Enter Your Email Address" size="40">
 						</div>
 						<div>
-							<input type="email" name="emailconfirm" required placeholder="Confirm Your Email Address" size="40">
+							<i class="material-icons">email</i> <input type="email" name="emailconfirm" required placeholder="Confirm Your Email Address" size="40">
+						</div>
+
+						<div>
+							<i class="material-icons">phone_in_talk</i> <input type="tel" name="phone" required placeholder="Enter your Phone Number (incl. country code)" size="40">
+						</div>
+
+						<div class="selection">
+							<i class="material-icons">language</i> <div class="select-html-wrapper"></div>
+							<br/>
+							This is important for creating your initial store defaults.
+							<br/>
+							<br/>
 						</div>
 
 						<div class="next">
-							<button type="submit" class="button btn-lg">Continue</button>
+							<button type="submit" class="button btn-lg">Continue <i class="material-icons">keyboard_arrow_right</i></button>
 						</div>
 						<div class="error-message">
 							<strong>Your email addresses do not match.</strong>

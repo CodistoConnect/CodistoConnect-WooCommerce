@@ -48,6 +48,27 @@
 
 		if(codistoForm) {
 
+			document.querySelector("#create-account-modal .selection").style.opacity = 0.1;
+
+			function jsonp(url, callback) {
+				var callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+				var script = document.createElement('script');
+
+				script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + callbackName;
+				document.body.appendChild(script);
+
+				window[callbackName] = function(data) {
+					delete window[callbackName];
+					document.body.removeChild(script);
+					callback(data);
+				};
+			}
+
+			jsonp("https://ui.codisto.com/getcountrylist", function(data) {
+				document.querySelector(".select-html-wrapper").innerHTML = data;
+				document.querySelector("#create-account-modal .selection").style.opacity = 1;
+			});
+
 			codistoForm.addEventListener("change", checkButton);
 			codistoForm.addEventListener("keyup", checkButton);
 			codistoForm.addEventListener("submit", function(e) {
