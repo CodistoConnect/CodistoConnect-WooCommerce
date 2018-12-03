@@ -945,7 +945,7 @@ final class CodistoConnect {
 					} else {
 
 						$tracking_object = get_post_meta( $order->post_id, 'wf_wc_shipment_source', true );
-						if( $tracking_object && is_object($tracking_object) && isset( $tracking_object['shipment_id_cs'] ) ) {
+						if( $tracking_object && is_array($tracking_object) && isset( $tracking_object['shipment_id_cs'] ) ) {
 
 							$ship_date = date( 'Y-m-d H:i:s', strtotime( $tracking_object['order_date'] ) );
 							if( $ship_date ) {
