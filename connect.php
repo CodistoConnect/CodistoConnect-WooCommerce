@@ -944,38 +944,48 @@ final class CodistoConnect {
 
 					} else {
 
-						$ship_date = get_post_meta( $order->post_id, '_date_shipped', true );
-						if ( $ship_date ) {
-							if ( is_numeric( $ship_date ) ) {
-								$ship_date = date( 'Y-m-d H:i:s', $ship_date );
+						$tracking_object = get_post_meta( $order->post_id, 'wf_wc_shipment_source', true );
+						if( $tracking_object && is_object($tracking_object) && isset( $tracking_object['shipment_id_cs'] ) ) {
+
+							$order->ship_date = $tracking_object['shipment_date'];
+							$order->carrier = $tracking_object['shipping_service'];
+							$order->track_number = $trackibg_object['shipment_id_cs'];
+
+						}  else {
+
+							$ship_date = get_post_meta( $order->post_id, '_date_shipped', true );
+							if ( $ship_date ) {
+								if ( is_numeric( $ship_date ) ) {
+									$ship_date = date( 'Y-m-d H:i:s', $ship_date );
+								}
+
+								$order->ship_date = $ship_date;
 							}
 
-							$order->ship_date = $ship_date;
-						}
+							$carrier = get_post_meta( $order->post_id, '_tracking_provider', true);
+							if ( $carrier ) {
+								if ( $carrier === 'custom' ) {
+									$carrier = get_post_meta( $order->post_id, '_custom_tracking_provider', true );
+								}
 
-						$carrier = get_post_meta( $order->post_id, '_tracking_provider', true);
-						if ( $carrier ) {
-							if ( $carrier === 'custom' ) {
-								$carrier = get_post_meta( $order->post_id, '_custom_tracking_provider', true );
+							} else {
+
+								$carrier = get_post_meta( $order->post_id, '_wcst_order_trackname', true);
+
+							}
+							if($carrier)
+							{
+								$order->carrier = $carrier;
 							}
 
-						} else {
-
-							$carrier = get_post_meta( $order->post_id, '_wcst_order_trackname', true);
-
-						}
-						if($carrier)
-						{
-							$order->carrier = $carrier;
-						}
-
-						$tracking_number = get_post_meta( $order->post_id, '_tracking_number', true);
-						if ( !$tracking_number ) {
-							$tracking_number = get_post_meta( $order->post_id, '_wcst_order_trackno', true );
-						}
-						if($tracking_number)
-						{
-							$order->track_number = $tracking_number;
+							$tracking_number = get_post_meta( $order->post_id, '_tracking_number', true);
+							if ( !$tracking_number ) {
+								$tracking_number = get_post_meta( $order->post_id, '_wcst_order_trackno', true );
+							}
+							if($tracking_number)
+							{
+								$order->track_number = $tracking_number;
+							}
 						}
 					}
 
