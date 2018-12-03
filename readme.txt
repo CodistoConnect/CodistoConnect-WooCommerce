@@ -3,7 +3,7 @@ Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
 Tested up to: 4.9.8
-Stable tag: 1.3.20
+Stable tag: 1.3.21
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -44,7 +44,7 @@ Amazon & eBay integration is all Codisto does.  By solely focusing on Amazon & e
 
 Visit https://codisto.com/connect/ to read more about Codisto LINQ including documentation, installation instructions and pricing.
 
-Pricing starts at $49 USD per month.
+Pricing starts at $29 USD per month.
 
 == Installation ==
 
@@ -93,6 +93,10 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 3. Order Management
 
 == Changelog ==
+
+= 1.3.21 - 04/12/2018 =
+
+* added support for WooCommerce Shipping Tracking Pro extension
 
 = 1.3.20 - 09/11/2018 =
 
