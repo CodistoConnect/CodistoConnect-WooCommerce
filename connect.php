@@ -947,9 +947,26 @@ final class CodistoConnect {
 						$tracking_object = get_post_meta( $order->post_id, 'wf_wc_shipment_source', true );
 						if( $tracking_object && is_object($tracking_object) && isset( $tracking_object['shipment_id_cs'] ) ) {
 
-							$order->ship_date = $tracking_object['shipment_date'];
-							$order->carrier = $tracking_object['shipping_service'];
-							$order->track_number = $trackibg_object['shipment_id_cs'];
+							$ship_date = date( 'Y-m-d H:i:s', strtotime( $tracking_object['order_date'] ) );
+							if( $ship_date ) {
+
+								$order->ship_date = $ship_date;
+
+							}
+
+							$carrier = $tracking_object['shipping_service'];
+							if( $carrier ) {
+
+								$order->carrier = $carrier;
+
+							}
+
+							$tracking_number = $tracking_object['shipment_id_cs'];
+							if( $tracking_number ) {
+
+								$order->track_number = $tracking_number;
+
+							}
 
 						}  else {
 
