@@ -252,6 +252,10 @@ final class CodistoConnect {
 			exit();
 		}
 
+		// simulate admin context for sync of prices so appropriate filters run
+		require_once( ABSPATH . 'wp-admin/includes/admin.php' );
+		set_current_screen( 'dashboard' );
+
 		$type = $wp->query_vars['codisto-sync-route'];
 		if ( strtolower( $_SERVER['REQUEST_METHOD'] ) == 'get' ) {
 			if ( $type == 'test' ||
@@ -2896,10 +2900,6 @@ final class CodistoConnect {
 			add_action( 'init', array( self::$_instance, 'init_plugin' ) );
 
 			if ( preg_match( '/\/codisto-sync\//', $_SERVER['REQUEST_URI'] ) ) {
-
-				// simulate admin context for sync of prices so appropriate filters run
-				require_once( ABSPATH . 'wp-admin/includes/admin.php' );
-				set_current_screen( 'dashboard' );
 
 				// force aelia currency switcher to
 				$_POST['aelia_cs_currency'] = get_option('woocommerce_currency');
