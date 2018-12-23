@@ -5,23 +5,23 @@
  * Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.21
+ * Version: 1.3.22
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
- * WC tested up to: 3.5.2
+ * WC tested up to: 3.5.3
  * License: GPLv2
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.21
+ * @version 1.3.22
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.21' );
+define( 'CODISTOCONNECT_VERSION', '1.3.22' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -251,6 +251,10 @@ final class CodistoConnect {
 			echo $this->json_encode( array( 'ack' => 'failed', 'message' => 'WooCommerce Deactivated' ) );
 			exit();
 		}
+
+		// simulate admin context for sync of prices so appropriate filters run
+		require_once( ABSPATH . 'wp-admin/includes/admin.php' );
+		set_current_screen( 'dashboard' );
 
 		$type = $wp->query_vars['codisto-sync-route'];
 		if ( strtolower( $_SERVER['REQUEST_METHOD'] ) == 'get' ) {
@@ -2896,10 +2900,6 @@ final class CodistoConnect {
 			add_action( 'init', array( self::$_instance, 'init_plugin' ) );
 
 			if ( preg_match( '/\/codisto-sync\//', $_SERVER['REQUEST_URI'] ) ) {
-
-				// simulate admin context for sync of prices so appropriate filters run
-				require_once( ABSPATH . 'wp-admin/includes/admin.php' );
-				set_current_screen( 'dashboard' );
 
 				// force aelia currency switcher to
 				$_POST['aelia_cs_currency'] = get_option('woocommerce_currency');
