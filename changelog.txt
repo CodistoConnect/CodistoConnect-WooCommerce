@@ -1,6 +1,9 @@
 *** WooCommerce Amazon and eBay Integration ***
 
 2018-12-23 - version 1.3.22
+* Update - tested up to 5.0.2 wordpress
+
+2018-12-23 - version 1.3.22
 * Fix	 - ordering of admin instantiation on sync
 
 2018-12-04 - version 1.3.21
