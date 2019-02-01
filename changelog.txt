@@ -1,5 +1,9 @@
 *** WooCommerce Amazon and eBay Integration ***
 
+2019-1-31 - version 1.3.24
+* Add	 - support WooCommerce REST API product edit hooks
+* Update - wordpress tested up to 5.0.3
+
 2018-12-23 - version 1.3.22
 * Update - tested up to 5.0.2 wordpress
 

@@ -5,7 +5,7 @@
  * Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.23
+ * Version: 1.3.24
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
@@ -14,14 +14,14 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.23
+ * @version 1.3.24
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.23' );
+define( 'CODISTOCONNECT_VERSION', '1.3.24' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -2611,6 +2611,7 @@ final class CodistoConnect {
 	* @param object $product object being bulk saved
 	*/
 	public function bulk_edit_save( $product ) {
+
 		if ( ! $this->ping ) {
 			$this->ping = array();
 		}
@@ -2650,7 +2651,7 @@ final class CodistoConnect {
 	* @param integer $id of the product
 	* @param object $post object that represents the post (which is checked to be a product)
 	*/
-	public function post_save( $id, $post ) {
+	public function product_save( $id, $post ) {
 
 		if ( $post->post_type == 'product' ) {
 			if ( ! $this->ping ) {
@@ -2862,7 +2863,8 @@ final class CodistoConnect {
 		add_action( 'admin_notices', 						array( $this, 'admin_notice_info' ) );
 		add_filter( 'admin_body_class', 					array( $this, 'admin_body_class' ) );
 		add_action(	'woocommerce_product_bulk_edit_save', 	array( $this, 'bulk_edit_save' ) );
-		add_action( 'save_post',							array( $this, 'post_save' ), 10, 2 );
+		add_action(	'woocommerce_before_product_object_save', 	array( $this, 'product_save' ) );
+		add_action( 'save_post',							array( $this, 'product_save' ), 10, 2 );
 		add_filter( 'woocommerce_product_data_tabs',		array( $this, 'add_ebay_product_tab' ) );
 		add_action( 'woocommerce_product_data_panels',		array( $this, 'ebay_product_tab_content' ) );
 		add_filter( 'wc_order_is_editable',					array( $this, 'order_is_editable' ), 10, 2 );

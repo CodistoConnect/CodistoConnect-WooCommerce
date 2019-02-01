@@ -2,8 +2,8 @@
 Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
-Tested up to: 5.0.2
-Stable tag: 1.3.23
+Tested up to: 5.0.3
+Stable tag: 1.3.24
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -93,6 +93,11 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 3. Order Management
 
 == Changelog ==
+
+= 1.3.24 - 31/1/2019 =
+
+* support WooCommerce REST API product edit hooks
+* wordpress tested up to 5.0.3
 
 = 1.3.23 - 23/12/2018 =
 
