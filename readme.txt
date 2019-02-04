@@ -3,7 +3,7 @@ Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
 Tested up to: 5.0.2
-Stable tag: 1.3.23
+Stable tag: 1.3.25
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
