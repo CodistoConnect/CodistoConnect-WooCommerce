@@ -1,5 +1,12 @@
 *** WooCommerce Amazon and eBay Integration ***
 
+2019-2-04 - version 1.3.25
+* add arguments to product_save hook
+
+2019-1-31 - version 1.3.24
+* support WooCommerce REST API product edit hooks
+* wordpress tested up to 5.0.3
+
 2018-12-23 - version 1.3.22
 * Update - tested up to 5.0.2 wordpress
 
