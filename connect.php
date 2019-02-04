@@ -2650,7 +2650,7 @@ final class CodistoConnect {
 	* @param integer $id of the product
 	* @param object $post object that represents the post (which is checked to be a product)
 	*/
-	public function post_save( $id, $post ) {
+	public function product_save( $id, $post ) {
 
 		if ( $post->post_type == 'product' ) {
 			if ( ! $this->ping ) {
