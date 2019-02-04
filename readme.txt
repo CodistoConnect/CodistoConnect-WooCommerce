@@ -94,6 +94,14 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 == Changelog ==
 
+= 1.3.25 - 3/02/2019 =
+* add arguments to product_save hook
+
+= 1.3.24 - 31/1/2019 =
+
+* support WooCommerce REST API product edit hooks
+* wordpress tested up to 5.0.3
+
 = 1.3.23 - 23/12/2018 =
 
 * wordpress tested up to 5.0.2
