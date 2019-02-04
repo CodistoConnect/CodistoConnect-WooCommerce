@@ -2611,6 +2611,7 @@ final class CodistoConnect {
 	* @param object $product object being bulk saved
 	*/
 	public function bulk_edit_save( $product ) {
+
 		if ( ! $this->ping ) {
 			$this->ping = array();
 		}
