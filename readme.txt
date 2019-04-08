@@ -2,8 +2,8 @@
 Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
-Tested up to: 5.0.2
-Stable tag: 1.3.25
+Tested up to: 5.1.1
+Stable tag: 1.3.26
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -18,6 +18,8 @@ Real time sync of catalog, inventory and orders.
 The only full catalog sync native WooCommerce extension for integrating Amazon & eBay.
 
 Amazon & eBay integration is all Codisto does.  By solely focusing on Amazon & eBay integration, Codisto ensures it is the leading provider of SaaS marketplace integration extensions.
+
+*Please note the plugin is free to download and install but the integration service requires a monthly subscription (after the 30 day free trial).  Please see pricing plans [here](https://codisto.com/linq/pricing.html)*
 
 = Key Features =
 
@@ -93,6 +95,11 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 3. Order Management
 
 == Changelog ==
+
+= 1.3.26 - 8/04/2019 =
+* change readme to highlight Codisto service
+* wordpress tested up to 5.1.1
+* woocommerce tested up to 3.5.7
 
 = 1.3.25 - 3/02/2019 =
 * add arguments to product_save hook
