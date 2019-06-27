@@ -5,23 +5,23 @@
  * Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.28
+ * Version: 1.3.29
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
- * WC tested up to: 3.6.2
+ * WC tested up to: 3.6.4
  * License: GPLv2
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.28
+ * @version 1.3.29
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.28' );
+define( 'CODISTOCONNECT_VERSION', '1.3.29' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -2551,7 +2551,7 @@ final class CodistoConnect {
 				$pages[] = add_submenu_page( 'codisto', __( 'Marketplace Orders', 'codisto-linq' ), __( 'Marketplace Orders', 'codisto-linq' ), 'edit_posts', 'codisto-orders', array( $this, 'orders' ) );
 				$pages[] = add_submenu_page( 'codisto', __( 'eBay Store Categories', 'codisto-linq' ), __( 'eBay Store Categories', 'codisto-linq' ), 'edit_posts', 'codisto-categories', array( $this, 'categories' ) );
 				$pages[] = add_submenu_page( 'codisto', __( 'Attribute Mapping', 'codisto-linq' ), __( 'Attribute Mapping', 'codisto-linq' ), 'edit_posts', 'codisto-attributes', array( $this, 'attributes' ) );
-				$pages[] = add_submenu_page( 'codisto', __( 'Link eBay Listings', 'codisto-linq' ), __( 'Link eBay Listings', 'codisto-linq' ), 'edit_posts', 'codisto-import', array( $this, 'import' ) );
+				$pages[] = add_submenu_page( 'codisto', __( 'Link Listings', 'codisto-linq' ), __( 'Link Listings', 'codisto-linq' ), 'edit_posts', 'codisto-import', array( $this, 'import' ) );
 				$pages[] = add_submenu_page( 'codisto', __( 'eBay Templates', 'codisto-linq' ), __( 'eBay Templates', 'codisto-linq' ), 'edit_posts', 'codisto-templates', array( $this, 'templates' ) );
 				$pages[] = add_submenu_page( 'codisto', __( 'Settings', 'codisto-linq' ), __( 'Settings', 'codisto-linq' ), 'edit_posts', 'codisto-settings', array( $this, 'settings' ) );
 				$pages[] = add_submenu_page( 'codisto', __( 'Account', 'codisto-linq' ), __( 'Account', 'codisto-linq' ), 'edit_posts', 'codisto-account', array( $this, 'account' ) );
