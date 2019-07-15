@@ -1,5 +1,8 @@
 *** WooCommerce Amazon and eBay Integration ***
 
+2019-07-15 - version 1.3.30
+* Update - woocommerce tested up to 3.6.5
+
 2019-06-27 - version 1.3.29
 * link listing menu name change
 * wordpress tested up to 5.2.2
