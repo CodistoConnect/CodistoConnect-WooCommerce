@@ -99,6 +99,7 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 = 1.3.31 - 02/08/2019 =
 * remove sqlite dependancy in template synchronisation
 * support multisite wordpress
+* fix writeable directory message in template editor
 
 = 1.3.30 - 15/07/2019 =
 * woocommerce tested up to 3.6.5
