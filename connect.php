@@ -1109,7 +1109,7 @@ final class CodistoConnect {
 
 							require_once( ABSPATH . 'wp-admin/includes/class-pclzip.php' );
 
-							$zipfile = new PclZip( $ebayDesignDir . "compressed.zip" );
+							$zipfile = new PclZip( $ebayDesignDir . "ebaytemplate.zip" );
 							$zipfile->create( $filestozip , PCLZIP_OPT_REMOVE_PATH, $ebayDesignDir );
 
 							$headers = array(
@@ -1119,7 +1119,7 @@ final class CodistoConnect {
 								'X-Codisto-Content-Type' => 'application/zip',
 								'Content-Type' => 'application/zip, application/octet-stream',
 								'Content-Disposition' => 'attachment; filename=' . basename( $zipfile ),
-								'Content-Length' => filesize( $ebayDesignDir . "compressed.zip" )
+								'Content-Length' => filesize( $ebayDesignDir . "ebaytemplate.zip" )
 							);
 
 							$this->sendHttpHeaders( '200 OK', $headers );
@@ -1131,11 +1131,11 @@ final class CodistoConnect {
 
 							flush();
 
-							readfile( $ebayDesignDir . "compressed.zip" );
+							readfile( $ebayDesignDir . "ebaytemplate.zip" );
 
 						}
 
-						unlink( $ebayDesignDir . "compressed.zip" );
+						unlink( $ebayDesignDir . "ebaytemplate.zip" );
 
 						exit();
 
