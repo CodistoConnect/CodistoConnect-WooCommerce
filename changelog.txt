@@ -1,5 +1,9 @@
 *** WooCommerce Amazon and eBay Integration ***
 
+2019-08-14 - version 1.3.32
+* Update - woocommerce tested up to 3.7
+* Fix - deal with simple product attributes that have is_variation true
+
 2019-08-02 - version 1.3.31
 * Update - remove sqlite dependancy in template synchronisation
 * Update - support multisite wordpress
