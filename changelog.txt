@@ -17,29 +17,29 @@
 * Update - woocommerce tested up to 3.6.5
 
 2019-06-27 - version 1.3.29
-* link listing menu name change
-* wordpress tested up to 5.2.2
+* Update - link listing menu name change
+* Update - wordpress tested up to 5.2.2
 * Update - woocommerce tested up to 3.6.4
 
 2019-05-10 - version 1.3.28
-* wordpress tested up to 5.2
+* Update - wordpress tested up to 5.2
 
 2019-04-26 - version 1.3.27
-* WooCommerce tested up to 3.6.2
+* Update - WooCommerce tested up to 3.6.2
 
 2019-4-08 - version 1.3.26
-* change readme to highlight Codisto service
-* wordpress tested up to 5.1.1
-* woocommerce tested up to 3.5.7
+* Update - change readme to highlight Codisto service
+* Update - wordpress tested up to 5.1.1
+* Update - woocommerce tested up to 3.5.7
 
 2019-2-04 - version 1.3.25
-* add arguments to product_save hook
+* Update - add arguments to product_save hook
 
 2019-1-31 - version 1.3.24
-* support WooCommerce REST API product edit hooks
-* wordpress tested up to 5.0.3
+* Update - support WooCommerce REST API product edit hooks
+* Update - wordpress tested up to 5.0.3
 
-2018-12-23 - version 1.3.22
+2018-12-23 - version 1.3.23
 * Update - tested up to 5.0.2 wordpress
 
 2018-12-23 - version 1.3.22
@@ -108,7 +108,7 @@
 2017-05-24 - version 1.3.0
 * Update - transmit plugin version during synchronisation
 
-2017-05-09 - version 1.2.5
+2017-05-09 - version 1.2.50
 * Update - updated menu items
 
 2017-05-01 - version 1.2.49
@@ -181,7 +181,7 @@
 * Update - support multiple shipping options in the shipping callback
 * Fix	 - properly add any applicable tax on shipping to the inc tax freight result
 
-2016-05-05 - version 1.2.6
+2016-05-05 - version 1.2.26
 * Fix	 - fixed an issue with rewrite generation in plugin activation when site and home urls had different protocols
 * Add 	 - added dynamic shipping callback for realtime bulky item rates on ebay
 
