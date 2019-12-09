@@ -5,23 +5,23 @@
  * Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.32
+ * Version: 1.3.33
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
- * WC tested up to: 3.7
+ * WC tested up to: 3.8
  * License: GPLv2
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.32
+ * @version 1.3.33
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.32' );
+define( 'CODISTOCONNECT_VERSION', '1.3.33' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -1487,7 +1487,7 @@ final class CodistoConnect {
 							// payment_complete
 							add_post_meta( $order_id, '_paid_date', current_time( 'mysql' ), true );
 							if ( $adjustStock && !get_post_meta( $order_id, '_order_stock_reduced', true ) ) {
-								$order->reduce_order_stock();
+								wc_maybe_reduce_stock_levels( $order_id );
 							}
 						}
 
@@ -1538,7 +1538,7 @@ final class CodistoConnect {
 							// payment_complete
 							add_post_meta( $order_id, '_paid_date', current_time( 'mysql' ), true );
 							if ( $adjustStock && ! get_post_meta( $order_id, '_order_stock_reduced', true ) ) {
-								$order->reduce_order_stock();
+								wc_maybe_reduce_stock_levels( $order_id );
 							}
 						}
 					}
