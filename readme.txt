@@ -96,7 +96,7 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 == Changelog ==
 
-= 1.3.34 - 27/11/2019 =
+= 1.3.34 - 23/12/2019 =
 * change WooCommerce plugin detection
 * WooCommerce tested up to 3.8.1
 * WordPress tested up to 5.3.2
