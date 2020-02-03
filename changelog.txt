@@ -1,5 +1,8 @@
 *** WooCommerce Amazon and eBay Integration ***
 
+2020-02-03 - version 1.3.37
+* Update - woocommerce tested up to 3.9.1
+
 2020-01-09 - version 1.3.36
 * Fix - include necessary files to ensure availability of is_plugin_active
 
