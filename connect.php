@@ -2751,7 +2751,7 @@ final class CodistoConnect {
 
 			$adminUrlLen = strlen($adminUrl);
 
-			if(substr($currentUrl, 0, adminUrlLen) === adminUrl){
+			if(substr($currentUrl, 0, $adminUrlLen) === $adminUrl){
 
 				define('WP_ADMIN', true);
 
