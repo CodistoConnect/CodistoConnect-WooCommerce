@@ -2,8 +2,8 @@
 Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
-Tested up to: 5.3.0
-Stable tag: 1.3.33
+Tested up to: 5.3.2
+Stable tag: 1.3.40
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -19,7 +19,7 @@ The only full catalog sync native WooCommerce extension for integrating Amazon &
 
 Amazon & eBay integration is all Codisto does.  By solely focusing on Amazon & eBay integration, Codisto ensures it is the leading provider of SaaS marketplace integration extensions.
 
-*Please note the plugin is free to download and install but the integration service requires a monthly subscription (after the 30 day free trial).  Please see pricing plans [here](https://codisto.com/linq/pricing.html)*
+*Please note the plugin is free to download and install but the integration service requires a monthly subscription (after the 14 day free trial).  Please see pricing plans [here](https://codisto.com/linq/pricing.html)*
 
 = Key Features =
 
@@ -95,6 +95,29 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 3. Order Management
 
 == Changelog ==
+
+= 1.3.40 - 3/03/2020 =
+* Fix - fix plugin load error
+
+= 1.3.39 - 2/03/2020 =
+* Update - compatibility improvements
+
+= 1.3.38 - 19/02/2020 =
+* Update - change trial days from 30 to 14
+
+= 1.3.37 - 3/02/2020 =
+* Update - woocommerce tested up to 3.9.1
+
+= 1.3.36 - 9/01/2020 =
+* Fix - include necessary files to ensure availability of is_plugin_active
+
+= 1.3.35 - 23/12/2019 =
+* Update - Synchronize variation level weight
+
+= 1.3.34 - 23/12/2019 =
+* change WooCommerce plugin detection
+* WooCommerce tested up to 3.8.1
+* WordPress tested up to 5.3.2
 
 = 1.3.33 - 27/11/2019 =
 * Switch to wc_maybe_reduce_stock_levels

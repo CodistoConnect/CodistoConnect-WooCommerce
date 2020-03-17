@@ -5,23 +5,23 @@
  * Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.33
+ * Version: 1.3.40
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
- * WC tested up to: 3.8
+ * WC tested up to: 3.9.1
  * License: GPLv2
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.33
+ * @version 1.3.40
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.33' );
+define( 'CODISTOCONNECT_VERSION', '1.3.40' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -238,7 +238,9 @@ final class CodistoConnect {
 			@ob_clean();
 		}
 
-		if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ))) {
+		require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
+		if ( ! is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
 			$this->sendHttpHeaders(
 				'500 Config Error',
 				array(
@@ -491,7 +493,8 @@ final class CodistoConnect {
 												'tax_class' => $child_product->get_tax_class(),
 												'stock_control' => $child_product->managing_stock(),
 												'stock_level' => $child_product->get_stock_quantity(),
-												'images' => array( array( 'source' => $img, 'sequence' => 0 ) )
+												'images' => array( array( 'source' => $img, 'sequence' => 0 ) ),
+												'weight' => $child_product->get_weight()
 											);
 
 							$attributes = array();
@@ -2744,6 +2747,24 @@ final class CodistoConnect {
 		return array_merge( $action_links, $links );
 	}
 
+	public function plugins_loaded() {
+
+		if (!defined('WP_ADMIN')) {
+
+			$adminUrl = preg_replace( '/^https?:\/\//', '', trim( admin_url() ) ).'codisto/';
+			$currentUrl = $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+
+			$adminUrlLen = strlen($adminUrl);
+
+			if(substr($currentUrl, 0, $adminUrlLen) === $adminUrl){
+
+				define('WP_ADMIN', true);
+
+			}
+
+		}
+	}
+
 	/**
 	* admin_notices hook handler to render post installation transient notice
 	*
@@ -2852,6 +2873,9 @@ final class CodistoConnect {
 
 			}
 		}
+
+		add_action( 'plugins_loaded', array( self::$_instance, 'plugins_loaded' ) );
+
 		return self::$_instance;
 	}
 
