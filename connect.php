@@ -1625,6 +1625,11 @@ final class CodistoConnect {
 
 					}
 
+					if($ordercontent->notifywoocommerceflag)
+					{
+						$order->save();
+					}
+
 					$wpdb->query( 'COMMIT' );
 
 					$response = array( 'ack' => 'ok', 'orderid' => $order_id );
