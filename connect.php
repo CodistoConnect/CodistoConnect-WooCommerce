@@ -731,8 +731,9 @@ final class CodistoConnect {
 										$value = implode( ',', $value );
 									}
 								}
-
-								$product->attributes[] = array( 'name' => $attribute, 'value' => $value );
+								if($attribute !== '_woocommerce_gpf_data') {
+									$product->attributes[] = array( 'name' => $attribute, 'value' => $value );
+								}									
 							}
 						}
 					}
