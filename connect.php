@@ -726,14 +726,16 @@ final class CodistoConnect {
 									if ( count( $value ) === 1 ) {
 										$value = $value[0];
 									} elseif($attribute === '_woocommerce_gpf_data') {
-										$product->attributes[] = array( 'name' => '_woocommerce_gpf_data.gtin', 'value' => $value['gtin'] );
+										if(is_array($value) && isset($value['gtin'])) {
+											$product->attributes[] = array( 'name' => '_woocommerce_gpf_data.gtin', 'value' => $value['gtin'] );
+										}
 									} else {
 										$value = implode( ',', $value );
 									}
 								}
 								if($attribute !== '_woocommerce_gpf_data') {
 									$product->attributes[] = array( 'name' => $attribute, 'value' => $value );
-								}									
+								}
 							}
 						}
 					}
