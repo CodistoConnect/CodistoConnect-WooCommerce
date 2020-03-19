@@ -714,8 +714,7 @@ final class CodistoConnect {
 					foreach ( get_post_custom_keys( $product->id ) as $attribute ) {
 
 						if ( ! ( substr( $attribute, 0, 1 ) === '_' ||
-							substr( $attribute, 0, 3 ) === 'pa_' ) ||
-							$attribute === '_woocommerce_gpf_data' ) {
+							substr( $attribute, 0, 3 ) === 'pa_' ) ) {
 
 							if ( ! array_key_exists( $attribute, $attributesUsed ) ) {
 								$attributesUsed[$attribute] = true;
@@ -725,19 +724,20 @@ final class CodistoConnect {
 
 									if ( count( $value ) === 1 ) {
 										$value = $value[0];
-									} elseif($attribute === '_woocommerce_gpf_data') {
-										if(is_array($value) && isset($value['gtin'])) {
-											$product->attributes[] = array( 'name' => '_woocommerce_gpf_data.gtin', 'value' => $value['gtin'] );
-										}
 									} else {
 										$value = implode( ',', $value );
 									}
 								}
-								if($attribute !== '_woocommerce_gpf_data') {
-									$product->attributes[] = array( 'name' => $attribute, 'value' => $value );
-								}
+								$product->attributes[] = array( 'name' => $attribute, 'value' => $value );
 							}
-						}
+						} elseif( $attribute === '_woocommerce_gpf_data' ) {
+						 	if ( is_array($value) ) {
+								if( isset($value['gtin']) ) {
+									$product->attributes[] = array( 'name' => '_woocommerce_gpf_data.gtin', 'value' => $value['gtin'] );
+								}
+						 	}
+					 	}
+
 					}
 
 					// acf
