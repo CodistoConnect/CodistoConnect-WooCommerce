@@ -714,7 +714,8 @@ final class CodistoConnect {
 					foreach ( get_post_custom_keys( $product->id ) as $attribute ) {
 
 						if ( ! ( substr( $attribute, 0, 1 ) === '_' ||
-							substr( $attribute, 0, 3 ) === 'pa_' ) ) {
+							substr( $attribute, 0, 3 ) === 'pa_' ) ||
+							$attribute === '_woocommerce_gpf_data' ) {
 
 							if ( ! array_key_exists( $attribute, $attributesUsed ) ) {
 								$attributesUsed[$attribute] = true;
@@ -724,6 +725,9 @@ final class CodistoConnect {
 
 									if ( count( $value ) === 1 ) {
 										$value = $value[0];
+									} elseif($attribute === '_woocommerce_gpf_data') {
+										$attribute = '_woocommerce_gpf_data.gtin';
+										$value = $value['gtin'];
 									} else {
 										$value = implode( ',', $value );
 									}
