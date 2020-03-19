@@ -726,8 +726,7 @@ final class CodistoConnect {
 									if ( count( $value ) === 1 ) {
 										$value = $value[0];
 									} elseif($attribute === '_woocommerce_gpf_data') {
-										$attribute = '_woocommerce_gpf_data.gtin';
-										$value = $value['gtin'];
+										$product->attributes[] = array( 'name' => '_woocommerce_gpf_data.gtin', 'value' => $value['gtin'] );
 									} else {
 										$value = implode( ',', $value );
 									}
