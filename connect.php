@@ -323,7 +323,7 @@ final class CodistoConnect {
 					'country_code' => $country_code,
 					'state_code' => $state_code,
 					'shipping_tax_class' => $shipping_tax_class,
-				 	'version' => CODISTOCONNECT_VERSION
+					'version' => CODISTOCONNECT_VERSION
 				);
 
 				$this->sendHttpHeaders(
@@ -1631,6 +1631,15 @@ final class CodistoConnect {
 						}
 
 					}
+
+					if ( isset( $ordercontent->notifywoocommerceflag ) && $ordercontent->notifywoocommerceflag != null ) {
+						$notifywoocommerceflag = (string)$ordercontent->notifywoocommerceflag;
+
+						if( $notifywoocommerceflag === 'true' ) {
+							$order->save();
+						}
+					}
+
 
 					$wpdb->query( 'COMMIT' );
 
