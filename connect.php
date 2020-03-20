@@ -1628,10 +1628,10 @@ final class CodistoConnect {
 
 					}
 
-					if(isset($ordercontent->notifywoocommerceflag) && $ordercontent->notifywoocommerceflag != null){
+					if ( isset( $ordercontent->notifywoocommerceflag ) && $ordercontent->notifywoocommerceflag != null ) {
 						$notifywoocommerceflag = (string)$ordercontent->notifywoocommerceflag;
 
-						if($notifywoocommerceflag === 'true'){
+						if( $notifywoocommerceflag === 'true' ) {
 							$order->save();
 						}
 					}
