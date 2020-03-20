@@ -98,6 +98,7 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 = 1.3.41 - 19/03/2020 =
 * Update - support google product feed GTIN field
+* Update - optionally allow notification of order changes
 
 = 1.3.40 - 3/03/2020 =
 * Fix - fix plugin load error
