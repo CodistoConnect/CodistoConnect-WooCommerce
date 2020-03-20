@@ -1630,7 +1630,7 @@ final class CodistoConnect {
 
 					if(isset($ordercontent->notifywoocommerceflag) && $ordercontent->notifywoocommerceflag != null)
 					{
-						let notifywoocommerceflag = (string)$ordercontent->notifywoocommerceflag;
+						notifywoocommerceflag = (string)$ordercontent->notifywoocommerceflag;
 
 						if(notifywoocommerceflag === 'true')
 						{
