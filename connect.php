@@ -2755,24 +2755,6 @@ final class CodistoConnect {
 		return array_merge( $action_links, $links );
 	}
 
-	public function plugins_loaded() {
-
-		if (!defined('WP_ADMIN')) {
-
-			$adminUrl = preg_replace( '/^https?:\/\//', '', trim( admin_url() ) ).'codisto/';
-			$currentUrl = $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-
-			$adminUrlLen = strlen($adminUrl);
-
-			if(substr($currentUrl, 0, $adminUrlLen) === $adminUrl){
-
-				define('WP_ADMIN', true);
-
-			}
-
-		}
-	}
-
 	/**
 	* admin_notices hook handler to render post installation transient notice
 	*
@@ -2881,8 +2863,6 @@ final class CodistoConnect {
 
 			}
 		}
-
-		add_action( 'plugins_loaded', array( self::$_instance, 'plugins_loaded' ) );
 
 		return self::$_instance;
 	}
