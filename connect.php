@@ -5,7 +5,7 @@
  * Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.43
+ * Version: 1.3.44
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
@@ -14,14 +14,14 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.43
+ * @version 1.3.44
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.43' );
+define( 'CODISTOCONNECT_VERSION', '1.3.44' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -957,6 +957,19 @@ final class CodistoConnect {
 
 						}
 
+					} elseif ($tracking_items && class_exists('WC_Advanced_Shipment_Tracking_Actions')) {
+
+						if ( $tracking_item['date_shipped'] ) {
+							$order->ship_date = date('Y-m-d H:i:s', $tracking_item['date_shipped']);
+						}
+
+						if ( $tracking_item['tracking_provider'] ) {
+							$order->carrier = $tracking_item['tracking_provider'];
+						}
+
+						if ( $tracking_item['tracking_number'] ) {
+							$order->track_number = $tracking_item['tracking_number'];
+						}
 
 					} else {
 

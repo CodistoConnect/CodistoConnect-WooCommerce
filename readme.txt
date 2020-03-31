@@ -3,7 +3,7 @@ Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
 Tested up to: 5.3.2
-Stable tag: 1.3.43
+Stable tag: 1.3.44
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -95,6 +95,9 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 3. Order Management
 
 == Changelog ==
+
+= 1.3.44 - 01/04/2020 =
+* Update - added support for Advanced Shipment Tracking by zorem
 
 = 1.3.43 - 27/03/2020 =
 * Update - removed forcing WPADMIN if in admin/codisto url space
