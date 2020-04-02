@@ -1,5 +1,8 @@
 *** WooCommerce Amazon and eBay Integration ***
 
+2020-04-01 - version 1.3.44
+* Update - added support for Advanced Shipment Tracking by zorem
+
 2020-03-27 - version 1.3.43
 * Update - removed forcing WPADMIN if in admin/codisto url space
 
