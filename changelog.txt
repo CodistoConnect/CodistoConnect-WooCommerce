@@ -1,5 +1,8 @@
 *** WooCommerce Amazon and eBay Integration ***
 
+2020-04-08 - version 1.3.45
+* Fix - Correctly set created_via to Amazon. Remove duplicated code
+
 2020-04-01 - version 1.3.44
 * Update - added support for Advanced Shipment Tracking by zorem
 
