@@ -96,6 +96,9 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 == Changelog ==
 
+= 1.3.46 - 17/04/2020 =
+* Fix - Fixed Shipping Tax on Orders
+
 = 1.3.45 - 08/04/2020 =
 * Fix - Correctly set created_via to Amazon. Remove duplicated code
 
