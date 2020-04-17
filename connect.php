@@ -1481,7 +1481,15 @@ final class CodistoConnect {
 								);
 
 								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->defaultcurrencylinetotal) );
+								wc_add_order_item_meta( $item_id, 'total_tax', wc_format_decimal( (real)$orderline->defaultcurrencylinetotalinctax - (real)$orderline->defaultcurrencylinetotal) );
 
+								$shipping_tax_array = array (
+									'total' => array (
+										1=> (real)$orderline->defaultcurrencylinetotalinctax - (real)$orderline->defaultcurrencylinetotal,
+									)
+								);
+
+								wc_add_order_item_meta( $item_id, 'taxes', $shipping_tax_array);
 								$shipping += (real)$orderline->defaultcurrencylinetotal;
 								$shipping_tax += (real)$orderline->defaultcurrencylinetotalinctax - (real)$orderline->defaultcurrencylinetotal;
 							}
@@ -1532,7 +1540,15 @@ final class CodistoConnect {
 								);
 
 								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->defaultcurrencylinetotal) );
+								wc_add_order_item_meta( $item_id, 'total_tax', wc_format_decimal( (real)$orderline->defaultcurrencylinetotalinctax - (real)$orderline->defaultcurrencylinetotal) );
 
+								$shipping_tax_array = array (
+									'total' => array (
+										1=> (real)$orderline->defaultcurrencylinetotalinctax - (real)$orderline->defaultcurrencylinetotal,
+									)
+								);
+
+								wc_add_order_item_meta( $item_id, 'taxes', $shipping_tax_array);
 								$shipping += (real)$orderline->defaultcurrencylinetotal;
 								$shipping_tax += (real)$orderline->defaultcurrencylinetotalinctax - (real)$orderline->defaultcurrencylinetotal;
 							}
