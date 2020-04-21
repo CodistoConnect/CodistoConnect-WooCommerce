@@ -96,8 +96,9 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 == Changelog ==
 
-= 1.3.46 - 17/04/2020 =
+= 1.3.46 - 21/04/2020 =
 * Fix - Fixed Shipping Tax on Orders
+* Update - Add product tags to product sync
 
 = 1.3.45 - 08/04/2020 =
 * Fix - Correctly set created_via to Amazon. Remove duplicated code
