@@ -1,5 +1,9 @@
 *** WooCommerce Amazon and eBay Integration ***
 
+2020-04-21 - version 1.3.46
+* Fix - Fixed Shipping Tax on Orders
+* Update - Add product tags to product sync
+
 2020-04-08 - version 1.3.45
 * Fix - Correctly set created_via to Amazon. Remove duplicated code
 
