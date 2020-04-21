@@ -659,6 +659,17 @@ final class CodistoConnect {
 						}
 					}
 
+					$product->tags = array();
+					$product_tags = get_the_terms( $product->id, 'product_tag' );
+
+					if ( is_array( $product_tags ) ) {
+						$sequence = 0;
+						foreach ( $product_tags as $tag ) {
+							$product->tags[] = array( 'tag' => $tag->name, 'sequence' => $sequence );
+							$sequence++;
+						}
+					}
+
 					$image_sequence = 1;
 					$product->images = array();
 
