@@ -5,7 +5,7 @@
  * Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.46
+ * Version: 1.3.47
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
@@ -14,14 +14,14 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.46
+ * @version 1.3.47
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.46' );
+define( 'CODISTOCONNECT_VERSION', '1.3.47' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -121,6 +121,19 @@ final class CodistoConnect {
 		// force order date
 
 		return $order_data;
+	}
+
+	/**
+	* filter for woocommerce woocommerce_email_enabled_new_order
+	*
+	* @param bool $enabled flag for enabled status
+	* @param object $object wc_email object
+	* @return bool $enabled as false
+	*/
+
+	public function set_send_wc_email($enabled, $object ){
+		// disabling new order email
+		return false;
 	}
 
 	/**
@@ -1700,13 +1713,11 @@ final class CodistoConnect {
 
 					}
 
-					if ( isset( $ordercontent->notifywoocommerceflag ) && $ordercontent->notifywoocommerceflag != null ) {
-						$notifywoocommerceflag = (string)$ordercontent->notifywoocommerceflag;
+					add_filter( 'woocommerce_email_enabled_new_order', 'set_send_wc_email');
 
-						if( $notifywoocommerceflag === 'true' ) {
-							$order->save();
-						}
-					}
+					$order->save();
+					
+					remove_filter( 'woocommerce_email_enabled_new_order', 'set_send_wc_email');
 
 
 					$wpdb->query( 'COMMIT' );
