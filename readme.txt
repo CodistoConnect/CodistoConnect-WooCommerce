@@ -3,7 +3,7 @@ Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
 Tested up to: 5.4.1
-Stable tag: 1.3.48
+Stable tag: 1.3.47
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -96,7 +96,9 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 == Changelog ==
 
-= 1.3.48 - 27/04/2020 =
+= 1.3.47 - 27/04/2020 =
+* Fix - Fixed Skipping New Orders email to Customer on Order Push
+* Fix - Added Optimized Order Fetch Query using Legacy Order Push
 * Fix - Skipped User Account Creation based on woocommerce_create_account_default_checked
 * WordPress tested up to 5.4.1
 

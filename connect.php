@@ -5,7 +5,7 @@
  * Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.48
+ * Version: 1.3.47
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
@@ -14,14 +14,14 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.48
+ * @version 1.3.47
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.48' );
+define( 'CODISTOCONNECT_VERSION', '1.3.47' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -121,6 +121,32 @@ final class CodistoConnect {
 		// force order date
 
 		return $order_data;
+	}
+
+	/**
+	* filter for woocommerce order emails
+	*
+	* @param bool $enabled flag for enabled status
+	* @param object $object wc_email object
+	* @return bool $enabled as false
+	*/
+
+	public function inhibit_order_emails( $enabled, $order ) {
+
+		if($enabled) {
+
+			$orderId = $order->get_id();
+
+			if( get_post_meta( $orderId, '_codisto_orderid' ) ) {
+
+				return false;
+
+			}
+
+		}
+
+		return $enabled;
+
 	}
 
 	/**
@@ -1297,15 +1323,48 @@ final class CodistoConnect {
 								'shipping_phone'		=> (string)$shipping_address->phone,
 							);
 
-					$order_id_sql = "SELECT ID FROM `{$wpdbsiteprefix}posts` AS P WHERE EXISTS (SELECT 1 FROM `{$wpdbsiteprefix}postmeta` " .
-					" WHERE meta_key = '_codisto_orderid' AND meta_value = %d AND post_id = P.ID ) " .
-					" AND (".
-						" EXISTS (SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.ID)" .
-						" OR NOT EXISTS (SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.ID)"
-					.")" .
-					" LIMIT 1";
+					$order_id = null;
 
-					$order_id = $wpdb->get_var( $wpdb->prepare( $order_id_sql, (int)$ordercontent->orderid, (int)$ordercontent->merchantid ) );
+					if ( isset( $ordercontent->wooneworderpush )
+						&& $ordercontent->wooneworderpush != null
+						&& (string)$ordercontent->wooneworderpush == 'true' ) {
+
+						if(!empty( $ordercontent->orderid )
+							&& !empty( $ordercontent->ordernumber )
+							&& intval( $ordercontent->orderid ) !== intval( $ordercontent->ordernumber ) ) {
+
+							$order_id_sql = "SELECT post_id AS ID FROM `{$wpdbsiteprefix}postmeta` " .
+							"WHERE post_id = %d AND (meta_key = '_codisto_merchantid' AND meta_value = %d) " .
+							"LIMIT 1";
+
+							$order_id = $wpdb->get_var( $wpdb->prepare( $order_id_sql, (int) $ordercontent->ordernumber, (int) $ordercontent->merchantid ) );
+
+						}
+
+						if(!$order_id) {
+
+							$order_id_sql = "SELECT PM.post_id as ID FROM `{$wpdbsiteprefix}postmeta` AS PM " .
+							"INNER JOIN `{$wpdbsiteprefix}postmeta` AS PM2 ON " .
+							"(PM2.post_id = PM.post_id AND PM2.meta_key = '_codisto_merchantid' AND PM2.meta_value = %d) " .
+							"WHERE (PM.meta_key = '_codisto_orderid' AND PM.meta_value = %d) " .
+							"LIMIT 1";
+
+							$order_id = $wpdb->get_var( $wpdb->prepare( $order_id_sql, (int) $ordercontent->merchantid, (int) $ordercontent->orderid ) );
+						}
+
+					} else {
+
+						$order_id_sql = "SELECT ID FROM `{$wpdbsiteprefix}posts` AS P WHERE EXISTS (SELECT 1 FROM `{$wpdbsiteprefix}postmeta` " .
+						" WHERE meta_key = '_codisto_orderid' AND meta_value = %d AND post_id = P.ID ) " .
+						" AND (".
+							" EXISTS (SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.ID)" .
+							" OR NOT EXISTS (SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.ID)"
+						.")" .
+						" LIMIT 1";
+
+						$order_id = $wpdb->get_var( $wpdb->prepare( $order_id_sql, (int)$ordercontent->orderid, (int)$ordercontent->merchantid ) );
+
+					}
 
 					$email = (string)$billing_address->email;
 					if ( ! $email ) {
@@ -1668,14 +1727,7 @@ final class CodistoConnect {
 
 					}
 
-					if ( isset( $ordercontent->notifywoocommerceflag ) && $ordercontent->notifywoocommerceflag != null ) {
-						$notifywoocommerceflag = (string)$ordercontent->notifywoocommerceflag;
-
-						if( $notifywoocommerceflag === 'true' ) {
-							$order->save();
-						}
-					}
-
+					$order->save();
 
 					$wpdb->query( 'COMMIT' );
 
@@ -2860,6 +2912,15 @@ final class CodistoConnect {
 		add_action( 'woocommerce_product_data_panels',		array( $this, 'ebay_product_tab_content' ) );
 		add_filter( 'wc_order_is_editable',					array( $this, 'order_is_editable' ), 10, 2 );
 		add_action( 'woocommerce_reduce_order_stock',		array( $this, 'order_reduce_stock' ) );
+		add_filter( 'woocommerce_email_enabled_new_order',	array( $this, 'inhibit_order_emails' ), 10, 2 );
+		add_filter( 'woocommerce_email_enabled_cancelled_order',	array( $this, 'inhibit_order_emails' ), 10, 2 );
+		add_filter( 'woocommerce_email_enabled_customer_completed_order',	array( $this, 'inhibit_order_emails' ), 10, 2 );
+		add_filter( 'woocommerce_email_enabled_customer_invoice',	array( $this, 'inhibit_order_emails' ), 10, 2 );
+		add_filter( 'woocommerce_email_enabled_customer_note',	array( $this, 'inhibit_order_emails' ), 10, 2 );
+		add_filter( 'woocommerce_email_enabled_customer_on_hold_order',	array( $this, 'inhibit_order_emails' ), 10, 2 );
+		add_filter( 'woocommerce_email_enabled_customer_processing_order',	array( $this, 'inhibit_order_emails' ), 10, 2 );
+		add_filter( 'woocommerce_email_enabled_customer_refunded_order',	array( $this, 'inhibit_order_emails' ), 10, 2 );
+		add_filter( 'woocommerce_email_enabled_failed_order',	array( $this, 'inhibit_order_emails' ), 10, 2 );
 		add_action(
 			'woocommerce_admin_order_data_after_order_details',
 			array( $this, 'order_buttons' )
