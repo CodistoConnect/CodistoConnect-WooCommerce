@@ -96,15 +96,11 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 == Changelog ==
 
-<<<<<<< HEAD
 = 1.3.47 - 27/04/2020 =
 * Fix - Fixed Skipping New Orders email to Customer on Order Push
 * Fix - Added Optimized Order Fetch Query using Legacy Order Push
-=======
-= 1.3.48 - 27/04/2020 =
 * Fix - Skipped User Account Creation based on woocommerce_create_account_default_checked
 * WordPress tested up to 5.4.1
->>>>>>> origin/master
 
 = 1.3.46 - 21/04/2020 =
 * Fix - Fixed Shipping Tax on Orders
