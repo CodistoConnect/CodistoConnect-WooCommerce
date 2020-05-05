@@ -131,7 +131,7 @@ final class CodistoConnect {
 	* @return bool $enabled as false
 	*/
 
-	public function inhibit_order_emails( $enabled, $object ) {
+	public function inhibit_order_emails( $enabled, $order ) {
 
 		if($enabled) {
 
