@@ -124,16 +124,29 @@ final class CodistoConnect {
 	}
 
 	/**
-	* filter for woocommerce woocommerce_email_enabled_new_order
+	* filter for woocommerce order emails
 	*
 	* @param bool $enabled flag for enabled status
 	* @param object $object wc_email object
 	* @return bool $enabled as false
 	*/
 
-	public function set_send_wc_email($enabled, $object ){
-		// disabling new order email
-		return false;
+	public function inhibit_order_emails( $enabled, $object ) {
+
+		if($enabled) {
+
+			$orderId = $order->get_id();
+
+			if( get_post_meta( $orderId, '_codisto_orderid' ) ) {
+
+				return false;
+
+			}
+
+		}
+
+		return $enabled;
+
 	}
 
 	/**
@@ -1323,32 +1336,32 @@ final class CodistoConnect {
 								" OR NOT EXISTS (SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.ID)"
 							.")" .
 							" LIMIT 1";
-		
+
 							$order_id = $wpdb->get_var( $wpdb->prepare( $order_id_sql, (int)$ordercontent->orderid, (int)$ordercontent->merchantid ) );
 							$updatedOrderFetch = false;
 						}
 
-					} 
+					}
 
 					if($updatedOrderFetch) {
 						$order_id = null;
-						
-						if(!empty($ordercontent->orderid) && !empty($ordercontent->ordernumber) && intval($ordercontent->orderid) !== intval($ordercontent->ordernumber)){ 
-							$order_id_sql = "SELECT post_id AS ID FROM `{$wpdbsiteprefix}postmeta` " . 
-							"WHERE post_id = %d AND (meta_key = '_codisto_merchantid' AND meta_value = %d) " . 
+
+						if(!empty($ordercontent->orderid) && !empty($ordercontent->ordernumber) && intval($ordercontent->orderid) !== intval($ordercontent->ordernumber)){
+							$order_id_sql = "SELECT post_id AS ID FROM `{$wpdbsiteprefix}postmeta` " .
+							"WHERE post_id = %d AND (meta_key = '_codisto_merchantid' AND meta_value = %d) " .
 							"LIMIT 1";
 
-							$order_id = $wpdb->get_var( $wpdb->prepare( $order_id_sql, (int) $ordercontent->ordernumber, (int) $ordercontent->merchantid ) ); 
+							$order_id = $wpdb->get_var( $wpdb->prepare( $order_id_sql, (int) $ordercontent->ordernumber, (int) $ordercontent->merchantid ) );
 						}
 
-						if(!$order_id) { 
-							$order_id_sql = "SELECT PM.post_id as ID FROM `{$wpdbsiteprefix}postmeta` AS PM " . 
-							"INNER JOIN `{$wpdbsiteprefix}postmeta` AS PM2 ON " . 
-							"(PM2.post_id = PM.post_id AND PM2.meta_key = '_codisto_merchantid' AND PM2.meta_value = %d) " . 
-							"WHERE (PM.meta_key = '_codisto_orderid' AND PM.meta_value = %d) " . 
+						if(!$order_id) {
+							$order_id_sql = "SELECT PM.post_id as ID FROM `{$wpdbsiteprefix}postmeta` AS PM " .
+							"INNER JOIN `{$wpdbsiteprefix}postmeta` AS PM2 ON " .
+							"(PM2.post_id = PM.post_id AND PM2.meta_key = '_codisto_merchantid' AND PM2.meta_value = %d) " .
+							"WHERE (PM.meta_key = '_codisto_orderid' AND PM.meta_value = %d) " .
 							"LIMIT 1";
 
-							$order_id = $wpdb->get_var( $wpdb->prepare( $order_id_sql, (int) $ordercontent->merchantid, (int) $ordercontent->orderid ) ); 
+							$order_id = $wpdb->get_var( $wpdb->prepare( $order_id_sql, (int) $ordercontent->merchantid, (int) $ordercontent->orderid ) );
 						}
 					}
 
@@ -1713,12 +1726,7 @@ final class CodistoConnect {
 
 					}
 
-					add_filter( 'woocommerce_email_enabled_new_order', 'set_send_wc_email');
-
 					$order->save();
-					
-					remove_filter( 'woocommerce_email_enabled_new_order', 'set_send_wc_email');
-
 
 					$wpdb->query( 'COMMIT' );
 
@@ -2903,6 +2911,15 @@ final class CodistoConnect {
 		add_action( 'woocommerce_product_data_panels',		array( $this, 'ebay_product_tab_content' ) );
 		add_filter( 'wc_order_is_editable',					array( $this, 'order_is_editable' ), 10, 2 );
 		add_action( 'woocommerce_reduce_order_stock',		array( $this, 'order_reduce_stock' ) );
+		add_filter( 'woocommerce_email_enabled_new_order',	array( $this, 'inhibit_order_emails' ), 10, 2 );
+		add_filter( 'woocommerce_email_enabled_cancelled_order',	array( $this, 'inhibit_order_emails' ), 10, 2 );
+		add_filter( 'woocommerce_email_enabled_customer_completed_order',	array( $this, 'inhibit_order_emails' ), 10, 2 );
+		add_filter( 'woocommerce_email_enabled_customer_invoice',	array( $this, 'inhibit_order_emails' ), 10, 2 );
+		add_filter( 'woocommerce_email_enabled_customer_note',	array( $this, 'inhibit_order_emails' ), 10, 2 );
+		add_filter( 'woocommerce_email_enabled_customer_on_hold_order',	array( $this, 'inhibit_order_emails' ), 10, 2 );
+		add_filter( 'woocommerce_email_enabled_customer_processing_order',	array( $this, 'inhibit_order_emails' ), 10, 2 );
+		add_filter( 'woocommerce_email_enabled_customer_refunded_order',	array( $this, 'inhibit_order_emails' ), 10, 2 );
+		add_filter( 'woocommerce_email_enabled_failed_order',	array( $this, 'inhibit_order_emails' ), 10, 2 );
 		add_action(
 			'woocommerce_admin_order_data_after_order_details',
 			array( $this, 'order_buttons' )
