@@ -1323,38 +1323,26 @@ final class CodistoConnect {
 								'shipping_phone'		=> (string)$shipping_address->phone,
 							);
 
-					$updatedOrderFetch = true;
+					$order_id = null;
 
-					if ( isset( $ordercontent->woolegacyorderpushflag ) && $ordercontent->woolegacyorderpushflag != null ) {
-						$woolegacyorderpushflag = (string)$ordercontent->woolegacyorderpushflag;
+					if ( isset( $ordercontent->wooneworderpush )
+						&& $ordercontent->wooneworderpush != null
+						&& (string)$ordercontent->wooneworderpush == 'true' ) {
 
-						if( $woolegacyorderpushflag === 'true' ) {
-							$order_id_sql = "SELECT ID FROM `{$wpdbsiteprefix}posts` AS P WHERE EXISTS (SELECT 1 FROM `{$wpdbsiteprefix}postmeta` " .
-							" WHERE meta_key = '_codisto_orderid' AND meta_value = %d AND post_id = P.ID ) " .
-							" AND (".
-								" EXISTS (SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.ID)" .
-								" OR NOT EXISTS (SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.ID)"
-							.")" .
-							" LIMIT 1";
+						if(!empty( $ordercontent->orderid )
+							&& !empty( $ordercontent->ordernumber )
+							&& intval( $ordercontent->orderid ) !== intval( $ordercontent->ordernumber ) ) {
 
-							$order_id = $wpdb->get_var( $wpdb->prepare( $order_id_sql, (int)$ordercontent->orderid, (int)$ordercontent->merchantid ) );
-							$updatedOrderFetch = false;
-						}
-
-					}
-
-					if($updatedOrderFetch) {
-						$order_id = null;
-
-						if(!empty($ordercontent->orderid) && !empty($ordercontent->ordernumber) && intval($ordercontent->orderid) !== intval($ordercontent->ordernumber)){
 							$order_id_sql = "SELECT post_id AS ID FROM `{$wpdbsiteprefix}postmeta` " .
 							"WHERE post_id = %d AND (meta_key = '_codisto_merchantid' AND meta_value = %d) " .
 							"LIMIT 1";
 
 							$order_id = $wpdb->get_var( $wpdb->prepare( $order_id_sql, (int) $ordercontent->ordernumber, (int) $ordercontent->merchantid ) );
+
 						}
 
 						if(!$order_id) {
+
 							$order_id_sql = "SELECT PM.post_id as ID FROM `{$wpdbsiteprefix}postmeta` AS PM " .
 							"INNER JOIN `{$wpdbsiteprefix}postmeta` AS PM2 ON " .
 							"(PM2.post_id = PM.post_id AND PM2.meta_key = '_codisto_merchantid' AND PM2.meta_value = %d) " .
@@ -1363,6 +1351,19 @@ final class CodistoConnect {
 
 							$order_id = $wpdb->get_var( $wpdb->prepare( $order_id_sql, (int) $ordercontent->merchantid, (int) $ordercontent->orderid ) );
 						}
+
+					} else {
+
+						$order_id_sql = "SELECT ID FROM `{$wpdbsiteprefix}posts` AS P WHERE EXISTS (SELECT 1 FROM `{$wpdbsiteprefix}postmeta` " .
+						" WHERE meta_key = '_codisto_orderid' AND meta_value = %d AND post_id = P.ID ) " .
+						" AND (".
+							" EXISTS (SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.ID)" .
+							" OR NOT EXISTS (SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.ID)"
+						.")" .
+						" LIMIT 1";
+
+						$order_id = $wpdb->get_var( $wpdb->prepare( $order_id_sql, (int)$ordercontent->orderid, (int)$ordercontent->merchantid ) );
+
 					}
 
 					$email = (string)$billing_address->email;
