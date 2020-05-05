@@ -1373,7 +1373,7 @@ final class CodistoConnect {
 					if ( $email ) {
 
 						$userid = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM `{$wpdbsiteprefix}users` WHERE user_email = %s", $email ) );
-						if ( ! $userid &&  ! $order_id ) {
+						if ( ! $userid &&  ! $order_id && (true === apply_filters( 'woocommerce_create_account_default_checked', false )) ) {
 							$username = $ebayusername;
 							if ( ! $username ) {
 								$username = current( explode( '@', $email ) );
