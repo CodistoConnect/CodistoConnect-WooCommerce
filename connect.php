@@ -133,7 +133,7 @@ final class CodistoConnect {
 
 	public function inhibit_order_emails( $enabled, $order ) {
 
-		if($enabled && ! is_admin()) {
+		if($enabled && !is_admin()) {
 
 			$orderId = $order->get_id();
 
