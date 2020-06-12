@@ -96,6 +96,9 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 == Changelog ==
 
+= 1.3.49 - 12/06/2020 =
+* Update - menu support for new home page
+
 = 1.3.48 - 11/05/2020 =
 * Fix - handle cases where email filters don't pass order objects
 

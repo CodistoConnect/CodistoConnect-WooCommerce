@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.48' );
+define( 'CODISTOCONNECT_VERSION', '1.3.49' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -2489,7 +2489,7 @@ final class CodistoConnect {
 	}
 
 	/**
-	* renders the 'manage listings' tab
+	* renders the 'home' tab
 	*
 	*/
 	public function ebay_tab() {
@@ -2499,41 +2499,21 @@ final class CodistoConnect {
 	}
 
 	/**
-	* renders the 'manage orders' tab
+	* renders the 'listings' tab
+	*
+	*/
+	public function listings() {
+		$adminUrl = admin_url( 'codisto/ebaytab/0/'.get_option( 'codisto_merchantid' ).'/listings/' );
+
+		$this->admin_tab( $adminUrl, 'codisto-bulk-editor' );
+	}
+
+	/**
+	* renders the 'orders' tab
 	*
 	*/
 	public function orders() {
 		$adminUrl = admin_url( 'codisto/ebaytab/0/'.get_option( 'codisto_merchantid' ).'/orders/' );
-
-		$this->admin_tab( $adminUrl, 'codisto-bulk-editor' );
-	}
-
-	/**
-	* renders the 'manage categories' tab
-	*
-	*/
-	public function categories() {
-		$adminUrl = admin_url( 'codisto/ebaytab/0/'.get_option( 'codisto_merchantid' ).'/categories/' );
-
-		$this->admin_tab( $adminUrl, 'codisto-bulk-editor' );
-	}
-
-	/**
-	* renders the 'attribute mapping' tab
-	*
-	*/
-	public function attributes() {
-		$adminUrl = admin_url( 'codisto/ebaytab/0/'.get_option( 'codisto_merchantid' ).'/attributemapping/' );
-
-		$this->admin_tab( $adminUrl, 'codisto-attributemapping' );
-	}
-
-	/**
-	* renders the 'import listings' tab
-	*
-	*/
-	public function import() {
-		$adminUrl = admin_url( 'codisto/ebaytab/0/'.get_option( 'codisto_merchantid' ).'/importlistings/' );
 
 		$this->admin_tab( $adminUrl, 'codisto-bulk-editor' );
 	}
@@ -2547,6 +2527,18 @@ final class CodistoConnect {
 
 		$this->admin_tab( $adminUrl, 'codisto-account' );
 	}
+
+	/**
+	* renders the 'settings' tab
+	*
+	*/
+	public function settings() {
+
+		$adminUrl = admin_url( 'codisto/settings/' );
+
+		$this->admin_tab( $adminUrl, 'codisto-settings' );
+	}
+
 
 	/**
 	* implements the templates link
@@ -2565,17 +2557,6 @@ final class CodistoConnect {
 	}
 
 	/**
-	* renders the 'settings' tab
-	*
-	*/
-	public function settings() {
-
-		$adminUrl = admin_url( 'codisto/settings/' );
-
-		$this->admin_tab( $adminUrl, 'codisto-settings' );
-	}
-
-	/**
 	* admin_menu hook handler used to add the codisto menu entries to the
 	* wordpress admin menu
 	*
@@ -2591,12 +2572,9 @@ final class CodistoConnect {
 
 			$pages = array();
 
-			$pages[] = add_submenu_page( 'codisto', __( 'Marketplace Listings', 'codisto-linq' ), __( 'Marketplace Listings', 'codisto-linq' ), 'edit_posts', 'codisto', array( $this, 'ebay_tab' ) );
-			$pages[] = add_submenu_page( 'codisto', __( 'Marketplace Orders', 'codisto-linq' ), __( 'Marketplace Orders', 'codisto-linq' ), 'edit_posts', 'codisto-orders', array( $this, 'orders' ) );
-			$pages[] = add_submenu_page( 'codisto', __( 'eBay Store Categories', 'codisto-linq' ), __( 'eBay Store Categories', 'codisto-linq' ), 'edit_posts', 'codisto-categories', array( $this, 'categories' ) );
-			$pages[] = add_submenu_page( 'codisto', __( 'Attribute Mapping', 'codisto-linq' ), __( 'Attribute Mapping', 'codisto-linq' ), 'edit_posts', 'codisto-attributes', array( $this, 'attributes' ) );
-			$pages[] = add_submenu_page( 'codisto', __( 'Link Listings', 'codisto-linq' ), __( 'Link Listings', 'codisto-linq' ), 'edit_posts', 'codisto-import', array( $this, 'import' ) );
-			$pages[] = add_submenu_page( 'codisto', __( 'eBay Templates', 'codisto-linq' ), __( 'eBay Templates', 'codisto-linq' ), 'edit_posts', 'codisto-templates', array( $this, 'templates' ) );
+			$pages[] = add_submenu_page( 'codisto', __( 'Home', 'codisto-linq' ), __( 'Home', 'codisto-linq' ), 'edit_posts', 'codisto', array( $this, 'ebay_tab' ) );
+			$pages[] = add_submenu_page( 'codisto', __( 'Listings', 'codisto-linq' ), __( 'Listings', 'codisto-linq' ), 'edit_posts', 'codisto-listings', array( $this, 'listings' ) );
+			$pages[] = add_submenu_page( 'codisto', __( 'Orders', 'codisto-linq' ), __( 'Orders', 'codisto-linq' ), 'edit_posts', 'codisto-orders', array( $this, 'orders' ) );
 			$pages[] = add_submenu_page( 'codisto', __( 'Settings', 'codisto-linq' ), __( 'Settings', 'codisto-linq' ), 'edit_posts', 'codisto-settings', array( $this, 'settings' ) );
 			$pages[] = add_submenu_page( 'codisto', __( 'Account', 'codisto-linq' ), __( 'Account', 'codisto-linq' ), 'edit_posts', 'codisto-account', array( $this, 'account' ) );
 
@@ -2638,7 +2616,7 @@ final class CodistoConnect {
 	*/
 	public function admin_scripts( $hook ) {
 
-		if ( preg_match ( '/codisto(?:-orders|-categories|-attributes|-import|-templates|-settings|-account|)$/', $hook ) ) {
+		if ( preg_match ( '/codisto(?:-orders|-categories|-attributes|-import|-templates|-settings|-account|-listings|)$/', $hook ) ) {
 
 			wp_enqueue_style( 'codisto-style' );
 			wp_enqueue_script( 'codisto-script' );
