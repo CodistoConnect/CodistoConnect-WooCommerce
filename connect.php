@@ -941,7 +941,7 @@ final class CodistoConnect {
 							") AS id, ".
 						" ID AS post_id, post_status AS status FROM `{$wpdbsiteprefix}posts` AS P".
 						" WHERE post_type = 'shop_order'".
-						" AND post_date > DATE_SUB(CURRENT_TIME(), INTERVAL 90 DAY)".
+						" AND post_date > DATE_SUB( CURRENT_TIMESTAMP(), INTERVAL 90 DAY )".
 						" AND ID IN (".
 							"SELECT post_id FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_orderid' AND (".
 								"EXISTS ( SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.id ) ".
@@ -958,7 +958,7 @@ final class CodistoConnect {
 				if ( $page == 0 ) {
 					$total_count = $wpdb->get_var(
 						$wpdb->prepare(
-							"SELECT COUNT(*) FROM `{$wpdbsiteprefix}posts` AS P WHERE post_type = 'shop_order' AND ID IN ( SELECT post_id FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_orderid' AND ( EXISTS ( SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.id ) OR NOT EXISTS (SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.id )))",
+							"SELECT COUNT(*) FROM `{$wpdbsiteprefix}posts` AS P WHERE post_type = 'shop_order' AND post_date > DATE_SUB( CURRENT_TIMESTAMP(), INTERVAL 90 DAY ) AND ID IN ( SELECT post_id FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_orderid' AND ( EXISTS ( SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.id ) OR NOT EXISTS (SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.id )))",
 							$merchantid
 						)
 					);
