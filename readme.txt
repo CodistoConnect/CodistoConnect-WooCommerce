@@ -96,6 +96,9 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 == Changelog ==
 
+= 1.3.50 - 15/06/2020 =
+* Update - improve shipping tracking sync performance
+
 = 1.3.49 - 12/06/2020 =
 * Update - menu support for new home page
 

@@ -5,7 +5,7 @@
  * Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.49
+ * Version: 1.3.50
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
@@ -14,14 +14,14 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.49
+ * @version 1.3.50
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.49' );
+define( 'CODISTOCONNECT_VERSION', '1.3.50' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -939,7 +939,10 @@ final class CodistoConnect {
 									"OR NOT EXISTS ( SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.id ) ".
 								")".
 							") AS id, ".
-						" ID AS post_id, post_status AS status FROM `{$wpdbsiteprefix}posts` AS P WHERE post_type = 'shop_order' AND ID IN (".
+						" ID AS post_id, post_status AS status FROM `{$wpdbsiteprefix}posts` AS P".
+						" WHERE post_type = 'shop_order'".
+						" AND post_date > DATE_SUB( CURRENT_TIMESTAMP(), INTERVAL 90 DAY )".
+						" AND ID IN (".
 							"SELECT post_id FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_orderid' AND (".
 								"EXISTS ( SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.id ) ".
 								"OR NOT EXISTS ( SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.id ) ".
@@ -955,7 +958,7 @@ final class CodistoConnect {
 				if ( $page == 0 ) {
 					$total_count = $wpdb->get_var(
 						$wpdb->prepare(
-							"SELECT COUNT(*) FROM `{$wpdbsiteprefix}posts` AS P WHERE post_type = 'shop_order' AND ID IN ( SELECT post_id FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_orderid' AND ( EXISTS ( SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.id ) OR NOT EXISTS (SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.id )))",
+							"SELECT COUNT(*) FROM `{$wpdbsiteprefix}posts` AS P WHERE post_type = 'shop_order' AND post_date > DATE_SUB( CURRENT_TIMESTAMP(), INTERVAL 90 DAY ) AND ID IN ( SELECT post_id FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_orderid' AND ( EXISTS ( SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND meta_value = %d AND post_id = P.id ) OR NOT EXISTS (SELECT 1 FROM `{$wpdbsiteprefix}postmeta` WHERE meta_key = '_codisto_merchantid' AND post_id = P.id )))",
 							$merchantid
 						)
 					);
