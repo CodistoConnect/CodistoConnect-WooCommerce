@@ -1,5 +1,8 @@
 *** WooCommerce Amazon and eBay Integration ***
 
+2020-06-15 - version 1.3.50
+* Update - improve shipping tracking sync performance
+
 2020-06-12 - version 1.3.49
 * Update - menu support for new home page
 
