@@ -3,7 +3,7 @@ Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
 Tested up to: 5.4.1
-Stable tag: 1.3.50
+Stable tag: 1.3.51
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -95,6 +95,9 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 3. Order Management
 
 == Changelog ==
+
+= 1.3.51 - 17/06/2020 =
+* Update - add eBay Templates menu option to new menu
 
 = 1.3.50 - 15/06/2020 =
 * Update - improve shipping tracking sync performance
