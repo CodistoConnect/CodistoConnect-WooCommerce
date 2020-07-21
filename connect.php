@@ -5,7 +5,7 @@
  * Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.51
+ * Version: 1.3.52
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
@@ -14,14 +14,14 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.51
+ * @version 1.3.52
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.51' );
+define( 'CODISTOCONNECT_VERSION', '1.3.52' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -1938,6 +1938,14 @@ final class CodistoConnect {
 				</p>
 				<?php
 			}
+			$amazon_order = get_post_meta( $order->get_id(), '_codisto_amazonorderid', true );
+			if ( $amazon_order ) {
+				?>
+				<p class="form-field form-field-wide codisto-order-buttons">
+				<a href="<?php echo htmlspecialchars( admin_url( 'codisto/amazonsale?orderid='.$codisto_order_id ) ) ?>" target="codisto!sale" class="button"><?php esc_html_e( 'Amazon Order', 'codisto-linq' ) ?> &rarr;</a>
+				</p>
+				<?php
+			}
 		}
 	}
 
@@ -2204,6 +2212,7 @@ final class CodistoConnect {
 			check_admin_referer( 'codisto-create' );
 
 			if ( $_POST['method'] == 'email' ) {
+
 				$signupemail = wp_unslash( $_POST['email'] );
 				$signupcountry = wp_unslash( $_POST['countrycode'] );
 				$signupphone = wp_unslash( $_POST['phone'] );
@@ -2221,6 +2230,7 @@ final class CodistoConnect {
 										'url' => $blogurl,
 										'email' => $signupemail,
 										'phone' => $signupphone,
+										'country' => $signupcountry,
 										'storename' => $blogdescription ,
 										'resellerkey' => $this->reseller_key(),
 										'codistoversion' => CODISTOCONNECT_VERSION
@@ -2476,6 +2486,7 @@ final class CodistoConnect {
 					Sit tight, this may take several minutes depending on the size of your catalog.<br>
 					When completed, you'll have the world's best eBay & Amazon integration at your fingertips.<br>
 				</div>
+
 			</div>
 
 			<?php
