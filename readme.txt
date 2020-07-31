@@ -3,7 +3,7 @@ Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
 Tested up to: 5.4.1
-Stable tag: 1.3.52
+Stable tag: 1.3.53
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -95,6 +95,9 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 3. Order Management
 
 == Changelog ==
+
+= 1.3.53 - 31/07/2020 =
+* Fix - order currency updated to woocommerce default currency
 
 = 1.3.52 - 21/07/2020 =
 * Update - add Amazon order button to order detail

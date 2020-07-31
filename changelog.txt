@@ -1,5 +1,8 @@
 *** WooCommerce Amazon and eBay Integration ***
 
+2020-07-31 - version 1.3.53
+* Fix - order currency updated to woocommerce default currency
+
 2020-07-21 - version 1.3.52
 * Update - add Amazon order button to order detail
 * Fix - record country code on account registration

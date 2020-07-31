@@ -5,7 +5,7 @@
  * Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.52
+ * Version: 1.3.53
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
@@ -14,14 +14,14 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.52
+ * @version 1.3.53
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.52' );
+define( 'CODISTOCONNECT_VERSION', '1.3.53' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -1476,7 +1476,7 @@ final class CodistoConnect {
 							update_post_meta( $order_id, '_codisto_ebaytransactionid', $ebaytransactionid );
 						}
 
-						update_post_meta( $order_id, '_order_currency', (string)$ordercontent->transactcurrency );
+						update_post_meta( $order_id, '_order_currency', (string)$currency );
 						update_post_meta( $order_id, '_customer_ip_address', '-' );
 						delete_post_meta( $order_id, '_prices_include_tax' );
 
