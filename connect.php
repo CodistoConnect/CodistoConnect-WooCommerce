@@ -1171,7 +1171,8 @@ final class CodistoConnect {
 
 							$tmpfile = wp_tempnam();
 							$zipfile = new PclZip( $tmpfile );
-							if ($zipfile->create( $filestozip , PCLZIP_OPT_REMOVE_PATH, $ebayDesignDir )) {
+							$zipsuccess = $zipfile->create( $filestozip , PCLZIP_OPT_REMOVE_PATH, $ebayDesignDir );
+							if ($zipsuccess) {
 								$headers = array(
 									'Cache-Control' => 'no-cache, must-revalidate',
 									'Pragma' => 'no-cache',
