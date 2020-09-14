@@ -1497,7 +1497,9 @@ final class CodistoConnect {
 							update_post_meta( $order_id, '_codisto_ebaytransactionid', $ebaytransactionid );
 						}
 
-						update_post_meta( $order_id, '_order_currency', (string)$ordercontent->defaultcurrency );
+						$defaultcurrency = @count( $ordercontent->defaultcurrency ) ? (string)$ordercontent->defaultcurrency : (string)$ordercontent->transactcurrency;
+
+						update_post_meta( $order_id, '_order_currency', $defaultcurrency );
 						update_post_meta( $order_id, '_customer_ip_address', '-' );
 						delete_post_meta( $order_id, '_prices_include_tax' );
 
