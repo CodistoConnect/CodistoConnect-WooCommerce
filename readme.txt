@@ -2,8 +2,8 @@
 Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
-Tested up to: 5.4.1
-Stable tag: 1.3.52
+Tested up to: 5.5.1
+Stable tag: 1.3.53
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -95,6 +95,13 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 3. Order Management
 
 == Changelog ==
+
+= 1.3.53 - 27/08/2020 =
+* Fix - stop errors when attempting to sync deleted variation children
+* Fix - use WooCommerce default currency for order currency
+* Update - add eBay template sync error logging
+* Update - WordPress tested up to 5.5.1
+* Update - WooCommerce tested up to 4.5.1
 
 = 1.3.52 - 21/07/2020 =
 * Update - add Amazon order button to order detail
