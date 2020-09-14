@@ -96,9 +96,10 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 == Changelog ==
 
-= 1.3.53 - 27/08/2020 =
+= 1.3.53 - 14/09/2020 =
 * Update - add eBay template sync error logging
 * Fix - stop errors when attempting to sync deleted variation children
+* Fix - use WooCommerce default currency for order currency
 
 = 1.3.52 - 21/07/2020 =
 * Update - add Amazon order button to order detail
