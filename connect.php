@@ -9,7 +9,7 @@
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
- * WC tested up to: 4.1.0
+ * WC tested up to: 4.5.1
  * License: GPLv2
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
@@ -506,6 +506,10 @@ final class CodistoConnect {
 
 							$child_product = $wc_product->get_child( $child_id );
 
+							if(!is_object($child_product)) {
+								continue;
+							}
+
 							$img = wp_get_attachment_image_src( $child_product->get_image_id(), 'full' );
 							$img = $img[0];
 
@@ -660,6 +664,10 @@ final class CodistoConnect {
 						foreach ( $wc_product->get_children() as $child_id ) {
 
 							$child_product = $wc_product->get_child( $child_id );
+
+							if(!is_object($child_product)) {
+								continue;
+							}
 
 							$child_product_data = array(
 												'id' => $child_id,
@@ -1182,18 +1190,18 @@ final class CodistoConnect {
 									'Content-Disposition' => 'attachment; filename=' . basename( $zipfile ),
 									'Content-Length' => filesize( $tmpfile )
 								);
-	
+
 								$this->sendHttpHeaders( '200 OK', $headers );
-	
+
 								while( ob_get_level() > 0 ) {
 									if ( ! @ob_end_clean() )
 										break;
 								}
-	
+
 								flush();
-	
+
 								readfile( $tmpfile );
-							} else {								
+							} else {
 								$this->sendHttpHeaders(
 									'200 OK',
 									array(
@@ -1204,7 +1212,7 @@ final class CodistoConnect {
 										'Pragma' => 'no-cache'
 									)
 								);
-								echo $this->json_encode( array('error'=>$zipfile->errorInfo(true)) );					
+								echo $this->json_encode( array('error'=>$zipfile->errorInfo(true)) );
 							}
 
 						}
