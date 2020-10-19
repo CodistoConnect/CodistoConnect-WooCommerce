@@ -1593,8 +1593,9 @@ final class CodistoConnect {
 
 						if ( $ordercontent->paymentstatus == 'complete' ) {
 							$transaction_id = (string)$ordercontent->orderpayments[0]->orderpayment->transactionid;
+							$paymentmethod = (string)$ordercontent->orderpayments[0]->orderpayment->paymentmethod;
 
-							if ( $transaction_id ) {
+							if ( $transaction_id  && $paymentmethod == "paypal") {
 								update_post_meta( $order_id, '_payment_method', 'paypal' );
 								update_post_meta( $order_id, '_payment_method_title', __( 'PayPal', 'woocommerce' ) );
 
@@ -1652,8 +1653,9 @@ final class CodistoConnect {
 
 						if ( $ordercontent->paymentstatus == 'complete' ) {
 							$transaction_id = (string)$ordercontent->orderpayments[0]->orderpayment->transactionid;
+							$paymentmethod = (string)$ordercontent->orderpayments[0]->orderpayment->paymentmethod;
 
-							if ( $transaction_id ) {
+							if ( $transaction_id  && $paymentmethod == "paypal") {
 								update_post_meta( $order_id, '_payment_method', 'paypal' );
 								update_post_meta( $order_id, '_payment_method_title', __( 'PayPal', 'woocommerce' ) );
 
