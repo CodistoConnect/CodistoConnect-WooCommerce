@@ -1595,7 +1595,7 @@ final class CodistoConnect {
 							$transaction_id = (string)$ordercontent->orderpayments[0]->orderpayment->transactionid;
 							$paymentmethod = (string)$ordercontent->orderpayments[0]->orderpayment->paymentmethod;
 
-							if ( $transaction_id  && preg_match('/^.*paypal.*$/i',$paymentmethod)) {
+							if ( $transaction_id  && preg_match('/paypal/i',$paymentmethod)) {
 								update_post_meta( $order_id, '_payment_method', 'paypal' );
 								update_post_meta( $order_id, '_payment_method_title', __( 'PayPal', 'woocommerce' ) );
 
@@ -1655,7 +1655,7 @@ final class CodistoConnect {
 							$transaction_id = (string)$ordercontent->orderpayments[0]->orderpayment->transactionid;
 							$paymentmethod = (string)$ordercontent->orderpayments[0]->orderpayment->paymentmethod;
 
-							if ( $transaction_id  && preg_match('/^.*paypal.*$/i',$paymentmethod)) {
+							if ( $transaction_id  && preg_match('/paypal/i',$paymentmethod)) {
 								update_post_meta( $order_id, '_payment_method', 'paypal' );
 								update_post_meta( $order_id, '_payment_method_title', __( 'PayPal', 'woocommerce' ) );
 
