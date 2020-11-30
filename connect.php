@@ -5,23 +5,23 @@
  * Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.53
+ * Version: 1.3.54
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
- * WC tested up to: 4.5.1
+ * WC tested up to: 4.7.1
  * License: GPLv2
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.53
+ * @version 1.3.54
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.53' );
+define( 'CODISTOCONNECT_VERSION', '1.3.54' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -1593,8 +1593,9 @@ final class CodistoConnect {
 
 						if ( $ordercontent->paymentstatus == 'complete' ) {
 							$transaction_id = (string)$ordercontent->orderpayments[0]->orderpayment->transactionid;
+							$paymentmethod = (string)$ordercontent->orderpayments[0]->orderpayment->paymentmethod;
 
-							if ( $transaction_id ) {
+							if ( $transaction_id  && preg_match('/paypal/i',$paymentmethod)) {
 								update_post_meta( $order_id, '_payment_method', 'paypal' );
 								update_post_meta( $order_id, '_payment_method_title', __( 'PayPal', 'woocommerce' ) );
 
@@ -1652,8 +1653,9 @@ final class CodistoConnect {
 
 						if ( $ordercontent->paymentstatus == 'complete' ) {
 							$transaction_id = (string)$ordercontent->orderpayments[0]->orderpayment->transactionid;
+							$paymentmethod = (string)$ordercontent->orderpayments[0]->orderpayment->paymentmethod;
 
-							if ( $transaction_id ) {
+							if ( $transaction_id  && preg_match('/paypal/i',$paymentmethod)) {
 								update_post_meta( $order_id, '_payment_method', 'paypal' );
 								update_post_meta( $order_id, '_payment_method_title', __( 'PayPal', 'woocommerce' ) );
 

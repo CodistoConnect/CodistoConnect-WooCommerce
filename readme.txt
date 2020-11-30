@@ -2,8 +2,8 @@
 Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
-Tested up to: 5.5.1
-Stable tag: 1.3.53
+Tested up to: 5.5.3
+Stable tag: 1.3.54
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -95,6 +95,11 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 3. Order Management
 
 == Changelog ==
+
+= 1.3.54 - 30/11/2020 =
+* Update - WordPress tested up to 5.5.3
+* Update - WooCommerce tested up to 4.7.1
+* Fix - handle eBay Managed Payments payment method correctly
 
 = 1.3.53 - 27/08/2020 =
 * Fix - stop errors when attempting to sync deleted variation children
