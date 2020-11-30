@@ -1,5 +1,10 @@
 *** WooCommerce Amazon and eBay Integration ***
 
+2020-11-30 - version 1.3.54
+* Update - WordPress tested up to 5.5.3
+* Update - WooCommerce tested up to 4.7.1
+* Fix - handle eBay Managed Payments payment method correctly
+
 2020-09-14 - version 1.3.53
 * Fix - stop errors when attempting to sync deleted variation children
 * Fix - use WooCommerce default currency for order currency
