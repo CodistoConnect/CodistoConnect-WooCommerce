@@ -2480,13 +2480,16 @@ final class CodistoConnect {
 
 						<div>
 							<i class="material-icons">email</i> <input type="email" name="email" required placeholder="Enter Your Email Address" size="40">
+							<div class="help-text email-help-text" data-defaultmessage="Email is required" data-invalidmessage="Please enter a valid email"></div>
 						</div>
 						<div>
 							<i class="material-icons">email</i> <input type="email" name="emailconfirm" required placeholder="Confirm Your Email Address" size="40">
+							<div class="help-text emailconfirm-help-text" data-defaultmessage="Confirm Email is required" data-invalidmessage="Please enter a valid confirm email"></div>
 						</div>
 
 						<div>
 							<i class="material-icons">phone_in_talk</i> <input type="tel" name="phone" required placeholder="Enter your Phone Number (incl. country code)" size="40">
+							<div class="help-text phone-help-text" data-defaultmessage="Phone is required" data-invalidmessage="Please enter a valid phone number"></div>
 						</div>
 
 						<div class="selection">
