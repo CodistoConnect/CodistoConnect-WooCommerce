@@ -36,27 +36,27 @@
 		const phone = document.querySelector("#codisto-form input[name=phone]").value;
 		let invalid = true;
 		if (email && !/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email))
-	  {
+		{
 			document.querySelector(".email-help-text").innerHTML = document.querySelector(".email-help-text").dataset.invalidmessage;
-	  } else if(!email) {
+		} else if(!email) {
 			document.querySelector(".email-help-text").innerHTML = document.querySelector(".email-help-text").dataset.defaultmessage;
 		} else {
 			invalid = invalid && false;
 			document.querySelector(".email-help-text").innerHTML = "";
 		}
 		if (emailconfirm && !/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(emailconfirm))
-	  {
+		{
 			document.querySelector(".emailconfirm-help-text").innerHTML = document.querySelector(".emailconfirm-help-text").dataset.invalidmessage;
-  	} else if(!emailconfirm) {
+		} else if(!emailconfirm) {
 			document.querySelector(".emailconfirm-help-text").innerHTML = document.querySelector(".emailconfirm-help-text").dataset.defaultmessage;
 		} else {
 			invalid = invalid && false;
 			document.querySelector(".emailconfirm-help-text").innerHTML = "";
 		}
 		if (phone && !/(\+?)\d{10,14}$/.test(phone))
-	  {
+		{
 			document.querySelector(".phone-help-text").innerHTML = document.querySelector(".phone-help-text").dataset.invalidmessage;
-  	} else if(!phone) {
+		} else if(!phone) {
 			document.querySelector(".phone-help-text").innerHTML = document.querySelector(".phone-help-text").dataset.defaultmessage;
 		} else {
 			invalid = invalid && false;
