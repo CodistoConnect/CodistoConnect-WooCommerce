@@ -9,7 +9,7 @@
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
- * WC tested up to: 4.7.1
+ * WC tested up to: 4.9.1
  * License: GPLv2
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
@@ -1296,6 +1296,47 @@ final class CodistoConnect {
 				}
 
 				$response['paymentmethods'] = $paymentmethods;
+
+				$this->sendHttpHeaders(
+					'200 OK',
+					array(
+						'Content-Type' => 'application/json',
+						'Cache-Control' => 'no-cache, no-store',
+						'X-Codisto-Content-Type' => 'application/json',
+						'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+						'Pragma' => 'no-cache'
+					)
+				);
+				echo $this->json_encode( $response );
+				exit();
+
+			} elseif ( $type == "shipping" ) {
+
+				$response = array( 'ack' => 'ok' );
+
+				$shippingmethodlist = WC()->shipping->get_shipping_methods();
+
+				$shippingmethods = array();
+
+				foreach( $shippingmethodlist as $shippingmethod ) {
+
+					$shippingmethods[] = get_object_vars( $shippingmethod );
+
+				}
+
+				$response['shippingmethods'] = $shippingmethods;
+
+				$zoneslist = WC_Shipping_Zones::get_zones();
+
+				$shippingzones = array();
+
+				foreach( $zoneslist as $zone ) {
+
+					$shippingzones[] = get_object_vars( $zone );
+
+				}
+
+				$response['shippingzones'] = $shippingzones;
 
 				$this->sendHttpHeaders(
 					'200 OK',
