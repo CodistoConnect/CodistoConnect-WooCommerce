@@ -2107,6 +2107,8 @@ final class CodistoConnect {
 				$conversion_tracking_file = '/codisto/conversion-tracking.js';
 				$conversion_tracking_path = $upload_dir['basedir'].$conversion_tracking_file;
 
+				wp_mkdir_p( dirname( $conversion_tracking_path ) );
+
 				file_put_contents( $conversion_tracking_path, file_get_contents( 'php://input' ) );
 
 				$this->sendHttpHeaders(
