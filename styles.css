@@ -217,3 +217,10 @@
 	vertical-align: middle;
 	font-size: 125%;
 }
+
+.help-text {
+	margin-top: -10px;
+	margin-bottom: 4px;
+	margin-left: 5%;
+	color: #f01657;
+}

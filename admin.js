@@ -33,8 +33,38 @@
 
 		const email = document.querySelector("#codisto-form input[name=email]").value;
 		const emailconfirm = document.querySelector("#codisto-form input[name=emailconfirm]").value;
-		if (email && emailconfirm
+		const phone = document.querySelector("#codisto-form input[name=phone]").value;
+		let invalid = true;
+		if (email && !/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email))
+		{
+			document.querySelector(".email-help-text").innerHTML = document.querySelector(".email-help-text").dataset.invalidmessage;
+		} else if(!email) {
+			document.querySelector(".email-help-text").innerHTML = document.querySelector(".email-help-text").dataset.defaultmessage;
+		} else {
+			invalid = invalid && false;
+			document.querySelector(".email-help-text").innerHTML = "";
+		}
+		if (emailconfirm && !/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(emailconfirm))
+		{
+			document.querySelector(".emailconfirm-help-text").innerHTML = document.querySelector(".emailconfirm-help-text").dataset.invalidmessage;
+		} else if(!emailconfirm) {
+			document.querySelector(".emailconfirm-help-text").innerHTML = document.querySelector(".emailconfirm-help-text").dataset.defaultmessage;
+		} else {
+			invalid = invalid && false;
+			document.querySelector(".emailconfirm-help-text").innerHTML = "";
+		}
+		if (phone && !/(\+?)\d{10,14}$/.test(phone))
+		{
+			document.querySelector(".phone-help-text").innerHTML = document.querySelector(".phone-help-text").dataset.invalidmessage;
+		} else if(!phone) {
+			document.querySelector(".phone-help-text").innerHTML = document.querySelector(".phone-help-text").dataset.defaultmessage;
+		} else {
+			invalid = invalid && false;
+			document.querySelector(".phone-help-text").innerHTML = "";
+		}
+		if (!invalid && email && emailconfirm
 			&& (email == emailconfirm)) {
+			document.querySelector(".error-message").style.display = "none";
 			document.querySelector("#codisto-form .next BUTTON").classList.add("button-primary");
 		} else {
 			document.querySelector("#codisto-form .next BUTTON").classList.remove("button-primary");
