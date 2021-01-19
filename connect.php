@@ -1322,12 +1322,6 @@ final class CodistoConnect {
 
 				}
 
-				$upload_dir = wp_upload_dir();
-				$conversion_tracking_file = '/codisto/conversion-tracking.js';
-				$conversion_tracking_path = $upload_dir['basedir'].$conversion_tracking_file;
-
-				file_put_contents( $conversion_tracking_path, file_get_contents( 'php://input' ) );
-
 				$this->sendHttpHeaders(
 					'200 OK',
 					array(
@@ -2068,8 +2062,11 @@ final class CodistoConnect {
 
 				update_option( 'codisto_conversion_tracking' , strval( $conversiontracking ) );
 
+				$upload_dir = wp_upload_dir();
+				$conversion_tracking_file = '/codisto/conversion-tracking.js';
+				$conversion_tracking_path = $upload_dir['basedir'].$conversion_tracking_file;
 
-
+				file_put_contents( $conversion_tracking_path, file_get_contents( 'php://input' ) );
 
 				$this->sendHttpHeaders(
 					'200 OK',
