@@ -1,8 +1,5 @@
 *** WooCommerce Amazon and eBay Integration ***
 
-2021-01-19 - version 1.3.55
-* stop errors when attempting to sync deleted order items
-
 2020-11-30 - version 1.3.54
 * Update - WordPress tested up to 5.5.3
 * Update - WooCommerce tested up to 4.7.1
