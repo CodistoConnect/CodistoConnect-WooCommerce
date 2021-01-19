@@ -5,7 +5,7 @@
  * Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.55
+ * Version: 1.3.54
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
@@ -14,14 +14,14 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.55
+ * @version 1.3.54
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.55' );
+define( 'CODISTOCONNECT_VERSION', '1.3.54' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -1577,17 +1577,17 @@ final class CodistoConnect {
 								);
 
 								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->defaultcurrencylinetotal) );
-								wc_add_order_item_meta( $item_id, 'total_tax', wc_format_decimal( (real)$orderline->defaultcurrencylinetotalinctax - (real)$orderline->defaultcurrencylinetotal) );
+								wc_add_order_item_meta( $item_id, 'total_tax', wc_format_decimal( (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal) );
 
 								$shipping_tax_array = array (
 									'total' => array (
-										1=> (real)$orderline->defaultcurrencylinetotalinctax - (real)$orderline->defaultcurrencylinetotal,
+										1=> (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal,
 									)
 								);
 
 								wc_add_order_item_meta( $item_id, 'taxes', $shipping_tax_array);
-								$shipping += (real)$orderline->defaultcurrencylinetotal;
-								$shipping_tax += (real)$orderline->defaultcurrencylinetotalinctax - (real)$orderline->defaultcurrencylinetotal;
+								$shipping += (float)$orderline->defaultcurrencylinetotal;
+								$shipping_tax += (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal;
 							}
 						}
 
@@ -1619,148 +1619,149 @@ final class CodistoConnect {
 					} else {
 						$order = wc_get_order( $order_id );
 
-						foreach ( $ordercontent->orderlines->orderline as $orderline ) {
-							if ( $orderline->productcode[0] != 'FREIGHT' ) {
-								$line_total = wc_format_decimal( (float)$orderline->defaultcurrencylinetotal );
-								$line_total_tax = wc_format_decimal( (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal );
+						if( is_object($order) ) {
 
-								$tax += $line_total_tax;
-							} else {
+							foreach ( $ordercontent->orderlines->orderline as $orderline ) {
+								if ( $orderline->productcode[0] != 'FREIGHT' ) {
+									$line_total = wc_format_decimal( (float)$orderline->defaultcurrencylinetotal );
+									$line_total_tax = wc_format_decimal( (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal );
 
-								if(!is_object($order)) {
-									continue;
+									$tax += $line_total_tax;
+								} else {
+									$order->remove_order_items( 'shipping' );
+
+									$item_id = wc_add_order_item(
+										$order_id,
+										array(
+											'order_item_name' 		=> (string)$orderline->productname,
+											'order_item_type' 		=> 'shipping'
+										)
+									);
+
+									wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->defaultcurrencylinetotal) );
+									wc_add_order_item_meta( $item_id, 'total_tax', wc_format_decimal( (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal) );
+
+									$shipping_tax_array = array (
+										'total' => array (
+											1=> (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal,
+										)
+									);
+
+									wc_add_order_item_meta( $item_id, 'taxes', $shipping_tax_array);
+									$shipping += (float)$orderline->defaultcurrencylinetotal;
+									$shipping_tax += (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal;
 								}
-								
-								$order->remove_order_items( 'shipping' );
+							}
 
-								$item_id = wc_add_order_item(
-									$order_id,
-									array(
-										'order_item_name' 		=> (string)$orderline->productname,
-										'order_item_type' 		=> 'shipping'
-									)
-								);
+							if ( $ordercontent->paymentstatus == 'complete' ) {
+								$transaction_id = (string)$ordercontent->orderpayments[0]->orderpayment->transactionid;
+								$paymentmethod = (string)$ordercontent->orderpayments[0]->orderpayment->paymentmethod;
 
-								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->defaultcurrencylinetotal) );
-								wc_add_order_item_meta( $item_id, 'total_tax', wc_format_decimal( (real)$orderline->defaultcurrencylinetotalinctax - (real)$orderline->defaultcurrencylinetotal) );
+								if ( $transaction_id  && preg_match('/paypal/i',$paymentmethod)) {
+									update_post_meta( $order_id, '_payment_method', 'paypal' );
+									update_post_meta( $order_id, '_payment_method_title', __( 'PayPal', 'woocommerce' ) );
 
-								$shipping_tax_array = array (
-									'total' => array (
-										1=> (real)$orderline->defaultcurrencylinetotalinctax - (real)$orderline->defaultcurrencylinetotal,
-									)
-								);
+									update_post_meta( $order_id, '_transaction_id', $transaction_id );
+								} else {
+									update_post_meta( $order_id, '_payment_method', 'bacs' );
+									update_post_meta( $order_id, '_payment_method_title', __( 'BACS', 'woocommerce' ) );
+								}
 
-								wc_add_order_item_meta( $item_id, 'taxes', $shipping_tax_array);
-								$shipping += (real)$orderline->defaultcurrencylinetotal;
-								$shipping_tax += (real)$orderline->defaultcurrencylinetotalinctax - (real)$orderline->defaultcurrencylinetotal;
+								// payment_complete
+								add_post_meta( $order_id, '_paid_date', current_time( 'mysql' ), true );
+								if ( $adjustStock && ! get_post_meta( $order_id, '_order_stock_reduced', true ) ) {
+									wc_maybe_reduce_stock_levels( $order_id );
+								}
 							}
 						}
+					}
 
-						if ( $ordercontent->paymentstatus == 'complete' ) {
-							$transaction_id = (string)$ordercontent->orderpayments[0]->orderpayment->transactionid;
-							$paymentmethod = (string)$ordercontent->orderpayments[0]->orderpayment->paymentmethod;
+					if( is_object($order) ) {
 
-							if ( $transaction_id  && preg_match('/paypal/i',$paymentmethod)) {
-								update_post_meta( $order_id, '_payment_method', 'paypal' );
-								update_post_meta( $order_id, '_payment_method_title', __( 'PayPal', 'woocommerce' ) );
+						foreach ( $address_data as $key => $value ) {
+							update_post_meta( $order_id, '_'.$key, $value );
+						}
 
-								update_post_meta( $order_id, '_transaction_id', $transaction_id );
+						$order->remove_order_items( 'tax' );
+						$order->add_tax( 1, $tax, $shipping_tax );
+
+						$order->set_total( $shipping, 'shipping' );
+						$order->set_total( $shipping_tax, 'shipping_tax' );
+						$order->set_total( $cart_discount, 'cart_discount' );
+						$order->set_total( $cart_discount_tax, 'cart_discount_tax' );
+						$order->set_total( $tax, 'tax' );
+						$order->set_total( $total, 'total');
+
+						if ( $ordercontent->orderstate == 'cancelled' ) {
+							if ( ! $order->has_status( 'cancelled' ) ) {
+								// update_status
+								$order->set_status( 'cancelled' );
+								$update_post_data  = array(
+									'ID'		 	=> $order_id,
+									'post_status'	=> 'wc-cancelled',
+									'post_date'		=> current_time( 'mysql', 0 ),
+									'post_date_gmt' => current_time( 'mysql', 1 )
+								);
+								wp_update_post( $update_post_data );
+
+								$order->decrease_coupon_usage_counts();
+
+								wc_delete_shop_order_transients( $order_id );
+							}
+						} elseif ( $ordercontent->orderstate == 'inprogress' || $ordercontent->orderstate == 'processing' ) {
+
+							if ( $ordercontent->paymentstatus == 'complete' ) {
+								if ( ! $order->has_status( 'processing' ) ) {
+									// update_status
+									$order->set_status( 'processing' );
+									$update_post_data  = array(
+										'ID'		 	=> $order_id,
+										'post_status'	=> 'wc-processing',
+										'post_date'		=> current_time( 'mysql', 0 ),
+										'post_date_gmt' => current_time( 'mysql', 1 )
+									);
+									wp_update_post( $update_post_data );
+								}
 							} else {
-								update_post_meta( $order_id, '_payment_method', 'bacs' );
-								update_post_meta( $order_id, '_payment_method_title', __( 'BACS', 'woocommerce' ) );
+								if ( ! $order->has_status( 'pending' ) ) {
+									// update_status
+									$order->set_status( 'pending' );
+									$update_post_data  = array(
+										'ID'		 	=> $order_id,
+										'post_status'	=> 'wc-pending',
+										'post_date'		=> current_time( 'mysql', 0 ),
+										'post_date_gmt' => current_time( 'mysql', 1 )
+									);
+									wp_update_post( $update_post_data );
+								}
 							}
 
-							// payment_complete
-							add_post_meta( $order_id, '_paid_date', current_time( 'mysql' ), true );
-							if ( $adjustStock && ! get_post_meta( $order_id, '_order_stock_reduced', true ) ) {
-								wc_maybe_reduce_stock_levels( $order_id );
-							}
-						}
-					}
+						} elseif ( $ordercontent->orderstate == 'complete' ) {
 
-					foreach ( $address_data as $key => $value ) {
-						update_post_meta( $order_id, '_'.$key, $value );
-					}
-
-					$order->remove_order_items( 'tax' );
-					$order->add_tax( 1, $tax, $shipping_tax );
-
-					$order->set_total( $shipping, 'shipping' );
-					$order->set_total( $shipping_tax, 'shipping_tax' );
-					$order->set_total( $cart_discount, 'cart_discount' );
-					$order->set_total( $cart_discount_tax, 'cart_discount_tax' );
-					$order->set_total( $tax, 'tax' );
-					$order->set_total( $total, 'total');
-
-					if ( $ordercontent->orderstate == 'cancelled' ) {
-						if ( ! $order->has_status( 'cancelled' ) ) {
-							// update_status
-							$order->set_status( 'cancelled' );
-							$update_post_data  = array(
-								'ID'		 	=> $order_id,
-								'post_status'	=> 'wc-cancelled',
-								'post_date'		=> current_time( 'mysql', 0 ),
-								'post_date_gmt' => current_time( 'mysql', 1 )
-							);
-							wp_update_post( $update_post_data );
-
-							$order->decrease_coupon_usage_counts();
-
-							wc_delete_shop_order_transients( $order_id );
-						}
-					} elseif ( $ordercontent->orderstate == 'inprogress' || $ordercontent->orderstate == 'processing' ) {
-
-						if ( $ordercontent->paymentstatus == 'complete' ) {
-							if ( ! $order->has_status( 'processing' ) ) {
+							if ( ! $order->has_status( 'completed' ) ) {
 								// update_status
-								$order->set_status( 'processing' );
+								$order->set_status( 'completed' );
 								$update_post_data  = array(
 									'ID'		 	=> $order_id,
-									'post_status'	=> 'wc-processing',
+									'post_status'	=> 'wc-completed',
 									'post_date'		=> current_time( 'mysql', 0 ),
 									'post_date_gmt' => current_time( 'mysql', 1 )
 								);
 								wp_update_post( $update_post_data );
+
+								$order->record_product_sales();
+
+								$order->increase_coupon_usage_counts();
+
+								update_post_meta( $order_id, '_completed_date', current_time( 'mysql' ) );
+
+								wc_delete_shop_order_transients( $order_id );
 							}
-						} else {
-							if ( ! $order->has_status( 'pending' ) ) {
-								// update_status
-								$order->set_status( 'pending' );
-								$update_post_data  = array(
-									'ID'		 	=> $order_id,
-									'post_status'	=> 'wc-pending',
-									'post_date'		=> current_time( 'mysql', 0 ),
-									'post_date_gmt' => current_time( 'mysql', 1 )
-								);
-								wp_update_post( $update_post_data );
-							}
+
 						}
 
-					} elseif ( $ordercontent->orderstate == 'complete' ) {
-
-						if ( ! $order->has_status( 'completed' ) ) {
-							// update_status
-							$order->set_status( 'completed' );
-							$update_post_data  = array(
-								'ID'		 	=> $order_id,
-								'post_status'	=> 'wc-completed',
-								'post_date'		=> current_time( 'mysql', 0 ),
-								'post_date_gmt' => current_time( 'mysql', 1 )
-							);
-							wp_update_post( $update_post_data );
-
-							$order->record_product_sales();
-
-							$order->increase_coupon_usage_counts();
-
-							update_post_meta( $order_id, '_completed_date', current_time( 'mysql' ) );
-
-							wc_delete_shop_order_transients( $order_id );
-						}
-
+						$order->save();
 					}
-
-					$order->save();
 
 					$wpdb->query( 'COMMIT' );
 
@@ -2484,18 +2485,21 @@ final class CodistoConnect {
 						<input type="hidden" name="method" value="email"/>
 
 						<div>
-							<i class="material-icons">email</i> <input type="email" name="email" required placeholder="Enter Your Email Address" size="40">
+							<label for="email"><i class="material-icons">email</i></label> <input type="email" id="email" name="email" required placeholder="Enter Your Email Address" size="40">
+							<div class="help-text email-help-text" data-defaultmessage="Email is required" data-invalidmessage="Please enter a valid email"></div>
 						</div>
 						<div>
-							<i class="material-icons">email</i> <input type="email" name="emailconfirm" required placeholder="Confirm Your Email Address" size="40">
+							<label for="emailconfirm"><i class="material-icons">email</i></label> <input type="email" id="emailconfirm" name="emailconfirm" required placeholder="Confirm Your Email Address" size="40">
+							<div class="help-text emailconfirm-help-text" data-defaultmessage="Confirm Email is required" data-invalidmessage="Please enter a valid confirm email"></div>
 						</div>
 
 						<div>
-							<i class="material-icons">phone_in_talk</i> <input type="tel" name="phone" required placeholder="Enter your Phone Number (incl. country code)" size="40">
+							<label for="phone"><i class="material-icons">phone_in_talk</i></label> <input type="tel" id="phone" name="phone" required placeholder="Enter your Phone Number (incl. country code)" size="40">
+							<div class="help-text phone-help-text" data-defaultmessage="Phone is required" data-invalidmessage="Please enter a valid phone number"></div>
 						</div>
 
 						<div class="selection">
-							<i class="material-icons">language</i> <div class="select-html-wrapper"></div>
+							<label for="countrycode"><i class="material-icons">language</i></label> <div class="select-html-wrapper"></div>
 							<br/>
 							This is important for creating your initial store defaults.
 							<br/>
