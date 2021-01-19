@@ -1,4 +1,4 @@
-*** WooCommerce Amazon and eBay Integration ***
+*** WooCommerce Google, Amazon & eBay Integration - Channel Cloud by Codisto ***
 
 2021-01-18
 * Update - additional endpoints for Google integration
