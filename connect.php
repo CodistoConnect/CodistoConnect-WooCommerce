@@ -1,11 +1,11 @@
 <?php
 /**
- * Plugin Name: Codisto LINQ by Codisto
+ * Plugin Name: Codisto Channel Cloud
  * Plugin URI: http://wordpress.org/plugins/codistoconnect/
- * Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
+ * Description: Sell multichannel on Google, Amazon & eBay direct from WooCommerce. Create listings & sync products, inventory & orders directly from WooCommerce
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.54
+ * Version: 1.3.55
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
@@ -1223,8 +1223,128 @@ final class CodistoConnect {
 
 					}
 				}
+
+			} elseif ( $type == "sites" ) {
+
+				$response = array( 'ack' => 'ok' );
+
+				if( is_multisite() ) {
+
+					$sites = array();
+
+					$sitelist = get_sites();
+					foreach( $sitelist as $site ) {
+
+						$sites[] = get_object_vars( $site );
+
+					}
+
+					$response['sites'] = $sites;
+
+				}
+
+				$this->sendHttpHeaders(
+					'200 OK',
+					array(
+						'Content-Type' => 'application/json',
+						'Cache-Control' => 'no-cache, no-store',
+						'X-Codisto-Content-Type' => 'application/json',
+						'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+						'Pragma' => 'no-cache'
+					)
+				);
+				echo $this->json_encode( $response );
+				exit();
+
+			} elseif ( $type == "siteverification" ) {
+
+				$response = array( 'ack' => 'ok' );
+
+				$siteverification = get_option( 'codisto_site_verification' );
+
+				if( $siteverification ) {
+
+					$response['siteverification'] = $siteverification;
+
+				}
+
+				$this->sendHttpHeaders(
+					'200 OK',
+					array(
+						'Content-Type' => 'application/json',
+						'Cache-Control' => 'no-cache, no-store',
+						'X-Codisto-Content-Type' => 'application/json',
+						'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+						'Pragma' => 'no-cache'
+					)
+				);
+				echo $this->json_encode( $response );
+				exit();
+
+			} elseif ( $type == "paymentmethods" ) {
+
+				$response = array( 'ack' => 'ok' );
+
+				$gateways = WC()->payment_gateways->payment_gateways();
+
+				$paymentmethods = array();
+
+				foreach( $gateways as $paymentmethod ) {
+
+					$paymentmethods[] = get_object_vars( $paymentmethod );
+
+				}
+
+				$response['paymentmethods'] = $paymentmethods;
+
+				$this->sendHttpHeaders(
+					'200 OK',
+					array(
+						'Content-Type' => 'application/json',
+						'Cache-Control' => 'no-cache, no-store',
+						'X-Codisto-Content-Type' => 'application/json',
+						'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+						'Pragma' => 'no-cache'
+					)
+				);
+				echo $this->json_encode( $response );
+				exit();
+
+			} elseif ( $type == "conversiontracking" ) {
+
+				$response = array( 'ack' => 'ok' );
+
+				$conversiontracking = get_option( 'codisto_conversion_tracking' );
+
+				if( $conversiontracking ) {
+
+					$response['conversiontracking'] = $conversiontracking;
+
+				}
+
+				$upload_dir = wp_upload_dir();
+				$conversion_tracking_file = '/codisto/conversion-tracking.js';
+				$conversion_tracking_path = $upload_dir['basedir'].$conversion_tracking_file;
+
+				file_put_contents( $conversion_tracking_path, file_get_contents( 'php://input' ) );
+
+				$this->sendHttpHeaders(
+					'200 OK',
+					array(
+						'Content-Type' => 'application/json',
+						'Cache-Control' => 'no-cache, no-store',
+						'X-Codisto-Content-Type' => 'application/json',
+						'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+						'Pragma' => 'no-cache'
+					)
+				);
+				echo $this->json_encode( $response );
+				exit();
+
 			}
+
 		} else {
+
 			if ( $type === 'createorder' ) {
 
 				if ( ! $this->check_hash() ) {
@@ -1925,7 +2045,47 @@ final class CodistoConnect {
 				);
 				echo $response;
 				exit();
+
+			} elseif ( $type == "siteverification" ) {
+
+				update_option( 'codisto_site_verification' , file_get_contents( 'php://input' ) );
+
+				$this->sendHttpHeaders(
+					'200 OK',
+					array(
+						'Content-Type' => 'application/json',
+						'Cache-Control' => 'no-cache, no-store',
+						'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+						'Pragma' => 'no-cache'
+					)
+				);
+				echo $this->json_encode( array( 'ack' => 'ok' ) );
+				exit();
+
+			} elseif ( $type == "conversiontracking" ) {
+
+				$conversiontracking = intval( get_option( 'codisto_conversion_tracking' ) ) + 1;
+
+				update_option( 'codisto_conversion_tracking' , strval( $conversiontracking ) );
+
+
+
+
+				$this->sendHttpHeaders(
+					'200 OK',
+					array(
+						'Content-Type' => 'application/json',
+						'Cache-Control' => 'no-cache, no-store',
+						'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+						'Pragma' => 'no-cache'
+					)
+				);
+				echo $this->json_encode( array( 'ack' => 'ok' ) );
+				exit();
+
 			}
+
+
 		}
 	}
 
@@ -2131,6 +2291,15 @@ final class CodistoConnect {
 					);
 					echo '<h1>Error processing request</h1> <p>'.htmlspecialchars( $response->get_error_message() ).'</p>';
 					exit();
+				}
+
+				if ( $httpOptions['sslcertificates']
+				 	&& strpos( $response->get_error_message(), 'cURL error 77' ) !== false ) {
+
+					@file_put_contents( $certPath, '' );
+					unset( $httpOptions['sslcertificates'] );
+					continue;
+
 				}
 
 				if ( $response->get_error_code() == 'http_request_failed' ) {
@@ -2548,6 +2717,16 @@ final class CodistoConnect {
 	}
 
 	/**
+	* renders the 'analytics' tab
+	*
+	*/
+	public function analytics() {
+		$adminUrl = admin_url( 'codisto/ebaytab/0/'.get_option( 'codisto_merchantid' ).'/analytics/' );
+
+		$this->admin_tab( $adminUrl, 'codisto-bulk-editor' );
+	}
+
+	/**
 	* renders the 'orders' tab
 	*
 	*/
@@ -2614,6 +2793,7 @@ final class CodistoConnect {
 			$pages[] = add_submenu_page( 'codisto', __( 'Home', 'codisto-linq' ), __( 'Home', 'codisto-linq' ), 'edit_posts', 'codisto', array( $this, 'ebay_tab' ) );
 			$pages[] = add_submenu_page( 'codisto', __( 'Listings', 'codisto-linq' ), __( 'Listings', 'codisto-linq' ), 'edit_posts', 'codisto-listings', array( $this, 'listings' ) );
 			$pages[] = add_submenu_page( 'codisto', __( 'Orders', 'codisto-linq' ), __( 'Orders', 'codisto-linq' ), 'edit_posts', 'codisto-orders', array( $this, 'orders' ) );
+			$pages[] = add_submenu_page( 'codisto', __( 'Analytics', 'codisto-linq' ), __( 'Analytics', 'codisto-linq' ), 'edit_posts', 'codisto-analytics', array( $this, 'analytics' ) );
 			$pages[] = add_submenu_page( 'codisto', __( 'Settings', 'codisto-linq' ), __( 'Settings', 'codisto-linq' ), 'edit_posts', 'codisto-settings', array( $this, 'settings' ) );
 			$pages[] = add_submenu_page( 'codisto', __( 'Account', 'codisto-linq' ), __( 'Account', 'codisto-linq' ), 'edit_posts', 'codisto-account', array( $this, 'account' ) );
 			$pages[] = add_submenu_page( 'codisto', __( 'eBay Templates', 'codisto-linq' ), __( 'eBay Templates', 'codisto-linq' ), 'edit_posts', 'codisto-templates', array( $this, 'templates' ) );
@@ -2656,7 +2836,7 @@ final class CodistoConnect {
 	*/
 	public function admin_scripts( $hook ) {
 
-		if ( preg_match ( '/codisto(?:-orders|-categories|-attributes|-import|-templates|-settings|-account|-listings|)$/', $hook ) ) {
+		if ( preg_match ( '/codisto(?:-orders|-categories|-attributes|-import|-templates|-settings|-account|-listings|-analytics|)$/', $hook ) ) {
 
 			wp_enqueue_style( 'codisto-style' );
 			wp_enqueue_script( 'codisto-script' );
@@ -2814,6 +2994,56 @@ final class CodistoConnect {
 	}
 
 	/**
+	* emits site verification tags
+	*
+	*/
+	public function site_verification() {
+
+		$site_verification = get_option('codisto_site_verification');
+		if( $site_verification ) {
+			echo $site_verification;
+		}
+
+	}
+
+	/**
+	* enqueues conversion tracking script for 'offsite' advertising campaigns
+	*
+	*/
+	public function conversion_tracking() {
+
+		$upload_dir = wp_upload_dir();
+		$conversion_tracking_file = '/codisto/conversion-tracking.js';
+		$conversion_tracking_path = $upload_dir['basedir'].$conversion_tracking_file;
+
+		$conversion_tracking = get_option('codisto_conversion_tracking');
+
+		if( $conversion_tracking
+			&& file_exists($conversion_tracking_path) ) {
+
+			$conversion_tracking_url = $upload_dir['baseurl'].$conversion_tracking_file;
+
+			wp_enqueue_script( 'codisto-conversion-tracking' , $conversion_tracking_url, array() , $conversion_tracking );
+		}
+
+	}
+
+	/***
+	* emits conversion information into the checkout completion page
+	*
+	*/
+	public function conversion_emit( $order_id ) {
+
+		$order = new WC_Order( $order_id );
+
+		$conversiondata = 'window.CodistoConversion = { transaction_id : '.$order_id.', value : '.($order->get_total() ? $order->get_total() : 0).', currency : "'.get_woocommerce_currency().'"};';
+
+		wp_add_inline_script( 'codisto-conversion-tracking', $conversiondata );
+
+	}
+
+
+	/**
 	* woocommerce_product_data_tabs hook handler used to render marketplace product tab
 	*
 	* @param array $tabs current set of tabs for the product page
@@ -2952,6 +3182,9 @@ final class CodistoConnect {
 			array( $this, 'plugin_links' )
 		);
 		add_action( 'shutdown',								array( $this, 'signal_edits' ) );
+		add_action( 'wp_head',								array( $this, 'site_verification' ) );
+		add_action( 'wp_enqueue_scripts',					array( $this, 'conversion_tracking' ) );
+		add_action( 'woocommerce_thankyou',					array( $this, 'conversion_emit' ) );
 
 	}
 
