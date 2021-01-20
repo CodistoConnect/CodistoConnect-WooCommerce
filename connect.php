@@ -1,27 +1,27 @@
 <?php
 /**
- * Plugin Name: Codisto LINQ by Codisto
+ * Plugin Name: Codisto Channel Cloud
  * Plugin URI: http://wordpress.org/plugins/codistoconnect/
- * Description: WooCommerce Amazon & eBay Integration - Convert a WooCommerce store into a fully integrated Amazon & eBay store in minutes
+ * Description: Sell multichannel on Google, Amazon & eBay direct from WooCommerce. Create listings & sync products, inventory & orders directly from WooCommerce
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.54
+ * Version: 1.3.55
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
- * WC tested up to: 4.7.1
+ * WC tested up to: 4.9.1
  * License: GPLv2
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.54
+ * @version 1.3.55
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.54' );
+define( 'CODISTOCONNECT_VERSION', '1.3.55' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -1223,8 +1223,163 @@ final class CodistoConnect {
 
 					}
 				}
+
+			} elseif ( $type == "sites" ) {
+
+				$response = array( 'ack' => 'ok' );
+
+				if( is_multisite() ) {
+
+					$sites = array();
+
+					$sitelist = get_sites();
+					foreach( $sitelist as $site ) {
+
+						$sites[] = get_object_vars( $site );
+
+					}
+
+					$response['sites'] = $sites;
+
+				}
+
+				$this->sendHttpHeaders(
+					'200 OK',
+					array(
+						'Content-Type' => 'application/json',
+						'Cache-Control' => 'no-cache, no-store',
+						'X-Codisto-Content-Type' => 'application/json',
+						'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+						'Pragma' => 'no-cache'
+					)
+				);
+				echo $this->json_encode( $response );
+				exit();
+
+			} elseif ( $type == "siteverification" ) {
+
+				$response = array( 'ack' => 'ok' );
+
+				$siteverification = get_option( 'codisto_site_verification' );
+
+				if( $siteverification ) {
+
+					$response['siteverification'] = $siteverification;
+
+				}
+
+				$this->sendHttpHeaders(
+					'200 OK',
+					array(
+						'Content-Type' => 'application/json',
+						'Cache-Control' => 'no-cache, no-store',
+						'X-Codisto-Content-Type' => 'application/json',
+						'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+						'Pragma' => 'no-cache'
+					)
+				);
+				echo $this->json_encode( $response );
+				exit();
+
+			} elseif ( $type == "paymentmethods" ) {
+
+				$response = array( 'ack' => 'ok' );
+
+				$gateways = WC()->payment_gateways->payment_gateways();
+
+				$paymentmethods = array();
+
+				foreach( $gateways as $paymentmethod ) {
+
+					$paymentmethods[] = get_object_vars( $paymentmethod );
+
+				}
+
+				$response['paymentmethods'] = $paymentmethods;
+
+				$this->sendHttpHeaders(
+					'200 OK',
+					array(
+						'Content-Type' => 'application/json',
+						'Cache-Control' => 'no-cache, no-store',
+						'X-Codisto-Content-Type' => 'application/json',
+						'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+						'Pragma' => 'no-cache'
+					)
+				);
+				echo $this->json_encode( $response );
+				exit();
+
+			} elseif ( $type == "shipping" ) {
+
+				$response = array( 'ack' => 'ok' );
+
+				$shippingmethodlist = WC()->shipping->get_shipping_methods();
+
+				$shippingmethods = array();
+
+				foreach( $shippingmethodlist as $shippingmethod ) {
+
+					$shippingmethods[] = get_object_vars( $shippingmethod );
+
+				}
+
+				$response['shippingmethods'] = $shippingmethods;
+
+				$zoneslist = WC_Shipping_Zones::get_zones();
+
+				$shippingzones = array();
+
+				foreach( $zoneslist as $zone ) {
+
+					$shippingzones[] = get_object_vars( $zone );
+
+				}
+
+				$response['shippingzones'] = $shippingzones;
+
+				$this->sendHttpHeaders(
+					'200 OK',
+					array(
+						'Content-Type' => 'application/json',
+						'Cache-Control' => 'no-cache, no-store',
+						'X-Codisto-Content-Type' => 'application/json',
+						'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+						'Pragma' => 'no-cache'
+					)
+				);
+				echo $this->json_encode( $response );
+				exit();
+
+			} elseif ( $type == "conversiontracking" ) {
+
+				$response = array( 'ack' => 'ok' );
+
+				$conversiontracking = get_option( 'codisto_conversion_tracking' );
+
+				if( $conversiontracking ) {
+
+					$response['conversiontracking'] = $conversiontracking;
+
+				}
+
+				$this->sendHttpHeaders(
+					'200 OK',
+					array(
+						'Content-Type' => 'application/json',
+						'Cache-Control' => 'no-cache, no-store',
+						'X-Codisto-Content-Type' => 'application/json',
+						'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+						'Pragma' => 'no-cache'
+					)
+				);
+				echo $this->json_encode( $response );
+				exit();
+
 			}
+
 		} else {
+
 			if ( $type === 'createorder' ) {
 
 				if ( ! $this->check_hash() ) {
@@ -1932,7 +2087,52 @@ final class CodistoConnect {
 				);
 				echo $response;
 				exit();
+
+			} elseif ( $type == "siteverification" ) {
+
+				update_option( 'codisto_site_verification' , file_get_contents( 'php://input' ) );
+
+				$this->sendHttpHeaders(
+					'200 OK',
+					array(
+						'Content-Type' => 'application/json',
+						'Cache-Control' => 'no-cache, no-store',
+						'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+						'Pragma' => 'no-cache'
+					)
+				);
+				echo $this->json_encode( array( 'ack' => 'ok' ) );
+				exit();
+
+			} elseif ( $type == "conversiontracking" ) {
+
+				$conversiontracking = intval( get_option( 'codisto_conversion_tracking' ) ) + 1;
+
+				update_option( 'codisto_conversion_tracking' , strval( $conversiontracking ) );
+
+				$upload_dir = wp_upload_dir();
+				$conversion_tracking_file = '/codisto/conversion-tracking.js';
+				$conversion_tracking_path = $upload_dir['basedir'].$conversion_tracking_file;
+
+				wp_mkdir_p( dirname( $conversion_tracking_path ) );
+
+				file_put_contents( $conversion_tracking_path, file_get_contents( 'php://input' ) );
+
+				$this->sendHttpHeaders(
+					'200 OK',
+					array(
+						'Content-Type' => 'application/json',
+						'Cache-Control' => 'no-cache, no-store',
+						'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+						'Pragma' => 'no-cache'
+					)
+				);
+				echo $this->json_encode( array( 'ack' => 'ok' ) );
+				exit();
+
 			}
+
+
 		}
 	}
 
@@ -2138,6 +2338,15 @@ final class CodistoConnect {
 					);
 					echo '<h1>Error processing request</h1> <p>'.htmlspecialchars( $response->get_error_message() ).'</p>';
 					exit();
+				}
+
+				if ( $httpOptions['sslcertificates']
+				 	&& strpos( $response->get_error_message(), 'cURL error 77' ) !== false ) {
+
+					@file_put_contents( $certPath, '' );
+					unset( $httpOptions['sslcertificates'] );
+					continue;
+
 				}
 
 				if ( $response->get_error_code() == 'http_request_failed' ) {
@@ -2558,6 +2767,16 @@ final class CodistoConnect {
 	}
 
 	/**
+	* renders the 'analytics' tab
+	*
+	*/
+	public function analytics() {
+		$adminUrl = admin_url( 'codisto/ebaytab/0/'.get_option( 'codisto_merchantid' ).'/analytics/' );
+
+		$this->admin_tab( $adminUrl, 'codisto-bulk-editor' );
+	}
+
+	/**
 	* renders the 'orders' tab
 	*
 	*/
@@ -2617,13 +2836,14 @@ final class CodistoConnect {
 			$mainpage = 'codisto';
 			$type = 'ebay_tab';
 
-			add_menu_page( __( 'Amazon & eBay', 'codisto-linq' ), __( 'Amazon & eBay', 'codisto-linq' ), 'edit_posts', $mainpage, array( $this, $type ), 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4cHgiIGhlaWdodD0iMThweCIgdmlld0JveD0iMCAwIDE3MjUuMDAwMDAwIDE3MjUuMDAwMDAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0Ij4gPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsMTcyNS4wMDAwMDApIHNjYWxlKDAuMTAwMDAwLC0wLjEwMDAwMCkiIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0ibm9uZSI+PHBhdGggZD0iTTgzNDAgMTcyNDAgYy0yMTk1IC03MCAtNDI1MyAtOTYyIC01ODEwIC0yNTIwIC0xNDYzIC0xNDYyIC0yMzM3IC0zMzU5IC0yNTAwIC01NDI1IC0yOSAtMzYyIC0yOSAtOTcwIDAgLTEzMzUgMTM4IC0xNzc0IDgwNyAtMzQzOCAxOTMxIC00ODA1IDM1MyAtNDMxIDc4NCAtODYwIDEyMTQgLTEyMTEgMTM2MiAtMTExMiAzMDIzIC0xNzc3IDQ3ODAgLTE5MTQgMzczIC0yOSA5NjAgLTI5IDEzMzUgMCAxNzU3IDEzNSAzNDIyIDgwMSA0Nzg1IDE5MTQgNDU0IDM3MCA5MDYgODI3IDEyNzcgMTI4OCAxNDcgMTgyIDMzNiA0NDEgNDcxIDY0NSAxMTUgMTc0IDMxNyA1MDcgMzE3IDUyMyAwIDYgMyAxMCA4IDEwIDQgMCAxMiAxMCAxOCAyMyAxOCAzOSA4OSAxNzIgOTQgMTc3IDUgNSA3NiAxNDggMTY5IDMzOSAyMyA0NiA0MSA5MCA0MSA5OCAwIDcgNSAxMyAxMCAxMyA2IDAgMTAgNyAxMCAxNSAwIDggNCAyMyAxMCAzMyA1IDkgMjEgNDQgMzUgNzcgMTUgMzMgMzAgNjggMzYgNzcgNSAxMCA5IDIyIDkgMjggMCA1IDEyIDM1IDI2IDY3IDQ3IDEwNSA1NCAxMjQgNTQgMTM4IDAgOCAzIDE1IDggMTUgNCAwIDE1IDI4IDI2IDYzIDEwIDM0IDI0IDcxIDMxIDgyIDcgMTEgMTYgMzYgMjAgNTUgNCAxOSAxMSA0MCAxNSA0NSA0IDYgMTEgMjYgMTUgNDUgNCAxOSAxMSAzNyAxNCA0MCA3IDUgMjEgNTAgNTcgMTgwIDkgMzAgMTkgNjAgMjQgNjUgNCA2IDE1IDQ0IDI0IDg1IDEwIDQxIDIxIDc5IDI2IDg1IDExIDEzIDEzMSA1MzEgMTY5IDcyNSAxNjMgODQ5IDE5OCAxNzY0IDEwMCAyNjMwIC0yNjMgMjMyOSAtMTQ2OCA0NDQ2IC0zMzQ5IDU4ODIgLTczMyA1NTkgLTE1ODcgMTAxMiAtMjQ2NSAxMzA2IC03NjQgMjU3IC0xNjAwIDQxMSAtMjM2NSA0MzcgLTMyMSAxMSAtNDQyIDEyIC02NzAgNXogbS0yOTI1IC0yNjYwIGM2NzEgLTQxIDEyMTQgLTIzMCAxNjk0IC01OTAgNDg1IC0zNjQgODI1IC03NjYgMTY1NiAtMTk2NSAyNzggLTQwMSA5NjggLTE0NDggMTEyMCAtMTcwMCAyMTcgLTM1OCA0MjcgLTg0NCA1MTEgLTExNzUgMTE0IC00NTUgMTEyIC03OTYgLTEwIC0xNDEwIC0zOSAtMTk5IC0xNTAgLTU0MCAtMjQzIC03NDYgLTEyNCAtMjc2IC0yOTQgLTU0NSAtNDkyIC03NzcgLTQyIC00OSAtODggLTEwMiAtMTAyIC0xMTkgbC0yNSAtMzAgLTQxMyA2MjIgLTQxMiA2MjIgMzQgODIgYzU1IDEzMCAxMTggMzY3IDE1MyA1ODEgMjUgMTU1IDE1IDU0MCAtMjAgNzMxIC05MyA1MDkgLTI5NiA5MDcgLTEwMDcgMTk3NCAtNTU3IDgzNiAtMTAyMCAxNDU4IC0xMzUxIDE4MTMgLTQ0NyA0ODAgLTk2NSA3MDUgLTE1MzYgNjY3IC03NzEgLTUxIC0xNDM2IC00ODcgLTE3ODYgLTExNzAgLTk3IC0xODggLTE2MiAtMzg1IC0xODUgLTU2MyAtMjcgLTE5NCAtOSAtNTA2IDQwIC03MDIgMTA5IC00MzcgMzk0IC05NjIgMTA3NSAtMTk3MiA4MjQgLTEyMjQgMTI1MyAtMTc2NiAxNjcyIC0yMTExIDE5MSAtMTU4IDQwMSAtMjYwIDY4NyAtMzM1IGw5MCAtMjMgMTM4IC0yMDUgYzc3IC0xMTIgMjg1IC00MjEgNDYzIC02ODYgbDMyNCAtNDgxIC02MyAtMTEgYy00NjcgLTgxIC05MDggLTc3IC0xMzUzIDE0IC03NDMgMTUzIC0xMzQ5IDUzNSAtMTkxNCAxMjA5IC0yODggMzQ0IC04MzkgMTExMiAtMTQ0MSAyMDExIC01MDEgNzQ3IC03MzQgMTEzOSAtOTEyIDE1MzUgLTE1NiAzNDUgLTIzNCA2MDQgLTI4MyA5NDUgLTIxIDE0MyAtMjQgNTA1IC02IDY2MCAxMzQgMTEyNiA2ODcgMjAxNyAxNjUyIDI2NjAgNjQ4IDQzMiAxMjU0IDYyNyAyMDIwIDY1MyAzMCAxIDEzMiAtMyAyMjUgLTh6IG00ODYwIC0yNjMwIGM2NzEgLTQxIDEyMTQgLTIzMCAxNjk0IC01OTAgMzUzIC0yNjQgNjM0IC01NjAgMTAxMyAtMTA2NSAzMjEgLTQyOSAxMjE3IC0xNzIxIDEyMTAgLTE3NDYgLTEgLTUgNzggLTEyNSAxNzYgLTI2NyAyNTggLTM3MyAzMzggLTQ5OSA1MTUgLTgxMyAxMTEgLTE5NyAyMzggLTQ3NSAyODcgLTYyOSA0NSAtMTQwIDcxIC0yMjkgNzYgLTI1NCAzIC0xNyAxNCAtNjYgMjUgLTEwOCA1NiAtMjIyIDg0IC01MTQgNzQgLTc2MyAtNCAtODggLTkgLTE2MiAtMTAgLTE2NSAtMyAtNSAtMTUgLTkwIC0zMSAtMjE1IC0zIC0yNyAtMTAgLTcwIC0xNSAtOTUgLTUgLTI1IC0xNCAtNzAgLTE5IC0xMDAgLTMzIC0xNjkgLTE3MSAtNjIwIC0xOTAgLTYyMCAtNSAwIC0xMSAtMTQgLTE1IC0zMCAtNCAtMTcgLTExIC0zMCAtMTYgLTMwIC02IDAgLTggLTMgLTYgLTcgMyAtNSAtMyAtMjQgLTEzIC00MyAtMTEgLTE5IC0yNCAtNDYgLTMwIC02MCAtMTkgLTQ0IC04NSAtMTc1IC05MCAtMTgwIC0zIC0zIC0xMyAtMjEgLTIzIC00MCAtMzQgLTYzIC01MiAtOTUgLTU4IC0xMDAgLTMgLTMgLTE0IC0yMSAtMjUgLTQwIC0xMCAtMTkgLTIxIC0zNyAtMjQgLTQwIC0zIC0zIC0zMSAtNDMgLTYyIC05MCAtNjIgLTk0IC0yNDQgLTMxMiAtMzYxIC00MzQgLTQzIC00NCAtNzcgLTgzIC03NyAtODcgMCAtNCAtNDggLTUwIC0xMDcgLTEwMyAtNTIwIC00NjIgLTExMjUgLTc4OCAtMTcyOCAtOTMxIC02NTggLTE1NiAtMTM2NSAtMTEzIC0yMDA0IDEyMyAtNTAxIDE4NCAtOTg3IDU0OSAtMTQyMSAxMDY2IC0zMTQgMzc0IC03NTYgOTk1IC0xNDQxIDIwMjMgLTQ4NCA3MjcgLTU5MyA4OTkgLTc0NyAxMTg4IC0yNTYgNDgwIC0zODUgODQ5IC00NDggMTI4MCAtMjEgMTQzIC0yNCA1MDUgLTYgNjYwIDg1IDcxMyAzNDAgMTMzNiA3NTggMTg1MiAxMjQgMTUzIDIwMSAyNDAgMjA3IDIzMyAyIC0zIDE4MSAtMjc2IDM5NyAtNjA4IGwzOTMgLTYwNCAtMjIgLTM2IGMtOTIgLTE1NiAtMTY4IC0zMzMgLTIxMCAtNDk0IC00MSAtMTU0IC01MSAtMjQxIC01MSAtNDM1IDAgLTQ2MSAxMjYgLTgyMCA1MjAgLTE0ODQgMzQgLTU3IDY1IC0xMDYgNjkgLTEwOSAzIC0zIDEyIC0xNyAxOCAtMzEgMjcgLTYzIDQ1OCAtNzI0IDcwNiAtMTA4NCA3MjggLTEwNTkgMTA5NiAtMTUxMyAxNDg1IC0xODMzIDE1OSAtMTMxIDMyNSAtMjIwIDU0MSAtMjkxIDIyOSAtNzYgMjkzIC04NSA1NzEgLTg2IDIxMiAwIDI2MSAzIDM2MSAyMyAzMTEgNTkgNTg4IDE3MCA4MzEgMzMzIDE0NiA5OSAzMjUgMjU3IDQ0MCAzOTAgODcgMTAwIDE2OCAyMDQgMTY4IDIxNSAwIDMgMTAgMjAgMjMgMzcgODggMTI0IDIxMSA0MDggMjUyIDU4NCA5IDM3IDIwIDg0IDI1IDEwNCAzNSAxMzEgNDEgNDgxIDEwIDYzNyAtMjYgMTMxIC0xMDIgMzQ3IC0xODggNTMyIC0xNiAzNiAtNDggMTA0IC03MCAxNTEgLTc2IDE2NCAtMzYxIDYzOCAtNDE5IDY5NiAtMTIgMTMgLTgxIDExNiAtMTU0IDIzMCAtNDYxIDcyNiAtMTEwMiAxNjI2IC0xNDc5IDIwNzggLTQxNSA0OTggLTc3NSA3NDYgLTEyMjkgODQ5IC02MiAxMyAtMTE0IDI2IC0xMTYgMjggLTIzIDI4IC04NTUgMTM1MSAtODUyIDEzNTUgMTggMTcgMzIyIDYxIDQ5NyA3MiAxOTcgMTIgMjI4IDEyIDQxNSAxeiIvPiA8L2c+IDwvc3ZnPg==', '55.501' );
+			add_menu_page( __( 'Google, Amazon & eBay', 'codisto-linq' ), __( 'Google, Amazon & eBay', 'codisto-linq' ), 'edit_posts', $mainpage, array( $this, $type ), 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4cHgiIGhlaWdodD0iMThweCIgdmlld0JveD0iMCAwIDE3MjUuMDAwMDAwIDE3MjUuMDAwMDAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0Ij4gPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsMTcyNS4wMDAwMDApIHNjYWxlKDAuMTAwMDAwLC0wLjEwMDAwMCkiIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0ibm9uZSI+PHBhdGggZD0iTTgzNDAgMTcyNDAgYy0yMTk1IC03MCAtNDI1MyAtOTYyIC01ODEwIC0yNTIwIC0xNDYzIC0xNDYyIC0yMzM3IC0zMzU5IC0yNTAwIC01NDI1IC0yOSAtMzYyIC0yOSAtOTcwIDAgLTEzMzUgMTM4IC0xNzc0IDgwNyAtMzQzOCAxOTMxIC00ODA1IDM1MyAtNDMxIDc4NCAtODYwIDEyMTQgLTEyMTEgMTM2MiAtMTExMiAzMDIzIC0xNzc3IDQ3ODAgLTE5MTQgMzczIC0yOSA5NjAgLTI5IDEzMzUgMCAxNzU3IDEzNSAzNDIyIDgwMSA0Nzg1IDE5MTQgNDU0IDM3MCA5MDYgODI3IDEyNzcgMTI4OCAxNDcgMTgyIDMzNiA0NDEgNDcxIDY0NSAxMTUgMTc0IDMxNyA1MDcgMzE3IDUyMyAwIDYgMyAxMCA4IDEwIDQgMCAxMiAxMCAxOCAyMyAxOCAzOSA4OSAxNzIgOTQgMTc3IDUgNSA3NiAxNDggMTY5IDMzOSAyMyA0NiA0MSA5MCA0MSA5OCAwIDcgNSAxMyAxMCAxMyA2IDAgMTAgNyAxMCAxNSAwIDggNCAyMyAxMCAzMyA1IDkgMjEgNDQgMzUgNzcgMTUgMzMgMzAgNjggMzYgNzcgNSAxMCA5IDIyIDkgMjggMCA1IDEyIDM1IDI2IDY3IDQ3IDEwNSA1NCAxMjQgNTQgMTM4IDAgOCAzIDE1IDggMTUgNCAwIDE1IDI4IDI2IDYzIDEwIDM0IDI0IDcxIDMxIDgyIDcgMTEgMTYgMzYgMjAgNTUgNCAxOSAxMSA0MCAxNSA0NSA0IDYgMTEgMjYgMTUgNDUgNCAxOSAxMSAzNyAxNCA0MCA3IDUgMjEgNTAgNTcgMTgwIDkgMzAgMTkgNjAgMjQgNjUgNCA2IDE1IDQ0IDI0IDg1IDEwIDQxIDIxIDc5IDI2IDg1IDExIDEzIDEzMSA1MzEgMTY5IDcyNSAxNjMgODQ5IDE5OCAxNzY0IDEwMCAyNjMwIC0yNjMgMjMyOSAtMTQ2OCA0NDQ2IC0zMzQ5IDU4ODIgLTczMyA1NTkgLTE1ODcgMTAxMiAtMjQ2NSAxMzA2IC03NjQgMjU3IC0xNjAwIDQxMSAtMjM2NSA0MzcgLTMyMSAxMSAtNDQyIDEyIC02NzAgNXogbS0yOTI1IC0yNjYwIGM2NzEgLTQxIDEyMTQgLTIzMCAxNjk0IC01OTAgNDg1IC0zNjQgODI1IC03NjYgMTY1NiAtMTk2NSAyNzggLTQwMSA5NjggLTE0NDggMTEyMCAtMTcwMCAyMTcgLTM1OCA0MjcgLTg0NCA1MTEgLTExNzUgMTE0IC00NTUgMTEyIC03OTYgLTEwIC0xNDEwIC0zOSAtMTk5IC0xNTAgLTU0MCAtMjQzIC03NDYgLTEyNCAtMjc2IC0yOTQgLTU0NSAtNDkyIC03NzcgLTQyIC00OSAtODggLTEwMiAtMTAyIC0xMTkgbC0yNSAtMzAgLTQxMyA2MjIgLTQxMiA2MjIgMzQgODIgYzU1IDEzMCAxMTggMzY3IDE1MyA1ODEgMjUgMTU1IDE1IDU0MCAtMjAgNzMxIC05MyA1MDkgLTI5NiA5MDcgLTEwMDcgMTk3NCAtNTU3IDgzNiAtMTAyMCAxNDU4IC0xMzUxIDE4MTMgLTQ0NyA0ODAgLTk2NSA3MDUgLTE1MzYgNjY3IC03NzEgLTUxIC0xNDM2IC00ODcgLTE3ODYgLTExNzAgLTk3IC0xODggLTE2MiAtMzg1IC0xODUgLTU2MyAtMjcgLTE5NCAtOSAtNTA2IDQwIC03MDIgMTA5IC00MzcgMzk0IC05NjIgMTA3NSAtMTk3MiA4MjQgLTEyMjQgMTI1MyAtMTc2NiAxNjcyIC0yMTExIDE5MSAtMTU4IDQwMSAtMjYwIDY4NyAtMzM1IGw5MCAtMjMgMTM4IC0yMDUgYzc3IC0xMTIgMjg1IC00MjEgNDYzIC02ODYgbDMyNCAtNDgxIC02MyAtMTEgYy00NjcgLTgxIC05MDggLTc3IC0xMzUzIDE0IC03NDMgMTUzIC0xMzQ5IDUzNSAtMTkxNCAxMjA5IC0yODggMzQ0IC04MzkgMTExMiAtMTQ0MSAyMDExIC01MDEgNzQ3IC03MzQgMTEzOSAtOTEyIDE1MzUgLTE1NiAzNDUgLTIzNCA2MDQgLTI4MyA5NDUgLTIxIDE0MyAtMjQgNTA1IC02IDY2MCAxMzQgMTEyNiA2ODcgMjAxNyAxNjUyIDI2NjAgNjQ4IDQzMiAxMjU0IDYyNyAyMDIwIDY1MyAzMCAxIDEzMiAtMyAyMjUgLTh6IG00ODYwIC0yNjMwIGM2NzEgLTQxIDEyMTQgLTIzMCAxNjk0IC01OTAgMzUzIC0yNjQgNjM0IC01NjAgMTAxMyAtMTA2NSAzMjEgLTQyOSAxMjE3IC0xNzIxIDEyMTAgLTE3NDYgLTEgLTUgNzggLTEyNSAxNzYgLTI2NyAyNTggLTM3MyAzMzggLTQ5OSA1MTUgLTgxMyAxMTEgLTE5NyAyMzggLTQ3NSAyODcgLTYyOSA0NSAtMTQwIDcxIC0yMjkgNzYgLTI1NCAzIC0xNyAxNCAtNjYgMjUgLTEwOCA1NiAtMjIyIDg0IC01MTQgNzQgLTc2MyAtNCAtODggLTkgLTE2MiAtMTAgLTE2NSAtMyAtNSAtMTUgLTkwIC0zMSAtMjE1IC0zIC0yNyAtMTAgLTcwIC0xNSAtOTUgLTUgLTI1IC0xNCAtNzAgLTE5IC0xMDAgLTMzIC0xNjkgLTE3MSAtNjIwIC0xOTAgLTYyMCAtNSAwIC0xMSAtMTQgLTE1IC0zMCAtNCAtMTcgLTExIC0zMCAtMTYgLTMwIC02IDAgLTggLTMgLTYgLTcgMyAtNSAtMyAtMjQgLTEzIC00MyAtMTEgLTE5IC0yNCAtNDYgLTMwIC02MCAtMTkgLTQ0IC04NSAtMTc1IC05MCAtMTgwIC0zIC0zIC0xMyAtMjEgLTIzIC00MCAtMzQgLTYzIC01MiAtOTUgLTU4IC0xMDAgLTMgLTMgLTE0IC0yMSAtMjUgLTQwIC0xMCAtMTkgLTIxIC0zNyAtMjQgLTQwIC0zIC0zIC0zMSAtNDMgLTYyIC05MCAtNjIgLTk0IC0yNDQgLTMxMiAtMzYxIC00MzQgLTQzIC00NCAtNzcgLTgzIC03NyAtODcgMCAtNCAtNDggLTUwIC0xMDcgLTEwMyAtNTIwIC00NjIgLTExMjUgLTc4OCAtMTcyOCAtOTMxIC02NTggLTE1NiAtMTM2NSAtMTEzIC0yMDA0IDEyMyAtNTAxIDE4NCAtOTg3IDU0OSAtMTQyMSAxMDY2IC0zMTQgMzc0IC03NTYgOTk1IC0xNDQxIDIwMjMgLTQ4NCA3MjcgLTU5MyA4OTkgLTc0NyAxMTg4IC0yNTYgNDgwIC0zODUgODQ5IC00NDggMTI4MCAtMjEgMTQzIC0yNCA1MDUgLTYgNjYwIDg1IDcxMyAzNDAgMTMzNiA3NTggMTg1MiAxMjQgMTUzIDIwMSAyNDAgMjA3IDIzMyAyIC0zIDE4MSAtMjc2IDM5NyAtNjA4IGwzOTMgLTYwNCAtMjIgLTM2IGMtOTIgLTE1NiAtMTY4IC0zMzMgLTIxMCAtNDk0IC00MSAtMTU0IC01MSAtMjQxIC01MSAtNDM1IDAgLTQ2MSAxMjYgLTgyMCA1MjAgLTE0ODQgMzQgLTU3IDY1IC0xMDYgNjkgLTEwOSAzIC0zIDEyIC0xNyAxOCAtMzEgMjcgLTYzIDQ1OCAtNzI0IDcwNiAtMTA4NCA3MjggLTEwNTkgMTA5NiAtMTUxMyAxNDg1IC0xODMzIDE1OSAtMTMxIDMyNSAtMjIwIDU0MSAtMjkxIDIyOSAtNzYgMjkzIC04NSA1NzEgLTg2IDIxMiAwIDI2MSAzIDM2MSAyMyAzMTEgNTkgNTg4IDE3MCA4MzEgMzMzIDE0NiA5OSAzMjUgMjU3IDQ0MCAzOTAgODcgMTAwIDE2OCAyMDQgMTY4IDIxNSAwIDMgMTAgMjAgMjMgMzcgODggMTI0IDIxMSA0MDggMjUyIDU4NCA5IDM3IDIwIDg0IDI1IDEwNCAzNSAxMzEgNDEgNDgxIDEwIDYzNyAtMjYgMTMxIC0xMDIgMzQ3IC0xODggNTMyIC0xNiAzNiAtNDggMTA0IC03MCAxNTEgLTc2IDE2NCAtMzYxIDYzOCAtNDE5IDY5NiAtMTIgMTMgLTgxIDExNiAtMTU0IDIzMCAtNDYxIDcyNiAtMTEwMiAxNjI2IC0xNDc5IDIwNzggLTQxNSA0OTggLTc3NSA3NDYgLTEyMjkgODQ5IC02MiAxMyAtMTE0IDI2IC0xMTYgMjggLTIzIDI4IC04NTUgMTM1MSAtODUyIDEzNTUgMTggMTcgMzIyIDYxIDQ5NyA3MiAxOTcgMTIgMjI4IDEyIDQxNSAxeiIvPiA8L2c+IDwvc3ZnPg==', '55.501' );
 
 			$pages = array();
 
 			$pages[] = add_submenu_page( 'codisto', __( 'Home', 'codisto-linq' ), __( 'Home', 'codisto-linq' ), 'edit_posts', 'codisto', array( $this, 'ebay_tab' ) );
 			$pages[] = add_submenu_page( 'codisto', __( 'Listings', 'codisto-linq' ), __( 'Listings', 'codisto-linq' ), 'edit_posts', 'codisto-listings', array( $this, 'listings' ) );
 			$pages[] = add_submenu_page( 'codisto', __( 'Orders', 'codisto-linq' ), __( 'Orders', 'codisto-linq' ), 'edit_posts', 'codisto-orders', array( $this, 'orders' ) );
+			$pages[] = add_submenu_page( 'codisto', __( 'Analytics', 'codisto-linq' ), __( 'Analytics', 'codisto-linq' ), 'edit_posts', 'codisto-analytics', array( $this, 'analytics' ) );
 			$pages[] = add_submenu_page( 'codisto', __( 'Settings', 'codisto-linq' ), __( 'Settings', 'codisto-linq' ), 'edit_posts', 'codisto-settings', array( $this, 'settings' ) );
 			$pages[] = add_submenu_page( 'codisto', __( 'Account', 'codisto-linq' ), __( 'Account', 'codisto-linq' ), 'edit_posts', 'codisto-account', array( $this, 'account' ) );
 			$pages[] = add_submenu_page( 'codisto', __( 'eBay Templates', 'codisto-linq' ), __( 'eBay Templates', 'codisto-linq' ), 'edit_posts', 'codisto-templates', array( $this, 'templates' ) );
@@ -2666,7 +2886,7 @@ final class CodistoConnect {
 	*/
 	public function admin_scripts( $hook ) {
 
-		if ( preg_match ( '/codisto(?:-orders|-categories|-attributes|-import|-templates|-settings|-account|-listings|)$/', $hook ) ) {
+		if ( preg_match ( '/codisto(?:-orders|-categories|-attributes|-import|-templates|-settings|-account|-listings|-analytics|)$/', $hook ) ) {
 
 			wp_enqueue_style( 'codisto-style' );
 			wp_enqueue_script( 'codisto-script' );
@@ -2824,6 +3044,56 @@ final class CodistoConnect {
 	}
 
 	/**
+	* emits site verification tags
+	*
+	*/
+	public function site_verification() {
+
+		$site_verification = get_option('codisto_site_verification');
+		if( $site_verification ) {
+			echo $site_verification;
+		}
+
+	}
+
+	/**
+	* enqueues conversion tracking script for 'offsite' advertising campaigns
+	*
+	*/
+	public function conversion_tracking() {
+
+		$upload_dir = wp_upload_dir();
+		$conversion_tracking_file = '/codisto/conversion-tracking.js';
+		$conversion_tracking_path = $upload_dir['basedir'].$conversion_tracking_file;
+
+		$conversion_tracking = get_option('codisto_conversion_tracking');
+
+		if( $conversion_tracking
+			&& file_exists($conversion_tracking_path) ) {
+
+			$conversion_tracking_url = $upload_dir['baseurl'].$conversion_tracking_file;
+
+			wp_enqueue_script( 'codisto-conversion-tracking' , $conversion_tracking_url, array() , $conversion_tracking );
+		}
+
+	}
+
+	/***
+	* emits conversion information into the checkout completion page
+	*
+	*/
+	public function conversion_emit( $order_id ) {
+
+		$order = new WC_Order( $order_id );
+
+		$conversiondata = 'window.CodistoConversion = { transaction_id : '.$order_id.', value : '.($order->get_total() ? $order->get_total() : 0).', currency : "'.get_woocommerce_currency().'"};';
+
+		wp_add_inline_script( 'codisto-conversion-tracking', $conversiondata );
+
+	}
+
+
+	/**
 	* woocommerce_product_data_tabs hook handler used to render marketplace product tab
 	*
 	* @param array $tabs current set of tabs for the product page
@@ -2864,7 +3134,7 @@ final class CodistoConnect {
 	public function plugin_links( $links ) {
 
 		$action_links = array(
-			'listings' => '<a href="' . admin_url( 'admin.php?page=codisto' ) . '" title="'.esc_html__( 'Manage Amazon & eBay Listings', 'codisto-linq' ).'">'.esc_html__( 'Manage Amazon & eBay Listings', 'codisto-linq' ).'</a>',
+			'listings' => '<a href="' . admin_url( 'admin.php?page=codisto' ) . '" title="'.esc_html__( 'Manage Google, Amazon & eBay Listings', 'codisto-linq' ).'">'.esc_html__( 'Manage Google, Amazon & eBay Listings', 'codisto-linq' ).'</a>',
 			'settings' => '<a href="' . admin_url( 'admin.php?page=codisto-settings' ) . '" title="'.esc_html__( 'Codisto Settings', 'codisto-linq' ).'">'.esc_html__( 'Settings', 'codisto-linq' ).'</a>'
 		);
 
@@ -2962,6 +3232,9 @@ final class CodistoConnect {
 			array( $this, 'plugin_links' )
 		);
 		add_action( 'shutdown',								array( $this, 'signal_edits' ) );
+		add_action( 'wp_head',								array( $this, 'site_verification' ) );
+		add_action( 'wp_enqueue_scripts',					array( $this, 'conversion_tracking' ) );
+		add_action( 'woocommerce_thankyou',					array( $this, 'conversion_emit' ) );
 
 	}
 

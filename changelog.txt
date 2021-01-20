@@ -1,4 +1,12 @@
-*** WooCommerce Amazon and eBay Integration ***
+*** WooCommerce Google, Amazon & eBay Integration - Channel Cloud by Codisto ***
+
+2021-01-18
+* Update - additional endpoints for Google integration
+* Update - improvements to registration screen
+* Update - Wordpress tested up to 5.6.0
+* Update - WooCommerce tested up to 4.9.1
+* Fix - handle the case of pushing an order update when it has been deleted
+* Fix - switch to casting float as real data type is deprecated in recent php versions
 
 2020-11-30 - version 1.3.54
 * Update - WordPress tested up to 5.5.3
