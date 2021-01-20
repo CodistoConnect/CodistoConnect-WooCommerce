@@ -1619,143 +1619,150 @@ final class CodistoConnect {
 					} else {
 						$order = wc_get_order( $order_id );
 
-						foreach ( $ordercontent->orderlines->orderline as $orderline ) {
-							if ( $orderline->productcode[0] != 'FREIGHT' ) {
-								$line_total = wc_format_decimal( (float)$orderline->defaultcurrencylinetotal );
-								$line_total_tax = wc_format_decimal( (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal );
+						if( is_object( $order ) ) {
 
-								$tax += $line_total_tax;
-							} else {
-								$order->remove_order_items( 'shipping' );
+							foreach ( $ordercontent->orderlines->orderline as $orderline ) {
+								if ( $orderline->productcode[0] != 'FREIGHT' ) {
+									$line_total = wc_format_decimal( (float)$orderline->defaultcurrencylinetotal );
+									$line_total_tax = wc_format_decimal( (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal );
 
-								$item_id = wc_add_order_item(
-									$order_id,
-									array(
-										'order_item_name' 		=> (string)$orderline->productname,
-										'order_item_type' 		=> 'shipping'
-									)
-								);
+									$tax += $line_total_tax;
+								} else {
+									$order->remove_order_items( 'shipping' );
 
-								wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->defaultcurrencylinetotal) );
-								wc_add_order_item_meta( $item_id, 'total_tax', wc_format_decimal( (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal) );
+									$item_id = wc_add_order_item(
+										$order_id,
+										array(
+											'order_item_name' 		=> (string)$orderline->productname,
+											'order_item_type' 		=> 'shipping'
+										)
+									);
 
-								$shipping_tax_array = array (
-									'total' => array (
-										1=> (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal,
-									)
-								);
+									wc_add_order_item_meta( $item_id, 'cost', wc_format_decimal( (float)$orderline->defaultcurrencylinetotal) );
+									wc_add_order_item_meta( $item_id, 'total_tax', wc_format_decimal( (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal) );
 
-								wc_add_order_item_meta( $item_id, 'taxes', $shipping_tax_array);
-								$shipping += (float)$orderline->defaultcurrencylinetotal;
-								$shipping_tax += (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal;
-							}
-						}
+									$shipping_tax_array = array (
+										'total' => array (
+											1=> (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal,
+										)
+									);
 
-						if ( $ordercontent->paymentstatus == 'complete' ) {
-							$transaction_id = (string)$ordercontent->orderpayments[0]->orderpayment->transactionid;
-							$paymentmethod = (string)$ordercontent->orderpayments[0]->orderpayment->paymentmethod;
-
-							if ( $transaction_id  && preg_match('/paypal/i',$paymentmethod)) {
-								update_post_meta( $order_id, '_payment_method', 'paypal' );
-								update_post_meta( $order_id, '_payment_method_title', __( 'PayPal', 'woocommerce' ) );
-
-								update_post_meta( $order_id, '_transaction_id', $transaction_id );
-							} else {
-								update_post_meta( $order_id, '_payment_method', 'bacs' );
-								update_post_meta( $order_id, '_payment_method_title', __( 'BACS', 'woocommerce' ) );
+									wc_add_order_item_meta( $item_id, 'taxes', $shipping_tax_array);
+									$shipping += (float)$orderline->defaultcurrencylinetotal;
+									$shipping_tax += (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal;
+								}
 							}
 
-							// payment_complete
-							add_post_meta( $order_id, '_paid_date', current_time( 'mysql' ), true );
-							if ( $adjustStock && ! get_post_meta( $order_id, '_order_stock_reduced', true ) ) {
-								wc_maybe_reduce_stock_levels( $order_id );
+							if ( $ordercontent->paymentstatus == 'complete' ) {
+								$transaction_id = (string)$ordercontent->orderpayments[0]->orderpayment->transactionid;
+								$paymentmethod = (string)$ordercontent->orderpayments[0]->orderpayment->paymentmethod;
+
+								if ( $transaction_id  && preg_match('/paypal/i',$paymentmethod)) {
+									update_post_meta( $order_id, '_payment_method', 'paypal' );
+									update_post_meta( $order_id, '_payment_method_title', __( 'PayPal', 'woocommerce' ) );
+
+									update_post_meta( $order_id, '_transaction_id', $transaction_id );
+								} else {
+									update_post_meta( $order_id, '_payment_method', 'bacs' );
+									update_post_meta( $order_id, '_payment_method_title', __( 'BACS', 'woocommerce' ) );
+								}
+
+								// payment_complete
+								add_post_meta( $order_id, '_paid_date', current_time( 'mysql' ), true );
+								if ( $adjustStock && ! get_post_meta( $order_id, '_order_stock_reduced', true ) ) {
+									wc_maybe_reduce_stock_levels( $order_id );
+								}
 							}
 						}
 					}
 
-					foreach ( $address_data as $key => $value ) {
-						update_post_meta( $order_id, '_'.$key, $value );
-					}
+					if( is_object( $order ) ) {
 
-					$order->remove_order_items( 'tax' );
-					$order->add_tax( 1, $tax, $shipping_tax );
-
-					$order->set_total( $shipping, 'shipping' );
-					$order->set_total( $shipping_tax, 'shipping_tax' );
-					$order->set_total( $cart_discount, 'cart_discount' );
-					$order->set_total( $cart_discount_tax, 'cart_discount_tax' );
-					$order->set_total( $tax, 'tax' );
-					$order->set_total( $total, 'total');
-
-					if ( $ordercontent->orderstate == 'cancelled' ) {
-						if ( ! $order->has_status( 'cancelled' ) ) {
-							// update_status
-							$order->set_status( 'cancelled' );
-							$update_post_data  = array(
-								'ID'		 	=> $order_id,
-								'post_status'	=> 'wc-cancelled',
-								'post_date'		=> current_time( 'mysql', 0 ),
-								'post_date_gmt' => current_time( 'mysql', 1 )
-							);
-							wp_update_post( $update_post_data );
-
-							$order->decrease_coupon_usage_counts();
-
-							wc_delete_shop_order_transients( $order_id );
+						foreach ( $address_data as $key => $value ) {
+							update_post_meta( $order_id, '_'.$key, $value );
 						}
-					} elseif ( $ordercontent->orderstate == 'inprogress' || $ordercontent->orderstate == 'processing' ) {
 
-						if ( $ordercontent->paymentstatus == 'complete' ) {
-							if ( ! $order->has_status( 'processing' ) ) {
+						$order->remove_order_items( 'tax' );
+						$order->add_tax( 1, $tax, $shipping_tax );
+
+						$order->set_total( $shipping, 'shipping' );
+						$order->set_total( $shipping_tax, 'shipping_tax' );
+						$order->set_total( $cart_discount, 'cart_discount' );
+						$order->set_total( $cart_discount_tax, 'cart_discount_tax' );
+						$order->set_total( $tax, 'tax' );
+						$order->set_total( $total, 'total');
+
+						if ( $ordercontent->orderstate == 'cancelled' ) {
+							if ( ! $order->has_status( 'cancelled' ) ) {
 								// update_status
-								$order->set_status( 'processing' );
+								$order->set_status( 'cancelled' );
 								$update_post_data  = array(
 									'ID'		 	=> $order_id,
-									'post_status'	=> 'wc-processing',
+									'post_status'	=> 'wc-cancelled',
 									'post_date'		=> current_time( 'mysql', 0 ),
 									'post_date_gmt' => current_time( 'mysql', 1 )
 								);
 								wp_update_post( $update_post_data );
+
+								$order->decrease_coupon_usage_counts();
+
+								wc_delete_shop_order_transients( $order_id );
 							}
-						} else {
-							if ( ! $order->has_status( 'pending' ) ) {
+						} elseif ( $ordercontent->orderstate == 'inprogress' || $ordercontent->orderstate == 'processing' ) {
+
+							if ( $ordercontent->paymentstatus == 'complete' ) {
+								if ( ! $order->has_status( 'processing' ) ) {
+									// update_status
+									$order->set_status( 'processing' );
+									$update_post_data  = array(
+										'ID'		 	=> $order_id,
+										'post_status'	=> 'wc-processing',
+										'post_date'		=> current_time( 'mysql', 0 ),
+										'post_date_gmt' => current_time( 'mysql', 1 )
+									);
+									wp_update_post( $update_post_data );
+								}
+							} else {
+								if ( ! $order->has_status( 'pending' ) ) {
+									// update_status
+									$order->set_status( 'pending' );
+									$update_post_data  = array(
+										'ID'		 	=> $order_id,
+										'post_status'	=> 'wc-pending',
+										'post_date'		=> current_time( 'mysql', 0 ),
+										'post_date_gmt' => current_time( 'mysql', 1 )
+									);
+									wp_update_post( $update_post_data );
+								}
+							}
+
+						} elseif ( $ordercontent->orderstate == 'complete' ) {
+
+							if ( ! $order->has_status( 'completed' ) ) {
 								// update_status
-								$order->set_status( 'pending' );
+								$order->set_status( 'completed' );
 								$update_post_data  = array(
 									'ID'		 	=> $order_id,
-									'post_status'	=> 'wc-pending',
+									'post_status'	=> 'wc-completed',
 									'post_date'		=> current_time( 'mysql', 0 ),
 									'post_date_gmt' => current_time( 'mysql', 1 )
 								);
 								wp_update_post( $update_post_data );
+
+								$order->record_product_sales();
+
+								$order->increase_coupon_usage_counts();
+
+								update_post_meta( $order_id, '_completed_date', current_time( 'mysql' ) );
+
+								wc_delete_shop_order_transients( $order_id );
 							}
+
 						}
 
-					} elseif ( $ordercontent->orderstate == 'complete' ) {
-
-						if ( ! $order->has_status( 'completed' ) ) {
-							// update_status
-							$order->set_status( 'completed' );
-							$update_post_data  = array(
-								'ID'		 	=> $order_id,
-								'post_status'	=> 'wc-completed',
-								'post_date'		=> current_time( 'mysql', 0 ),
-								'post_date_gmt' => current_time( 'mysql', 1 )
-							);
-							wp_update_post( $update_post_data );
-
-							$order->record_product_sales();
-
-							$order->increase_coupon_usage_counts();
-
-							update_post_meta( $order_id, '_completed_date', current_time( 'mysql' ) );
-
-							wc_delete_shop_order_transients( $order_id );
-						}
+						$order->save();
 
 					}
-
-					$order->save();
 
 					$wpdb->query( 'COMMIT' );
 
