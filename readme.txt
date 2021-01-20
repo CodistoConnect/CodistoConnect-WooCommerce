@@ -98,6 +98,9 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 = 1.3.54 - 18/01/2021 =
 * Update - additional endpoints for Google integration
+* Update - improvements to registration screen
+* Update - Wordpress tested up to 5.6.0
+* Update - WooCommerce tested up to 4.9.1
 
 = 1.3.54 - 30/11/2020 =
 * Update - WordPress tested up to 5.5.3
