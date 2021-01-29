@@ -5,7 +5,7 @@
  * Description: Sell multichannel on Google, Amazon & eBay direct from WooCommerce. Create listings & sync products, inventory & orders directly from WooCommerce
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.55
+ * Version: 1.3.56
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
@@ -14,14 +14,14 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.55
+ * @version 1.3.56
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.55' );
+define( 'CODISTOCONNECT_VERSION', '1.3.56' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -3204,7 +3204,7 @@ final class CodistoConnect {
 		add_action( 'admin_notices', 						array( $this, 'admin_notice_info' ) );
 		add_filter( 'admin_body_class', 					array( $this, 'admin_body_class' ) );
 		add_action(	'woocommerce_product_bulk_edit_save', 	array( $this, 'bulk_edit_save' ) );
-		add_action(	'woocommerce_before_product_object_save', 	array( $this, 'product_save', 10, 2 ) );
+		add_action(	'woocommerce_before_product_object_save', 	array( $this, 'product_save' ), 10, 2 );
 		add_action( 'save_post',							array( $this, 'product_save' ), 10, 2 );
 		add_filter( 'woocommerce_product_data_tabs',		array( $this, 'add_ebay_product_tab' ) );
 		add_action( 'woocommerce_product_data_panels',		array( $this, 'ebay_product_tab_content' ) );
