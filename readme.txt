@@ -97,7 +97,8 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 == Changelog ==
 
 = 1.3.56 - 29/01/2021 =
-* Update - shipping order line method update 
+* Update - shipping order line method update
+* Fix - fix for products before save action 
 
 = 1.3.55 - 18/01/2021 =
 * Update - additional endpoints for Google integration

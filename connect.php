@@ -3208,7 +3208,7 @@ final class CodistoConnect {
 		add_action( 'admin_notices', 						array( $this, 'admin_notice_info' ) );
 		add_filter( 'admin_body_class', 					array( $this, 'admin_body_class' ) );
 		add_action(	'woocommerce_product_bulk_edit_save', 	array( $this, 'bulk_edit_save' ) );
-		add_action(	'woocommerce_before_product_object_save', 	array( $this, 'product_save', 10, 2 ) );
+		add_action(	'woocommerce_before_product_object_save', 	array( $this, 'product_save' ), 10, 2 );
 		add_action( 'save_post',							array( $this, 'product_save' ), 10, 2 );
 		add_filter( 'woocommerce_product_data_tabs',		array( $this, 'add_ebay_product_tab' ) );
 		add_action( 'woocommerce_product_data_panels',		array( $this, 'ebay_product_tab_content' ) );
