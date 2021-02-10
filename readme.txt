@@ -3,7 +3,7 @@ Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
 Tested up to: 5.6.0
-Stable tag: 1.3.55
+Stable tag: 1.3.56
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -96,7 +96,11 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 == Changelog ==
 
-= 1.3.54 - 18/01/2021 =
+= 1.3.56 - 29/01/2021 =
+* Update - shipping order line method update
+* Fix - fix for products before save action 
+
+= 1.3.55 - 18/01/2021 =
 * Update - additional endpoints for Google integration
 * Update - improvements to registration screen
 * Update - Wordpress tested up to 5.6.0

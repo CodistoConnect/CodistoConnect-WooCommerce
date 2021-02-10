@@ -1,5 +1,9 @@
 *** WooCommerce Google, Amazon & eBay Integration - Channel Cloud by Codisto ***
 
+2021-01-29 - version 1.3.56
+* Update - shipping order line method update
+* Fix - fix for products before save action
+
 2021-01-18 - version 1.3.55
 * Update - additional endpoints for Google integration
 * Update - improvements to registration screen
