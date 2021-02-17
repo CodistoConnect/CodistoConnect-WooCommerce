@@ -447,6 +447,10 @@ final class CodistoConnect {
 
 					$wc_product = $this->get_product( $product->id );
 
+					if(!is_object($wc_product)) {
+						continue;
+					}
+
 					$categoryproduct = $wc_product->get_categories();
 
 					$product->sku = $wc_product->get_sku();
