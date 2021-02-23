@@ -2166,11 +2166,12 @@ final class CodistoConnect {
 		$codisto_order_id = get_post_meta( $order->get_id(), '_codisto_orderid', true );
 		if ( is_numeric( $codisto_order_id ) && $codisto_order_id !== 0 ) {
 			$ebay_user = get_post_meta( $order->get_id(), '_codisto_ebayusername', true );
+			$merchantid = get_post_meta( $order->get_id(), '_codisto_merchantid', true );
 			if ( $ebay_user ) {
 				?>
 				<p class="form-field form-field-wide codisto-order-buttons">
-				<a href="<?php echo htmlspecialchars( admin_url( 'codisto/ebaysale?orderid='.$codisto_order_id ) ) ?>" target="codisto!sale" class="button"><?php esc_html_e( 'eBay Order', 'codisto-linq' ) ?> &rarr;</a>
-				<a href="<?php echo htmlspecialchars( admin_url( 'codisto/ebayuser?orderid='.$codisto_order_id) ) ?>" target="codisto!user" class="button"><?php esc_html_e( 'eBay User', 'codisto-linq' ) ?><?php echo $ebay_user ? ' : '.htmlspecialchars( $ebay_user ) : ''; ?> &rarr;</a>
+				<a href="<?php echo htmlspecialchars( admin_url( 'codisto/ebaysale?orderid='.$codisto_order_id.'&merchantid='.$merchantid ) ) ?>" target="codisto!sale" class="button"><?php esc_html_e( 'eBay Order', 'codisto-linq' ) ?> &rarr;</a>
+				<a href="<?php echo htmlspecialchars( admin_url( 'codisto/ebayuser?orderid='.$codisto_order_id.'&merchantid='.$merchantid) ) ?>" target="codisto!user" class="button"><?php esc_html_e( 'eBay User', 'codisto-linq' ) ?><?php echo $ebay_user ? ' : '.htmlspecialchars( $ebay_user ) : ''; ?> &rarr;</a>
 				</p>
 				<?php
 			}
@@ -2178,7 +2179,7 @@ final class CodistoConnect {
 			if ( $amazon_order ) {
 				?>
 				<p class="form-field form-field-wide codisto-order-buttons">
-				<a href="<?php echo htmlspecialchars( admin_url( 'codisto/amazonsale?orderid='.$codisto_order_id ) ) ?>" target="codisto!sale" class="button"><?php esc_html_e( 'Amazon Order', 'codisto-linq' ) ?> &rarr;</a>
+				<a href="<?php echo htmlspecialchars( admin_url( 'codisto/amazonsale?orderid='.$codisto_order_id.'&merchantid='.$merchantid ) ) ?>" target="codisto!sale" class="button"><?php esc_html_e( 'Amazon Order', 'codisto-linq' ) ?> &rarr;</a>
 				</p>
 				<?php
 			}
