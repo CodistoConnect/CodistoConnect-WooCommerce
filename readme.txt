@@ -98,10 +98,11 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 = 1.3.57 - 17/02/2021 =
 * Fix - fix for handling the deleted products
+* Fix - order link for multi channel connections
 
 = 1.3.56 - 29/01/2021 =
 * Update - shipping order line method update
-* Fix - fix for products before save action 
+* Fix - fix for products before save action
 
 = 1.3.55 - 18/01/2021 =
 * Update - additional endpoints for Google integration
