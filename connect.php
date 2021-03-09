@@ -1616,7 +1616,7 @@ final class CodistoConnect {
 					$cart_discount_tax = 0;
 					$total = (float)$ordercontent->defaultcurrencytotal;
 					$tax = 0;
-
+					$taxes_array = array();
 					if ( ! $order_id ) {
 
 						$new_order_data_callback = array( $this, 'order_set_date' );
@@ -1665,6 +1665,7 @@ final class CodistoConnect {
 						do_action( 'woocommerce_new_order', $order_id );
 
 						foreach ( $ordercontent->orderlines->orderline as $orderline ) {
+							$orderline_taxid = (int) $orderline->taxid;
 							if ( $orderline->productcode[0] != 'FREIGHT' ) {
 								$productcode = (string)$orderline->productcode;
 								if ( $productcode == null ) {
@@ -1725,6 +1726,8 @@ final class CodistoConnect {
 
 								$tax += $line_total_tax;
 
+								$taxes_array[$orderline_taxid]['product'] = isset($taxes_array[$orderline_taxid]['product']) ? ($taxes_array[$orderline_taxid]['product'] + $line_total_tax) : $line_total_tax;
+
 							} else {
 								$method_id = (string)$orderline->productcode;
 								if ( $method_id == null ) {
@@ -1744,13 +1747,15 @@ final class CodistoConnect {
 
 								$shipping_tax_array = array (
 									'total' => array (
-										1=> (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal,
+										$orderline_taxid => (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal,
 									)
 								);
 
 								wc_add_order_item_meta( $item_id, 'taxes', $shipping_tax_array);
 								$shipping += (float)$orderline->defaultcurrencylinetotal;
 								$shipping_tax += (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal;
+
+								$taxes_array[$orderline_taxid]['shipping'] = isset($taxes_array[$orderline_taxid]['shipping']) ? ($taxes_array[$orderline_taxid]['shipping'] + ((float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal)) : ((float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal);
 							}
 						}
 
@@ -1785,11 +1790,14 @@ final class CodistoConnect {
 						if( is_object( $order ) ) {
 
 							foreach ( $ordercontent->orderlines->orderline as $orderline ) {
+								$orderline_taxid = (int) $orderline->taxid;
 								if ( $orderline->productcode[0] != 'FREIGHT' ) {
 									$line_total = wc_format_decimal( (float)$orderline->defaultcurrencylinetotal );
 									$line_total_tax = wc_format_decimal( (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal );
 
 									$tax += $line_total_tax;
+
+									$taxes_array[$orderline_taxid]['product'] = isset($taxes_array[$orderline_taxid]['product']) ? ($taxes_array[$orderline_taxid]['product'] + $line_total_tax) : $line_total_tax;
 								} else {
 									$order->remove_order_items( 'shipping' );
 
@@ -1806,13 +1814,14 @@ final class CodistoConnect {
 
 									$shipping_tax_array = array (
 										'total' => array (
-											1=> (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal,
+											$orderline_taxid => (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal,
 										)
 									);
-
 									wc_add_order_item_meta( $item_id, 'taxes', $shipping_tax_array);
 									$shipping += (float)$orderline->defaultcurrencylinetotal;
 									$shipping_tax += (float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal;
+
+									$taxes_array[$orderline_taxid]['shipping'] = isset($taxes_array[$orderline_taxid]['shipping']) ? ($taxes_array[$orderline_taxid]['shipping'] + ((float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal)) : ((float)$orderline->defaultcurrencylinetotalinctax - (float)$orderline->defaultcurrencylinetotal);
 								}
 							}
 
@@ -1846,7 +1855,10 @@ final class CodistoConnect {
 						}
 
 						$order->remove_order_items( 'tax' );
-						$order->add_tax( 1, $tax, $shipping_tax );
+
+						foreach($taxes_array as $rate_id => $taxarray) {
+						    $order->add_tax( $rate_id, isset($taxarray['product']) ? $taxarray['product'] : 0, isset($taxarray['shipping']) ? $taxarray['shipping'] : 0 );
+						}
 
 						$order->set_total( $shipping, 'shipping' );
 						$order->set_total( $shipping_tax, 'shipping_tax' );
