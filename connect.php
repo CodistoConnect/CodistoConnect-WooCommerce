@@ -379,7 +379,7 @@ final class CodistoConnect {
 				}
 
 				if ( $tax_enabled ) {
-					$rates = $wpdb->get_results( "SELECT tax_rate_country AS country, tax_rate_state AS state, tax_rate AS rate, tax_rate_name AS name, tax_rate_class AS class, tax_rate_order AS sequence, tax_rate_priority AS priority FROM `{$wpdbsiteprefix}woocommerce_tax_rates` ORDER BY tax_rate_order" );
+					$rates = $wpdb->get_results( "SELECT tax_rate_id AS rateid, tax_rate_country AS country, tax_rate_state AS state, tax_rate AS rate, tax_rate_name AS name, tax_rate_class AS class, tax_rate_order AS sequence, tax_rate_priority AS priority FROM `{$wpdbsiteprefix}woocommerce_tax_rates` ORDER BY tax_rate_order" );
 				} else {
 					$rates = array();
 				}
