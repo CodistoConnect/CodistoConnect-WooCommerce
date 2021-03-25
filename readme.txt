@@ -1,9 +1,10 @@
-=== WooCommerce Google, Amazon & eBay Integration - Channel Cloud by Codisto ===
+=== Multichannel for WooCommerce: Google, Amazon, eBay & Walmart Integration - Channel Cloud by Codisto ===
 Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
 Tested up to: 5.6.0
 Stable tag: 1.3.57
+Requires PHP: 5.6
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -11,42 +12,82 @@ Codisto Channel Cloud - WooCommerce Google, Amazon & eBay Integration - Sell mul
 
 == Description ==
 
-Sell on Amazon & eBay directly from WooCommerce.
+* Download of the extension is free.
+* 14 day free trial of integration services.
+* Paid subscription required for integration services after 14 days of free trial.
+* For more details on pricing, please see https://codisto.com/pricing.html.
 
-Real time sync of catalog, inventory and orders.
+== Smarter Google ==
 
-The only full catalog sync native WooCommerce extension for integrating Amazon & eBay.
+Boost sales with automated Product Listing Ads and quickly list and manage products on Google Shopping and Surfaces Across Google. Full ‘Buy on Google’ & enhanced listings support.
 
-Amazon & eBay integration is all Codisto does.  By solely focusing on Amazon & eBay integration, Codisto ensures it is the leading provider of SaaS marketplace integration extensions.
-
-*Please note the plugin is free to download and install but the integration service requires a monthly subscription (after the 14 day free trial).  Please see pricing plans [here](https://codisto.com/linq/pricing.html)*
-
-= Key Features =
-
-* Real time, two-way synchronization of product catalog & inventory between WooCommerce - Amazon & eBay
-* Orders from Amazon & eBay sent to WooCommerce for efficient fulfilment
-* Automatic ASIN matching from UPC data
-* Simply ASIN lookup for non UPC data
-* Create unique Amazon listings directly from within WooCommerce
-* Products auto-categorized into most appropriate eBay category
-* Professional, full editable, mobile optimized template apply to every eBay listing
-* List on any Amazon and/or eBay marketplace worldwide
-* Supports multi-account/multi Amazon/eBay marketplace
-* XpressGrid multi edit for simple management
-* Order control for sending to WooCommerce
-* Automatic feedback& shipping tracking on eBay
-* Domestic and international shipping options
-* Platform calculated shipping rate support
-* Supports multi-variant products
-* CDN for image hosting
-* Retain sales history of existing eBay listings by mapping to products in WooCommerce
-* Lightweight plugin design – minimal files in WordPress
-
-= More Information =
+== Smarter Amazon ==
 
 Visit https://codisto.com/connect/ to read more about Codisto LINQ including documentation, installation instructions and pricing.
 
-Pricing starts at $29 USD per month.
+== Smarter eBay ==
+
+Unrivalled listing automation & sync control on any global eBay marketplace direct from WooCommerce, retaining existing listings & sales history.
+
+== Smarter Walmart ==
+
+Reach over 120 million monthly visitors on Walmart.com directly from WooCommerce and quickly list and manage thousands of products on Walmart Marketplace.
+
+** *Multichannel for WooCommerce is free to download and install but requires a paid monthly subscription for ongoing integration services after the 14-day free trial period. For more details on pricing, see below.*
+
+Multichannel for WooCommerce by Codisto is a Google channel, an Amazon channel, an eBay channel and a Walmart Channel all in one smartly designed extension for WooCommerce.
+
+Multichannel for WooCommerce functions as a marketplace listing tool and a fully-featured multichannel solution with real-time inventory & pricing sync directly from WooCommerce.
+
+Other multichannel selling tools for WooCommerce require you to export & migrate your entire product catalog to their platform, but with Multichannel for WooCommerce powering your Google, Amazon, eBay and Walmart integration you can connect to all their global marketplaces and sales channels directly from WooCommerce giving you complete control of your Amazon, eBay, Walmart and Google listings and Google Product Listing Ads
+
+== Features: ==
+
+* All global Google, Amazon, Walmart & eBay sales channels with in-built currency control
+* All WooCommerce store currencies
+* Create new or link existing Google, Amazon, Walmart & eBay listings in bulk
+* Real-time sync of inventory, orders, pricing & product details
+* Supports use of channel specific titles, prices, descriptions & product details
+* Create Buy on Google listings & Product Listing Ads for Google Search, Google Shopping, YouTube, Google Display Network and more Surfaces Across Google
+
+== Smarter Listing Creation & Linking ==
+
+Choose from three distinct listing modes – single-listing, multi-listing or attribute mapping mode – with a suite of powerful automation features making it easier than ever before to create, sync and manage sales channel listings across Google, Amazon, eBay and Walmart all in the one place.
+
+* Create new listings for Google, Amazon, eBay and Walmart in bulk, including new Amazon ASINs
+* Built-in smarts for auto-categorization and enhanced listing creation
+* Boost conversion with Buy on Google checkout and integrated order flow support
+* Automatically create Google Product Listing Ads and set daily budgets directly from Multichannel for WooCommerce
+* Already selling on sales channels? Multichannel for WooCommerce automatically links any Google, Amazon, eBay and Walmart listings in minutes protecting search ranking and sales history
+
+== Receive Multichannel Orders in WooCommerce with Fully Synced & Integrated Order Flow ==
+
+Sales channel orders are received in WooCommerce, and by updating inventory counts across all your connected sales channels and marketplaces as soon as a sale is made, Multichannel for WooCommerce prevents overselling and allows you to manage inventory efficiently for all sales channels
+
+* Receive multichannel orders in WooCommerce
+* Shipment tracking data and fulfilment status automatically updated on sales channels
+* No overselling or paying for ads on out-of-stock products
+
+== 100% Real-time Sync for Everything with Codisto SmartSync™ ==
+
+Avoid having to update listings on every channel; Change once in WooCommerce and Multichannel for WooCommerce automatically updates all sales channel listings.
+
+* Real-time sync with Amazon Seller Central, eBay Seller Hub, Walmart Seller Center and Google Merchant Center – no periodic data feeds!
+
+== Flexible Pricing Plans to Suit Your Business ==
+
+Multichannel for WooCommerce is free to download, install and try for 14-days, after which a recurring paid subscription is required for ongoing integration services provided by Codisto.
+
+All plans come with the full range of features including real-time sync for inventory, pricing, orders and product information, as well as 24/7 customer support.
+
+The *Codisto Elite* plan with unlimited orders and *Channel Cloud Plus* plans are also available for high-volume merchants.
+
+For more information on pricing visit https://codisto.com/pricing.html.
+
+**Multichannel for WooCommerce is the only official WooCommerce extension that connects your online store with millions of customers on Google, Amazon, eBay and Walmart.**
+
+**Take control of your multichannel strategy and reach more customers with Multichannel for WooCommerce!Install Multichannel for WooCommerce today and get 14 days free to create, sync and manage listings on any number of global Google, Amazon, eBay and Walmart sales channels.**
+
 
 == Installation ==
 
@@ -56,33 +97,136 @@ Pricing starts at $29 USD per month.
 
 == Frequently Asked Questions ==
 
-= Does Codisto LINQ work with all Amazon & eBay sites? =
+= How long does it take to set up and start selling? =
 
-Yes, it does.
+Because Multichannel for WooCommerce sits inside your existing WooCommerce platform there’s no data migration to a separate multi-channel platform required which can save days or even weeks of setup time.
 
-= What are the requirements to run Codisto LINQ? =
+With Multichannel for WooCommerce, installation and connecting a sales channel takes about a minute. Setting default listing values takes another minute or so. If you are happy listing all products with default values there is nothing more to do except enable the products (in bulk) you want to list (or link to existing listings).
 
-Codisto LINQ requires a recent version of WordPress (4.2+) with WooCommerce (2.2+) installed. Your server should run on Linux and have PHP 5.3.
+Amazon, Walmart and eBay limit the speed of listing hundreds or thousands of products to a certain rate per minute but a few thousand products are listed in about an hour. Google Merchant Centre can take up to 3 days to verify your products. If you wish to configure certain products away from the default values, setup time is dependent on how many changes you are making but all changes can be done in bulk. It’s rare that merchants take any more than an hour or so for the most complicated configurations and everyone is normally selling same day.
 
-= Does Codisto LINQ just list my products on Amazon/eBay or provide full catalog synchronization? =
+= Does Multichannel for WooCommerce support all Amazon, Google and eBay sales channels globally and all WooCommerce store currencies? =
 
-Codisto LINQ is more than just a listing tool. It keeps your whole catalog – products, prices, images, descriptions, inventory levels and more in sync with Amazon/eBay in real time. Orders from Amazon/eBay are automatically sent to WooCommerce and inventory reduced in real time so you never oversell on either channel.  Further, you can of course choose which products from your catalog to list.
+Yes. Multichannel for WooCommerce supports listings on all Google, Amazon and eBay sites around the world all from within WooCommerce, and listing for approved sellers on Walmart US.
 
-= How easy is Codisto LINQ to setup and use? =
+Multichannel for WooCommerce supports all store currencies and you can use our in-built currency manager to list on sales channels in different currencies.
 
-Codisto LINQ was designed for merchants to increase their sales by adding the Amazon & eBay channels for virtually no effort and keep their current WooCommerce fulfilment processes.
-This has been achieved by applying the maximum automation to setting up and managing Amazon/eBay. There are many areas of automation from categorizing products on eBay, applying a professional template, upscaling images, UPC/EAN error prevention, automatic tax rate detection for orders and many more.
-If you’re happy with our standard template, eBay best practice selling values e.g. 30 days returns and free shipping, once Codisto LINQ has installed, you can list your entire catalog in just 4 clicks.
-Amazon ASIN matches is fully automated if you have UPC data and there is a quick and easy search tool if you don’t have UPC data. There is no better performing solution that makes it as easy to list on Amazon/eBay anywhere, let alone offer full, real time integration.
+= Can I set separate price and quantity rules, titles and descriptions? =
+
+Yes. It’s easy to set different rules for sales channel listings different to those used on your webstore and quickly apply them in bulk using in built operators or mapping fields from WooCommerce.
+
+= What do you mean by real-time sync? =
+
+Multichannel for WooCommerce sync is ‘event driven’. This means as soon as something happens like an item gets sold or a price gets changed, it is constantly ‘listening’ and reacts as soon as the message that something has changed is received, which means you can’t oversell or sell at the wrong price because we avoid the need for scheduled sync events. This is different from alternative approaches which run event changes on scheduled frequencies e.g. every hour. A scheduled sync approach means you are always out of sync between schedules.
 
 = I already have listed my products on Amazon/eBay. Can Codisto LINQ import them to WooCommerce? =
 
 No, Codisto LINQ is designed to let WooCommerce be the “source of true” – you contine to manage your products in WordPress – and use Codisto LINQ to manage which products and how they are listed on Amazon/eBay.
 But it is possible to map existing Amazon/eBay listings to products in WooCommerce once they are in WooCommerce with the ‘map products’ function.
 
-= Does Codisto LINQ support auction style listings? =
+= Does Multichannel for WooCommerce work with other third-party apps? =
 
-No, Codisto LINQ is designed for merchants with catalogs who want to create fixed price, good til cancelled listings.
+Multichannel for WooCommerce works well with common third-party extensions e.g. shipping integrations. Multichannel for WooCommerce ‘should’ work well with other third-party apps due to our rigorous adherence to app development guidelines.
+
+However, we cannot guarantee all third-party apps have been developed in accordance with the guidelines and given the large number it is impossible to test all. If you are using a third-party app that you are already using and suspect may cause a conflict we suggest testing Multichannel for WooCommerce with a small number or products/orders first and reach out to support if you experience any difficulties.
+
+= I have Amazon/eBay listings and want to create an online store, can Multichannel for WooCommerce do that for me? =
+
+No. Multichannel for WooCommerce uses your online store product catalog as the ‘source of truth’ to sync with Amazon/eBay. There are third-party importer tools available to create products in WooCommerce (search Google or app store). You can then use Multichannel for WooCommerce to create/link and sync your WooCommerce products with Google, Amazon, Walmart and eBay.
+
+= Do you mark orders as coming from Google, Amazon, Walmart or eBay when you sync them with WooCommerce? =
+
+Yes. Multichannel for WooCommerce marks orders and puts them into Google, Amazon, Walmart and eBay customer groups in WooCommerce.
+
+= How does the free trial work? =
+
+You can use Multichannel for WooCommerce free for 14 days. No credit card is required to install and configure (‘click around’). We ask you to choose a plan and enter credit card when you list/link your first item(s).
+
+Nothing gets charged during the free trial period but we need a payment method in place should you decided to continue with Multichannel for WooCommerce at the end of the free trial period so that sync isn’t interrupted as you move from free trial to paying subscription.
+
+If you want to cancel at any time during the free trial simply email support@codisto.com and nothing will ever get charged.
+
+= What happens at end of trial? =
+
+If you choose to continue with Multichannel for WooCommerce at the end of the free trial, we will charge your credit card for the plan selected. If you choose to cancel during the free trial period (email support@codisto.com), we’ll end sync and not charge you. Any listings created during the free trial remain active at the end of the trial (we never end them), but they are no longer kept in sync with WooCommerce.
+
+= What’s included in the free trial? =
+
+Everything. The product you use during your free trial is the same product you would use as a paying subscription.
+
+= Can I upgrade/downgrade anytime? =
+
+Yes. You can choose to upgrade or downgrade plans at any time by selecting the appropriate plan within the app.
+
+= Are there any contracts? =
+
+No. There’s no contract – just pay as you go, month-to-month. You can cancel at any time without penalty.
+
+= Are there any setup fees? =
+
+There are no setup fees or hidden charges with any of our plans.
+
+= What if I go over my plan limits? =
+
+To find out more about the specific overages and inclusions in your plan, please visit the Codisto pricing page.
+
+= What kind of payments do you accept? =
+
+We accept Visa and Mastercard.
+
+= Do I need my credit card info to sign up? =
+
+No. You can install and experience Multichannel for WooCommerce without a credit card. We ask you to choose a plan and enter credit card when you list/link your first item(s).
+
+Nothing gets charged during the free trial period but we need a payment method in place should you decided to continue with Multichannel for WooCommerce at the end of the free trial period so that sync isn’t interrupted as you move from free trial to paying subscription. If you want to cancel at any time, email support@codisto.com.
+
+= Can I cancel anytime? =
+
+Yes. If you ever decide that Multichannel for WooCommerce isn’t the best Amazon/eBay integration solution for your business, simply cancel by emailing support@codisto.com. We never end any listings when you cancel, they are just not kept in sync any longer.
+
+= Do I need my own Google, Amazon, Walmart or eBay account to use Multichannel for WooCommerce? =
+
+Yes. Multichannel for WooCommerce connects your online store to your Google/Amazon/eBay/Walmart account(s). You need an Amazon Professional Seller account (you can’t use an individual account because Amazon doesn’t allow third-party connections) or an eBay seller account (list any item on eBay manually once and eBay automatically turn an eBay buyer account into an eBay seller account). For Walmart, you will need a Walmart account and be approved to sell by applying directly to Walmart as a seller. If you do not have a Google account or Google Merchant Center account, one can be created for you automatically. You are responsible for any Google/Amazon/eBay fees – these are separate to Multichannel for WooCommerce charges.
+
+= Can I use multiple Google/Amazon/eBay/Walmart accounts? =
+
+Yes. Multichannel for WooCommerce supports multi Google/Amazon/eBay account, multi Google/Amazon/eBay site and multi-store use
+
+= I operate two stores, do I need two Multichannel for WooCommerce subscriptions? =
+
+Multichannel for WooCommerce works on a ‘per instance’ basis so you need more than one subscription unless you have multiple stores on the same instance.
+
+= What is your support like? =
+
+Support is available 24/7 by email, chat. Phone support is available for Channel Cloud Plus customers.
+
+= Why is Multichannel for WooCommerce a monthly fee not a one-time software purchase? =
+
+Multichannel for WooCommerce is constantly ‘listening’ and reacting to any changes made on sales channels or your platform to ensure sync is maintained. This architecture is the only way to provide the performance demanded by professional online sellers. This requires a lot of server resources that we get charged on a monthly basis for by Amazon Web Services.
+
+Also, sales channels and platforms and regularly changing their offerings in terms of features, meta data or APIs (what we use to connect stores to sales channels). Furthermore, we are having to constantly reinvest to develop new features and maintain the solution to ensure it works for all sites and platforms supported. We also provide 24/7 support. All of this is included in the monthly fee.
+
+= Do I need to end my current eBay listings to use Multichannel for WooCommerce? =
+
+No. Multichannel for WooCommerce understands the importance of retaining your current listings. During the installation flow we prompt you to ‘Link Existing eBay Listings’ which guides you through how to link your existing eBay listings to your eCommerce products. This can be done in bulk in a few clicks.
+
+= Do you end listings if I cancel Multichannel for WooCommerce? =
+
+No. Listings are never ended if you cancel your Codisto subscription for Multichannel for WooCommerce, they are just no longer kept in sync with WooCommerce and no orders are transferred to WooCommerce.
+
+= Why does Multichannel for WooCommerce offer a Flexi plan with a variable % (+1.9% of sales channels sales) and how does this work? =
+
+Some merchants are unsure how their products will sell on sales channels, but they have a lot of products they want to list and try selling. The idea of the flexi plan is to give merchants a low commitment way of trying sales channel selling.
+
+Once sales are known or it becomes cheaper to move to a fixed plan, simply change plans in app. This can be done at any time. Merchants on the flexi plan get charged the fixed portion in advance and the variable portion in arrears.
+
+= Can I list selected products or part of my catalog or do I have to list the entire catalog? =
+
+You can choose what you want to list, individually or in bulk. Filtering and bulk edit makes it very fast to list any number of products.
+
+= Can I use Multichannel for WooCommerce just for order sync from Amazon/eBay/Walmart to WooCommerce? =
+
+Absolutely. You don’t need to list anything with Multichannel for WooCommerce to take advantage of sales channel order sync – set to “all orders” in the orders settings screen.
 
 = Are there any more FAQ? =
 
@@ -90,9 +234,11 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 == Screenshots ==
 
-1. XpressGrid listing mananagement
-2. Standard, mobile optimized template (fully editable)
-3. Order Management
+1. Set separate pricing inventory, and product details based on your WooCommerce values
+2. Create configurations for advanced integrations with Attribute Mapping
+3. Optimize title, description and keyword fields in the XpressGrid
+4. Create and edit sales channel listings in bulk with XpressGrid Multi Edit
+5. Fulfill your Google, Amazon and eBay orders directly from WooCommerce
 
 == Changelog ==
 
