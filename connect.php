@@ -562,6 +562,21 @@ final class CodistoConnect {
 
 								$name = wc_attribute_label( $name, $child_product );
 
+								if ( $name === '_woocommerce_gpf_data' &&
+									is_array($newvalue) &&
+									(isset($newvalue['gtin']) || isset($newvalue[0]['gtin'])) ) {
+									$gtin = "";
+									if ( isset($newvalue['gtin']) ) {
+										$gtin = $newvalue['gtin'];
+									} elseif ( isset($value[0]['gtin']) ) {
+										$gtin = $newvalue[0]['gtin'];
+									}
+									$name = '_woocommerce_gpf_data.gtin';
+									$newvalue = $gtin;
+								} elseif( $name === '_woocommerce_gpf_data' && !is_array($newvalue)){
+									$name = '_woocommerce_gpf_data.gtin';
+								}
+
 								$attributes[] = array( 'name' => $name, 'value' => $newvalue, 'slug' => $value );
 
 							}
@@ -603,6 +618,8 @@ final class CodistoConnect {
 										}
 										$attribute = '_woocommerce_gpf_data.gtin';
 										$value = $gtin;
+									}  elseif( $attribute === '_woocommerce_gpf_data' && !is_array($value)){
+										$attribute = '_woocommerce_gpf_data.gtin';
 									}
 
 									$attributes[] = array( 'name' => $attribute, 'value' => $value, 'custom' => true );
