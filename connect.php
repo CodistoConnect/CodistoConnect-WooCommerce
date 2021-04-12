@@ -592,6 +592,19 @@ final class CodistoConnect {
 										}
 									}
 
+									if ( $attribute === '_woocommerce_gpf_data' &&
+										is_array($value) &&
+										(isset($value['gtin']) || isset($value[0]['gtin'])) ) {
+										$gtin = "";
+										if ( isset($value['gtin']) ) {
+											$gtin = $value['gtin'];
+										} elseif ( isset($value[0]['gtin']) ) {
+											$gtin = $value[0]['gtin'];
+										}
+										$attribute = '_woocommerce_gpf_data.gtin';
+										$value = $gtin;
+									}
+
 									$attributes[] = array( 'name' => $attribute, 'value' => $value, 'custom' => true );
 								}
 							}
