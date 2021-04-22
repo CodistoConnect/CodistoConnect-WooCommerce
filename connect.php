@@ -5,7 +5,7 @@
  * Description: Sell multichannel on Google, Amazon, eBay & Walmart direct from WooCommerce. Create listings & sync products, inventory & orders directly from WooCommerce
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.57
+ * Version: 1.3.58
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
@@ -14,14 +14,14 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.57
+ * @version 1.3.58
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.57' );
+define( 'CODISTOCONNECT_VERSION', '1.3.58' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -562,6 +562,21 @@ final class CodistoConnect {
 
 								$name = wc_attribute_label( $name, $child_product );
 
+								if ( $name === '_woocommerce_gpf_data' &&
+									is_array($newvalue) &&
+									(isset($newvalue['gtin']) || isset($newvalue[0]['gtin'])) ) {
+									$gtin = "";
+									if ( isset($newvalue['gtin']) ) {
+										$gtin = $newvalue['gtin'];
+									} elseif ( isset($value[0]['gtin']) ) {
+										$gtin = $newvalue[0]['gtin'];
+									}
+									$name = '_woocommerce_gpf_data.gtin';
+									$newvalue = $gtin;
+								} elseif( $name === '_woocommerce_gpf_data' && !is_array($newvalue)){
+									$name = '_woocommerce_gpf_data.gtin';
+								}
+
 								$attributes[] = array( 'name' => $name, 'value' => $newvalue, 'slug' => $value );
 
 							}
@@ -590,6 +605,21 @@ final class CodistoConnect {
 										} else {
 											$value = implode( ',', $value );
 										}
+									}
+
+									if ( $attribute === '_woocommerce_gpf_data' &&
+										is_array($value) &&
+										(isset($value['gtin']) || isset($value[0]['gtin'])) ) {
+										$gtin = "";
+										if ( isset($value['gtin']) ) {
+											$gtin = $value['gtin'];
+										} elseif ( isset($value[0]['gtin']) ) {
+											$gtin = $value[0]['gtin'];
+										}
+										$attribute = '_woocommerce_gpf_data.gtin';
+										$value = $gtin;
+									}  elseif( $attribute === '_woocommerce_gpf_data' && !is_array($value)){
+										$attribute = '_woocommerce_gpf_data.gtin';
 									}
 
 									$attributes[] = array( 'name' => $attribute, 'value' => $value, 'custom' => true );
@@ -761,7 +791,7 @@ final class CodistoConnect {
 					}
 
 					foreach ( get_post_custom_keys( $product->id ) as $attribute ) {
-
+						$value = get_post_meta( $product->id, $attribute, false );
 						if ( ! ( substr( $attribute, 0, 1 ) === '_' ||
 							substr( $attribute, 0, 3 ) === 'pa_' ) ) {
 
@@ -781,8 +811,14 @@ final class CodistoConnect {
 							}
 						} elseif ( $attribute === '_woocommerce_gpf_data' &&
 							is_array($value) &&
-							isset($value['gtin']) ) {
-							$product->attributes[] = array( 'name' => '_woocommerce_gpf_data.gtin', 'value' => $value['gtin'] );
+							(isset($value['gtin']) || isset($value[0]['gtin'])) ) {
+							$gtin = "";
+							if ( isset($value['gtin']) ) {
+								$gtin = $value['gtin'];
+							} elseif ( isset($value[0]['gtin']) ) {
+								$gtin = $value[0]['gtin'];
+							}
+							$product->attributes[] = array( 'name' => '_woocommerce_gpf_data.gtin', 'value' => $gtin );
 					 	}
 
 					}
