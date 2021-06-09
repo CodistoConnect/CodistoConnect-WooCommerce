@@ -1874,7 +1874,8 @@ final class CodistoConnect {
 						} elseif ( $ordercontent->orderstate == 'inprogress' || $ordercontent->orderstate == 'processing' ) {
 
 							if ( $ordercontent->paymentstatus == 'complete' ) {
-								if ( ! $order->has_status( 'processing' ) ) {
+								if ( ! $order->has_status( 'processing' ) && ! $order->has_status( 'completed' )) {
+
 									// update_status
 									$order->set_status( 'processing' );
 									$update_post_data  = array(
