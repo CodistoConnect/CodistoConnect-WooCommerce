@@ -14,14 +14,14 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.57
+ * @version 1.3.58
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.57' );
+define( 'CODISTOCONNECT_VERSION', '1.3.58' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -1874,7 +1874,8 @@ final class CodistoConnect {
 						} elseif ( $ordercontent->orderstate == 'inprogress' || $ordercontent->orderstate == 'processing' ) {
 
 							if ( $ordercontent->paymentstatus == 'complete' ) {
-								if ( ! $order->has_status( 'processing' ) ) {
+								if ( ! $order->has_status( 'processing' ) && ! $order->has_status( 'completed' )) {
+
 									// update_status
 									$order->set_status( 'processing' );
 									$update_post_data  = array(
