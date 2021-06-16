@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.58' );
+define( 'CODISTOCONNECT_VERSION', '1.3.59' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -161,6 +161,7 @@ final class CodistoConnect {
 			false == strpos( $_SERVER['REQUEST_URI'], 'wp-admin') ) {
 			$_SERVER['REQUEST_URI'] = '/wp-admin'.$_SERVER['REQUEST_URI'];
 		}
+
 		preg_match_all('/((\d+)|(.*))/', $status, $statusArray);
 		$statusCode = isset($statusArray[0]) && isset($statusArray[0][0]) ? (int) $statusArray[0][0] : "";
 		$statusMessage = isset($statusArray[0]) && isset($statusArray[0][1]) ? trim($statusArray[0][1]) : "";
