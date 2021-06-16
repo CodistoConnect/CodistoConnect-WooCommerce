@@ -17,7 +17,7 @@
  * @version 1.3.59
  */
 
-iif ( ! defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
