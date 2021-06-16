@@ -17,11 +17,11 @@
  * @version 1.3.59
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+iif ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.59' );
+define( 'CODISTOCONNECT_VERSION', '1.3.58' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -76,7 +76,7 @@ final class CodistoConnect {
 		if ( ! isset( $_SERVER['HTTP_X_CODISTONONCE'] ) ||
 			! isset( $_SERVER['HTTP_X_CODISTOKEY'] ) ) {
 			$this->sendHttpHeaders(
-				'400', 'Security Error',
+				'400 Security Error',
 				array(
 					'Content-Type' => 'application/json',
 					'Cache-Control' => 'no-cache, no-store',
@@ -94,7 +94,7 @@ final class CodistoConnect {
 		$checkHash = base64_encode( $base );
 		if ( ! hash_equals( $_SERVER['HTTP_X_CODISTOKEY'], $checkHash ) ) {
 			$this->sendHttpHeaders(
-				'400', 'Security Error',
+				'400 Security Error',
 				array(
 					'Content-Type' => 'application/json',
 					'Cache-Control' => 'no-cache, no-store',
@@ -155,14 +155,16 @@ final class CodistoConnect {
 	* @param integer $status the http status to send
 	* @param array $headers an array of headers to send
 	*/
-	private function sendHttpHeaders($statusCode, $status, $headers ) {
+	private function sendHttpHeaders( $status, $headers ) {
 
 		if ( defined( 'ADVANCEDCACHEPROBLEM' ) &&
 			false == strpos( $_SERVER['REQUEST_URI'], 'wp-admin') ) {
 			$_SERVER['REQUEST_URI'] = '/wp-admin'.$_SERVER['REQUEST_URI'];
 		}
-
-		status_header( $statusCode, $status );
+		preg_match_all('/((\d+)|(.*))/', $status, $statusArray);
+		$statusCode = isset($statusArray[0]) && isset($statusArray[0][0]) ? (int) $statusArray[0][0] : "";
+		$statusMessage = isset($statusArray[0]) && isset($statusArray[0][1]) ? trim($statusArray[0][1]) : "";
+		status_header( $statusCode, $statusMessage );
 		foreach ( $headers as $header => $value ) {
 			header( $header.': '.$value );
 		}
@@ -268,7 +270,7 @@ final class CodistoConnect {
 
 		if ( ! is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
 			$this->sendHttpHeaders(
-				'500', 'Config Error',
+				'500 Config Error',
 				array(
 					'Content-Type' => 'application/json',
 					'Cache-Control' => 'no-cache, no-store',
@@ -295,7 +297,7 @@ final class CodistoConnect {
 				}
 
 				$this->sendHttpHeaders(
-					'200', 'OK',
+					'200 OK',
 					array(
 						'Content-Type' => 'application/json',
 						'Cache-Control' => 'no-cache, no-store',
@@ -353,7 +355,7 @@ final class CodistoConnect {
 				);
 
 				$this->sendHttpHeaders(
-					'200', 'OK',
+					'200 OK',
 					array(
 						'Content-Type' => 'application/json',
 						'Cache-Control' => 'no-cache, no-store',
@@ -387,7 +389,7 @@ final class CodistoConnect {
 				$response = array( 'ack' => 'ok', 'tax_rates' => $rates );
 
 				$this->sendHttpHeaders(
-					'200', 'OK',
+					'200 OK',
 					array(
 						'Content-Type' => 'application/json',
 						'Cache-Control' => 'no-cache, no-store',
@@ -885,7 +887,7 @@ final class CodistoConnect {
 				}
 
 				$this->sendHttpHeaders(
-					'200', 'OK',
+					'200 OK',
 					array(
 						'Content-Type' => 'application/json',
 						'Cache-Control' => 'no-cache, no-store',
@@ -920,7 +922,7 @@ final class CodistoConnect {
 				$response = array( 'ack' => 'ok', 'categories' => $result, 'total_count' => count( $categories ) );
 
 				$this->sendHttpHeaders(
-					'200', 'OK',
+					'200 OK',
 					array(
 						'Content-Type' => 'application/json',
 						'Cache-Control' => 'no-cache, no-store',
@@ -1100,7 +1102,7 @@ final class CodistoConnect {
 				}
 
 				$this->sendHttpHeaders(
-					'200', 'OK',
+					'200 OK',
 					array(
 						'Content-Type' => 'application/json',
 						'Cache-Control' => 'no-cache, no-store',
@@ -1132,7 +1134,7 @@ final class CodistoConnect {
 					if ( isset( $_GET['markreceived'] ) ) {
 
 						$this->sendHttpHeaders(
-							'200', 'OK',
+							'200 OK',
 							array(
 								'Content-Type' => 'application/json',
 								'Cache-Control' => 'no-cache, must-revalidate',
@@ -1169,7 +1171,7 @@ final class CodistoConnect {
 						if ( sizeof( $filestozip ) == 0 ) {
 
 							$this->sendHttpHeaders(
-								'204', 'No Content',
+								'204 No Content',
 								array(
 									'Cache-Control' => 'no-cache, must-revalidate',
 									'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
@@ -1195,7 +1197,7 @@ final class CodistoConnect {
 									'Content-Length' => filesize( $tmpfile )
 								);
 
-								$this->sendHttpHeaders( '200', 'OK', $headers );
+								$this->sendHttpHeaders( '200 OK', $headers );
 
 								while( ob_get_level() > 0 ) {
 									if ( ! @ob_end_clean() )
@@ -1207,7 +1209,7 @@ final class CodistoConnect {
 								readfile( $tmpfile );
 							} else {
 								$this->sendHttpHeaders(
-									'200', 'OK',
+									'200 OK',
 									array(
 										'Content-Type' => 'application/json',
 										'Cache-Control' => 'no-cache, no-store',
@@ -1248,7 +1250,7 @@ final class CodistoConnect {
 				}
 
 				$this->sendHttpHeaders(
-					'200', 'OK',
+					'200 OK',
 					array(
 						'Content-Type' => 'application/json',
 						'Cache-Control' => 'no-cache, no-store',
@@ -1273,7 +1275,7 @@ final class CodistoConnect {
 				}
 
 				$this->sendHttpHeaders(
-					'200', 'OK',
+					'200 OK',
 					array(
 						'Content-Type' => 'application/json',
 						'Cache-Control' => 'no-cache, no-store',
@@ -1302,7 +1304,7 @@ final class CodistoConnect {
 				$response['paymentmethods'] = $paymentmethods;
 
 				$this->sendHttpHeaders(
-					'200', 'OK',
+					'200 OK',
 					array(
 						'Content-Type' => 'application/json',
 						'Cache-Control' => 'no-cache, no-store',
@@ -1343,7 +1345,7 @@ final class CodistoConnect {
 				$response['shippingzones'] = $shippingzones;
 
 				$this->sendHttpHeaders(
-					'200', 'OK',
+					'200 OK',
 					array(
 						'Content-Type' => 'application/json',
 						'Cache-Control' => 'no-cache, no-store',
@@ -1368,7 +1370,7 @@ final class CodistoConnect {
 				}
 
 				$this->sendHttpHeaders(
-					'200', 'OK',
+					'200 OK',
 					array(
 						'Content-Type' => 'application/json',
 						'Cache-Control' => 'no-cache, no-store',
@@ -1933,7 +1935,7 @@ final class CodistoConnect {
 					$response = array( 'ack' => 'ok', 'orderid' => $order_id );
 
 					$this->sendHttpHeaders(
-						'200', 'OK',
+						'200 OK',
 						array(
 							'Content-Type' => 'application/json',
 							'Cache-Control' => 'no-cache, no-store',
@@ -1950,7 +1952,7 @@ final class CodistoConnect {
 					$response = array( 'ack' => 'failed', 'message' => $e->getMessage() .'  '.$e->getFile().' '.$e->getLine()  );
 
 					$this->sendHttpHeaders(
-						'200', 'OK',
+						'200 OK',
 						array(
 							'Content-Type' => 'application/json',
 							'Cache-Control' => 'no-cache, no-store',
@@ -2012,7 +2014,7 @@ final class CodistoConnect {
 					unlink( $tmpPath );
 
 					$this->sendHttpHeaders(
-						'200', 'OK',
+						'200 OK',
 						array(
 							'Content-Type' => 'application/json',
 							'Cache-Control' => 'no-cache, no-store',
@@ -2086,7 +2088,7 @@ final class CodistoConnect {
 				}
 
 				$this->sendHttpHeaders(
-					'200', 'OK',
+					'200 OK',
 					array(
 						'Content-Type' => 'application/json',
 						'Cache-Control' => 'no-cache, no-store',
@@ -2102,7 +2104,7 @@ final class CodistoConnect {
 				update_option( 'codisto_site_verification' , file_get_contents( 'php://input' ) );
 
 				$this->sendHttpHeaders(
-					'200', 'OK',
+					'200 OK',
 					array(
 						'Content-Type' => 'application/json',
 						'Cache-Control' => 'no-cache, no-store',
@@ -2128,7 +2130,7 @@ final class CodistoConnect {
 				file_put_contents( $conversion_tracking_path, file_get_contents( 'php://input' ) );
 
 				$this->sendHttpHeaders(
-					'200', 'OK',
+					'200 OK',
 					array(
 						'Content-Type' => 'application/json',
 						'Cache-Control' => 'no-cache, no-store',
@@ -2264,7 +2266,7 @@ final class CodistoConnect {
 
 		if ( ! $merchantid ) {
 			$this->sendHttpHeaders(
-				'404', 'Not Found',
+				'404 Not Found',
 				array(
 					'Content-Type' => 'text/html',
 					'Cache-Control' => 'no-cache, no-store',
@@ -2338,7 +2340,7 @@ final class CodistoConnect {
 			if ( is_wp_error( $response ) ) {
 				if ( $retry >= 3 ) {
 					$this->sendHttpHeaders(
-						'500', 'Server Error',
+						'500 Server Error',
 						array(
 							'Content-Type' => 'text/html',
 							'Cache-Control' => 'no-cache, no-store',
