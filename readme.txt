@@ -247,6 +247,9 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 * Update - woocommerce tested up to 5.4.1
 * Update - status header updates to improve compatibility
 
+= 1.3.59 - 09/06/2021 =
+* Update - prevent completed orders being set back to processing
+
 = 1.3.58 - 09/06/2021 =
 * Update - prevent completed orders being set back to processing
 

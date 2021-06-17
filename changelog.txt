@@ -5,6 +5,9 @@
 * Update - woocommerce tested up to 5.4.1
 * Update - status header updates to improve compatibility
 
+2021-06-09 - version 1.3.59
+* Update - prevent completed orders being set back to processing
+
 2021-06-09 - version 1.3.58
 * Update - prevent completed orders being set back to processing
 
