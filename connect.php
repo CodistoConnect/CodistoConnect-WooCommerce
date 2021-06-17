@@ -5,23 +5,23 @@
  * Description: Sell multichannel on Google, Amazon, eBay & Walmart direct from WooCommerce. Create listings & sync products, inventory & orders directly from WooCommerce
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.58
+ * Version: 1.3.60
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
- * WC tested up to: 4.9.1
+ * WC tested up to: 5.4.1
  * License: GPLv2
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.58
+ * @version 1.3.60
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.58' );
+define( 'CODISTOCONNECT_VERSION', '1.3.60' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -162,7 +162,8 @@ final class CodistoConnect {
 			$_SERVER['REQUEST_URI'] = '/wp-admin'.$_SERVER['REQUEST_URI'];
 		}
 
-		status_header( $status );
+		$statusheader = preg_split('/ /', $status, 2);
+		status_header( intval($statusheader[0]), is_set($statusheader[1]) ? $statusheader[1] : '' );
 		foreach ( $headers as $header => $value ) {
 			header( $header.': '.$value );
 		}
