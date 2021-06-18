@@ -1,5 +1,8 @@
 *** WooCommerce Google, Amazon & eBay Integration - Channel Cloud by Codisto ***
 
+2021-06-19 - version 1.3.61
+* Fix - check for presence of status description
+
 2021-06-16 - version 1.3.60
 * Update - Wordpress tested up to 5.7.2
 * Update - woocommerce tested up to 5.4.1
