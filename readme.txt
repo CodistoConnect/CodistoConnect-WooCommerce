@@ -244,6 +244,8 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 = 1.3.62 - 03/08/2021
 * Update - Support for Advanced Shipment Tracking Pro
+* Update - WooCommerce tested up to 5.4.1
+* Update - WordPress tested up to 5.8
 
 = 1.3.61 - 18/06/2021 =
 * Fix - check for presence of status description
