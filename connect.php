@@ -5,7 +5,7 @@
  * Description: Sell multichannel on Google, Amazon, eBay & Walmart direct from WooCommerce. Create listings & sync products, inventory & orders directly from WooCommerce
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.61
+ * Version: 1.3.62
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
@@ -14,14 +14,14 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.61
+ * @version 1.3.62
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.61' );
+define( 'CODISTOCONNECT_VERSION', '1.3.62' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -1010,7 +1010,7 @@ final class CodistoConnect {
 
 						}
 
-					} elseif ($tracking_items && class_exists('WC_Advanced_Shipment_Tracking_Actions')) {
+					} elseif ($tracking_items && (class_exists('WC_Advanced_Shipment_Tracking_Actions') || class_exists('AST_Pro_Actions'))) {
 
 						if ( $tracking_item['date_shipped'] ) {
 							$order->ship_date = date('Y-m-d H:i:s', $tracking_item['date_shipped']);
