@@ -2,7 +2,7 @@
 Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
-Tested up to: 5.7.2
+Tested up to: 5.8
 Stable tag: 1.3.62
 Requires PHP: 5.6
 License: GPLv2

@@ -9,7 +9,7 @@
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
- * WC tested up to: 5.4.1
+ * WC tested up to: 5.5.2
  * License: GPLv2
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
