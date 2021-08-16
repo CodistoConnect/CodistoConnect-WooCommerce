@@ -5,7 +5,7 @@
  * Description: Sell multichannel on Google, Amazon, eBay & Walmart direct from WooCommerce. Create listings & sync products, inventory & orders directly from WooCommerce
  * Author: Codisto
  * Author URI: https://codisto.com/
- * Version: 1.3.62
+ * Version: 1.3.63
  * Text Domain: codisto-linq
  * Woo: 3545890:ba4772797f6c2c68c5b8e0b1c7f0c4e2
  * WC requires at least: 2.0.0
@@ -14,14 +14,14 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Codisto LINQ by Codisto
- * @version 1.3.62
+ * @version 1.3.63
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CODISTOCONNECT_VERSION', '1.3.62' );
+define( 'CODISTOCONNECT_VERSION', '1.3.63' );
 define( 'CODISTOCONNECT_RESELLERKEY', '' );
 
 if ( ! class_exists( 'CodistoConnect' ) ) :
@@ -458,6 +458,7 @@ final class CodistoConnect {
 					$product->name = html_entity_decode( apply_filters( 'woocommerce_product_title', $wc_product->post->post_title, $wc_product ), ENT_COMPAT | ENT_HTML401, 'UTF-8' );
 					$product->enabled = $wc_product->is_purchasable() && ( $wc_product->managing_stock() || $wc_product->is_in_stock() );
 					$product->price = $wc_product->get_price_excluding_tax();
+					$product->url = $wc_product->get_permalink();
 					$product->listprice = floatval( $wc_product->get_regular_price() );
 					$product->is_taxable = $wc_product->is_taxable();
 					$product->tax_class = $wc_product->get_tax_class();
@@ -523,6 +524,7 @@ final class CodistoConnect {
 												'sku' => $child_product->get_sku(),
 												'enabled' => $wc_product->is_purchasable() && ( $wc_product->managing_stock() || $wc_product->is_in_stock() ),
 												'price' => $child_product->get_price_excluding_tax(),
+												'url'   => $child_product->get_permalink(),
 												'listprice' => $child_product->get_regular_price(),
 												'is_taxable' => $child_product->is_taxable(),
 												'tax_class' => $child_product->get_tax_class(),
