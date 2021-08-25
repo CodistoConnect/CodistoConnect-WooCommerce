@@ -242,7 +242,11 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 == Changelog ==
 
-= 1.3.62 - 03/08/2021
+= 1.3.63 - 26/08/2021 =
+* Fix - stop errors when creating orders in some scenarios
+* Update - WooCommerce tested up to 5.6.0
+
+= 1.3.62 - 03/08/2021 =
 * Update - Support for Advanced Shipment Tracking Pro
 * Update - WooCommerce tested up to 5.4.1
 * Update - WordPress tested up to 5.8
