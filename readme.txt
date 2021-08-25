@@ -3,7 +3,7 @@ Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
 Tested up to: 5.8
-Stable tag: 1.3.62
+Stable tag: 1.3.63
 Requires PHP: 5.6
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
@@ -242,7 +242,11 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 
 == Changelog ==
 
-= 1.3.62 - 03/08/2021
+= 1.3.63 - 26/08/2021 =
+* Fix - stop errors when creating orders in some scenarios
+* Update - WooCommerce tested up to 5.6.0
+
+= 1.3.62 - 03/08/2021 =
 * Update - Support for Advanced Shipment Tracking Pro
 * Update - WooCommerce tested up to 5.4.1
 * Update - WordPress tested up to 5.8
