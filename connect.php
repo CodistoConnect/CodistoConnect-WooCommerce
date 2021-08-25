@@ -1663,7 +1663,7 @@ final class CodistoConnect {
 						update_post_meta( $order_id, '_customer_ip_address', '-' );
 						delete_post_meta( $order_id, '_prices_include_tax' );
 
-						do_action( 'woocommerce_new_order', $order_id );
+						do_action( 'woocommerce_new_order', $order_id, $order );
 
 						foreach ( $ordercontent->orderlines->orderline as $orderline ) {
 							if ( $orderline->productcode[0] != 'FREIGHT' ) {
