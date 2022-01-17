@@ -2648,8 +2648,7 @@ final class CodistoConnect {
 		$filename = wp_unslash( $_POST['file'] );
 		$content = wp_unslash( $_POST['newcontent'] );
 
-		$filename = preg_replace('/[^A-Za-z0-9\-]/', '', $filename);
-		$filename = preg_replace('/\s+/', '', $filename); 
+		$filename = preg_replace('/[^A-Za-z0-9\-\s+_]/', '', $filename);
 
 		$file = WP_CONTENT_DIR . '/ebay/' . $filename;
 
