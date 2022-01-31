@@ -2646,9 +2646,9 @@ final class CodistoConnect {
 		check_admin_referer( 'edit-ebay-template' );
 
 		$filename = wp_unslash( $_POST['file'] );
-		$content = wp_unslash( $_POST['newcontent'] );
+		$filename = preg_replace('/[^ -~]+|[\\/:"*?<>|]+/', '', $filename);
 
-		$filename = preg_replace('/[^A-Za-z0-9\-\s+_]/', '', $filename);
+		$content = wp_unslash( $_POST['newcontent'] );
 
 		$file = WP_CONTENT_DIR . '/ebay/' . $filename;
 
