@@ -2,8 +2,8 @@
 Contributors: codisto
 Tags: ecommerce, e-commerce, woocommerce, ebay, amazon, paypal, integration, multi-channel, listings, store, sales, sell, shop
 Requires at least: 4.0
-Tested up to: 5.8
-Stable tag: 1.3.63
+Tested up to: 5.9
+Stable tag: 1.3.64
 Requires PHP: 5.6
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
@@ -241,6 +241,10 @@ Yes, there are! Please check out our growing knowledgebase at <http://help.codis
 5. Fulfill your Google, Amazon and eBay orders directly from WooCommerce
 
 == Changelog ==
+
+= 1.3.64 - 31/01/2022 =
+* Fix - filter template file names
+* Update - WordPress tested up to 5.9
 
 = 1.3.63 - 26/08/2021 =
 * Fix - stop errors when creating orders in some scenarios

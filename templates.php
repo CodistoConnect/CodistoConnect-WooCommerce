@@ -11,6 +11,7 @@ if ( !current_user_can('edit_themes') ) {
 if ( isset( $_GET['file'] ) ) {
 
 	$filename = wp_unslash( $_GET['file'] );
+	$filename = preg_replace('/[^ -~]+|[\\/:"*?<>|]+/', '', $filename);
 
 } else {
 
