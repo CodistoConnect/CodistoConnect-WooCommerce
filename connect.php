@@ -416,7 +416,7 @@ final class CodistoConnect {
 						$product_ids = array( $product_ids );
 					}
 
-					$product_ids = array_filter( $product_ids, create_function( '$v', 'return is_numeric($v);' ) );
+					$product_ids = array_filter( $product_ids, "is_numeric");
 
 					if ( ! isset( $_GET['count'] ) ) {
 						$count = count( $product_ids );
