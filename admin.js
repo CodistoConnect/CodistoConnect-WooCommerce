@@ -117,6 +117,24 @@
 
 		}
 
+		function setFrameLeft() {
+
+			const adminMenu = document.querySelector("#adminmenuwrap");
+			if(adminMenu) {
+				const adminMenuWidth = parseInt(adminMenu.clientWidth, 10);
+				if(adminMenuWidth) {
+					document.querySelector(".codisto #wpbody").style.setProperty("left", adminMenuWidth + "px", "important");
+				}
+			}
+
+		}
+
+		setFrameLeft();
+
+		document.getElementById("collapse-menu").addEventListener("click", function(e) {
+			setFrameLeft();
+		});
+
 	});
 
 })();
