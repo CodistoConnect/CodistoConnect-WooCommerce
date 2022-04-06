@@ -1931,7 +1931,7 @@ final class CodistoConnect {
 
 					$wpdb->query( 'COMMIT' );
 
-					$response = array( 'ack' => 'ok', 'orderid' => $order_id );
+					$response = array( 'ack' => 'ok', 'orderid' => $order->get_order_number() );
 
 					$this->sendHttpHeaders(
 						'200 OK',
